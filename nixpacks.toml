@@ -6,8 +6,3 @@ cmds = ["composer install --no-interaction --prefer-dist --optimize-autoloader"]
 
 [phases.build]
 cmds = ["npm install", "npm run build"]
-
-[phases.start]
-cmd = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache"
-# Nixpacks will automatically start httpd/php-fpm if we don't override the start command with a long-running process,
-# or we can let it handle the server and just run our migrations/cache in the start phase.
