@@ -14,7 +14,7 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::where('is_admin', false);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {

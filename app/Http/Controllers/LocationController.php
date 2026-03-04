@@ -27,7 +27,10 @@ class LocationController extends Controller
 
     public function index()
     {
-        $locations = EmployeeLocation::with('user')
+        $locations = EmployeeLocation::whereHas('user', function($q) {
+                $q->where('is_admin', false);
+            })
+            ->with('user')
             ->select('employee_locations.id', 'employee_locations.user_id', 'employee_locations.employee_id_no', 'employee_locations.address', 'employee_locations.latitude', 'employee_locations.longitude', 'employee_locations.mobile_no', 'employee_locations.office', 'employee_locations.employee_type', 'employee_locations.recorded_at')
             ->join(
                 \DB::raw('(select max(id) as max_id from employee_locations group by user_id) as latest'),
