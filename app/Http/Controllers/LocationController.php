@@ -28,12 +28,11 @@ class LocationController extends Controller
     public function index()
     {
         $locations = EmployeeLocation::with('user')
-            ->select('id', 'user_id', 'employee_id_no', 'address', 'latitude', 'longitude', 'mobile_no', 'office', 'employee_type', 'recorded_at')
-            ->whereIn('id', function($query) {
-                $query->selectRaw('max(id)')
-                    ->from('employee_locations')
-                    ->groupBy('user_id');
-            })
+            ->select('employee_locations.id', 'employee_locations.user_id', 'employee_locations.employee_id_no', 'employee_locations.address', 'employee_locations.latitude', 'employee_locations.longitude', 'employee_locations.mobile_no', 'employee_locations.office', 'employee_locations.employee_type', 'employee_locations.recorded_at')
+            ->join(
+                \DB::raw('(select max(id) as max_id from employee_locations group by user_id) as latest'),
+                'employee_locations.id', '=', 'latest.max_id'
+            )
             ->get();
 
         return response()->json($locations);

@@ -126,15 +126,15 @@ class AdminController extends Controller
             ->count();
         
         // Get latest location for each non-admin user
+        // Using a more efficient join-based approach for "latest per group"
         $latestLocations = EmployeeLocation::whereHas('user', function($q) {
                 $q->where('is_admin', false);
             })
             ->with('user')
-            ->whereIn('id', function($query) {
-                $query->selectRaw('max(id)')
-                    ->from('employee_locations')
-                    ->groupBy('user_id');
-            })
+            ->join(
+                \DB::raw('(select max(id) as max_id from employee_locations group by user_id) as latest'),
+                'employee_locations.id', '=', 'latest.max_id'
+            )
             ->get();
 
         $offices = $latestLocations->pluck('office')->unique()->filter()->values();
