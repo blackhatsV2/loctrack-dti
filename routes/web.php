@@ -12,6 +12,9 @@ Route::get('/', function () {
 // Employee routes (authenticated)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user()->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
         return view('dashboard');
     })->name('dashboard');
 
