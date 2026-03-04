@@ -47,8 +47,22 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Enable Apache mod_rewrite and mod_deflate
+RUN a2enmod rewrite deflate
+
+# Add Gzip configuration
+RUN echo '<IfModule mod_deflate.c>\n\
+    AddOutputFilterByType DEFLATE text/plain\n\
+    AddOutputFilterByType DEFLATE text/html\n\
+    AddOutputFilterByType DEFLATE text/xml\n\
+    AddOutputFilterByType DEFLATE text/css\n\
+    AddOutputFilterByType DEFLATE application/xml\n\
+    AddOutputFilterByType DEFLATE application/xhtml+xml\n\
+    AddOutputFilterByType DEFLATE application/rss+xml\n\
+    AddOutputFilterByType DEFLATE application/javascript\n\
+    AddOutputFilterByType DEFLATE application/x-javascript\n\
+    AddOutputFilterByType DEFLATE application/json\n\
+</IfModule>' >> /etc/apache2/apache2.conf
 
 # Build assets
 RUN npm install && npm run build
