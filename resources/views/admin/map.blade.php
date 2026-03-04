@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
     .map-wrapper {
         display: flex;
@@ -129,21 +129,25 @@
                 <button onclick="toggleAll(true)">Show All</button>
             </div>
         </div>
-        <div id="map"></div>
+        <div id="map" style="height: 600px; width: 100%; min-height: 600px;"></div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        if (typeof L === 'undefined') {
+            console.error('Leaflet failed to load from CDN');
+            document.getElementById('map').innerHTML = '<div style="color:white;padding:20px;">Error: Leaflet library failed to load. Please check your internet connection.</div>';
+            return;
+        }
         const map = L.map('map', { preferCanvas: true }).setView([10.69, 122.52], 8);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
         }).addTo(map);
 
         const categories = [
@@ -326,11 +330,12 @@
             .then(r => r.json())
             .then(data => {
                 document.getElementById('total-count').textContent = data.length;
+                const markerLayer = L.layerGroup().addTo(map);
                 data.forEach(loc => {
                     const catKey = getCategory(loc);
                     const marker = L.marker([parseFloat(loc.latitude), parseFloat(loc.longitude)], { icon: getIcon(catKey) });
                     marker.bindPopup(buildPopup(loc), { maxWidth: 300 });
-                    marker.addTo(map);
+                    markerLayer.addLayer(marker);
                     allMarkers.push({ marker, catKey, data: loc });
                 });
                 buildSidebar();
