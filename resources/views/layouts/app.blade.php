@@ -12,7 +12,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
             --primary: #6366f1;
@@ -397,7 +400,10 @@
     </div>
     <nav>
         <a href="{{ url('/') }}" class="logo-container">
-            <img src="{{ asset('dti-logo.png') }}" alt="DTI Logo" class="logo-img" width="40" height="40" decoding="async">
+            <picture>
+                <source srcset="{{ asset('dti-logo.webp') }}" type="image/webp">
+                <img src="{{ asset('dti-logo.png') }}" alt="DTI Logo" class="logo-img" width="40" height="40" decoding="async">
+            </picture>
             <span class="logo-text">LocTrack Pro</span>
         </a>
         <button class="nav-hamburger" onclick="document.getElementById('nav-links').classList.toggle('mobile-open')" aria-label="Toggle navigation">☰</button>

@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@vite(['resources/js/map-bundle.js'])
 <style>
     .stat-card {
         cursor: pointer;
@@ -252,7 +251,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
         const hideLoading = () => {
             document.getElementById('office-chart-loading')?.classList.add('hidden');

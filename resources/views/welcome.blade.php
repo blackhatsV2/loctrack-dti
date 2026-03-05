@@ -3,7 +3,10 @@
 @section('content')
 <div class="animate-fade-in text-center" style="max-width: 800px; margin: 0 auto;">
     <div style="margin-bottom: 2rem;">
-        <img src="{{ asset('dti-logo.png') }}" alt="DTI Logo" style="height: 100px; width: auto;">
+        <picture>
+            <source srcset="{{ asset('dti-logo.webp') }}" type="image/webp">
+            <img src="{{ asset('dti-logo.png') }}" alt="DTI Logo" style="height: 100px; width: auto;" decoding="async">
+        </picture>
     </div>
     <h1 class="hero-title" style="font-size: 3.5rem; margin-bottom: 1.5rem; font-weight: 600; line-height: 1.1;">
         Track Your Team in <br>
@@ -20,7 +23,10 @@
 
     <div style="margin-top: 6rem; position: relative;">
         <div style="background: var(--glass); padding: 1rem; border-radius: 2rem; border: 1px solid var(--glass-border); opacity: 0.5;">
-            <img src="{{ asset('images/world_map_preview.png') }}" alt="Map Preview" style="width: 100%; height: 300px; object-fit: cover; border-radius: 1.5rem; display: block;" loading="lazy" decoding="async">
+            <picture>
+                <source srcset="{{ asset('images/world_map_preview.webp') }}" type="image/webp">
+                <img src="{{ asset('images/world_map_preview.png') }}" alt="Map Preview" style="width: 100%; height: 300px; object-fit: cover; border-radius: 1.5rem; display: block;" loading="lazy" decoding="async">
+            </picture>
         </div>
     </div>
 </div>
