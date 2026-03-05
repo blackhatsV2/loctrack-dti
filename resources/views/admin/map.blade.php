@@ -285,22 +285,16 @@
 
         function buildPopup(loc) {
             const name = loc.user?.name || 'Unknown';
-            const isMasterAdmin = loc.user?.is_admin;
-            const isKmlAdmin = loc.user?.name === 'Admin' && !isMasterAdmin;
             const idNo = loc.employee_id_no || 'N/A';
             const empType = loc.employee_type || '';
             const office = loc.office || 'Unassigned';
             const address = loc.address || '—';
             const mobile = loc.mobile_no || '—';
             const color = getCatColor(getCategory(loc));
-            
-            let labelHtml = '';
-            if (isKmlAdmin) labelHtml = '<span class="nav-badge" style="background:rgba(99,102,241,0.2);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);position:static;font-size:0.6rem;">KML Entry</span>';
-            else if (isMasterAdmin) labelHtml = '<span class="nav-badge" style="background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);position:static;font-size:0.6rem;">Master Admin</span>';
 
             return `
                 <div class="popup-card">
-                    <div class="popup-name">${name} ${labelHtml}</div>
+                    <div class="popup-name">${name}</div>
                     <div class="popup-id">ID: ${idNo}${empType ? ' • ' + empType : ''}</div>
                     <hr class="popup-divider">
                     <div class="popup-row"><span class="popup-label">Type</span><span class="popup-value"><span class="popup-office-badge" style="background:${color}22;color:${color};border:1px solid ${color}44;">${empType}</span></span></div>

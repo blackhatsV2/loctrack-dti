@@ -14,7 +14,10 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::where('is_admin', false);
+        // Only show non-admin users (KML entries only)
+        $adminEmail = 'admin@dti6.gov.ph';
+        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+        $query = User::whereNotIn('id', $adminIds)->where('is_admin', false);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -32,12 +35,12 @@ class AdminController extends Controller
         $employees = $query->with(['locations' => function ($q) {
             $q->latest('id')->limit(1);
         }])
-        ->orderByRaw('id = ? DESC', [auth()->id()])
         ->orderBy('name')
         ->paginate(20);
 
-        // Get unique offices for filter dropdown
-        $offices = EmployeeLocation::select('office')
+        // Get unique offices for filter dropdown (only from non-admin users' locations)
+        $offices = EmployeeLocation::whereNotIn('user_id', $adminIds)
+            ->select('office')
             ->distinct()
             ->whereNotNull('office')
             ->orderBy('office')
@@ -113,36 +116,33 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $totalEmployees = User::where('is_admin', false)->count();
-        \Log::info("Dashboard: Total Employees count in DB: " . $totalEmployees);
+        // Define admin email to exclude
+        $adminEmail = 'admin@dti6.gov.ph';
+        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+
+        // Total employees count should be all non-admin users (all KML entries)
+        $totalEmployees = User::whereNotIn('id', $adminIds)->count();
+        \Log::info("Dashboard: Total non-admin users count: " . $totalEmployees);
         
-        $totalLocations = EmployeeLocation::whereHas('user', function($q) {
-                $q->where('is_admin', false);
-            })
-            ->distinct('user_id')
-            ->count();
-        $recentUpdatesCount = EmployeeLocation::whereHas('user', function($q) {
-                $q->where('is_admin', false);
-            })
+        $totalLocations = $totalEmployees; // One location per KML entry
+        $recentUpdatesCount = EmployeeLocation::whereNotIn('user_id', $adminIds)
             ->where('recorded_at', '>=', now()->subDay())
             ->count();
-        
+
         // Get latest location for each non-admin user
-        // Using a more efficient join-based approach for "latest per group"
-        $latestLocations = EmployeeLocation::whereHas('user', function($q) {
-                $q->where('is_admin', false);
-            })
+        $latestLocationIds = EmployeeLocation::whereNotIn('user_id', $adminIds)
+            ->selectRaw('MAX(id) as max_id')
+            ->groupBy('user_id')
+            ->pluck('max_id');
+
+        $latestLocations = EmployeeLocation::whereIn('id', $latestLocationIds)
             ->with('user')
-            ->join(
-                \DB::raw('(select max(id) as max_id from employee_locations group by user_id) as latest'),
-                'employee_locations.id', '=', 'latest.max_id'
-            )
             ->get();
 
         $offices = $latestLocations->pluck('office')->unique()->filter()->values();
         $totalOffices = $offices->count();
 
-        // Data for Office Distribution Chart (Non-Admins only)
+        // Data for Office Distribution Chart (KML entries only)
         $officeDistribution = $latestLocations->groupBy('office')
             ->map(function($group) {
                 return $group->count();
@@ -151,7 +151,7 @@ class AdminController extends Controller
                 return !empty($office);
             });
 
-        // Data for Employee Type Distribution Chart (Non-Admins only)
+        // Data for Employee Type Distribution Chart (KML entries only)
         $typeDistribution = $latestLocations->groupBy('employee_type')
             ->map(function($group) {
                 return $group->count();
@@ -160,13 +160,11 @@ class AdminController extends Controller
                 return !empty($type);
             });
 
-        // Get recent location records for non-admins
-        $recentLocations = EmployeeLocation::whereHas('user', function($q) {
-                $q->where('is_admin', false);
-            })
+        // Get all location records for non-admins (for location records table)
+        $recentLocations = EmployeeLocation::whereNotIn('user_id', $adminIds)
             ->with('user')
             ->latest('id')
-            ->limit(100)
+            ->limit(300)
             ->get();
 
         return view('admin.dashboard', compact(

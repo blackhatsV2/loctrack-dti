@@ -201,12 +201,6 @@
                         <tr class="search-row">
                             <td class="searchable">
                                 {{ $loc->user->name }}
-                                @if($loc->user->name === 'Admin' && !$loc->user->is_admin)
-                                    <span style="font-size: 0.75rem; background: rgba(99, 102, 241, 0.2); color: #818cf8; padding: 0.2rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem; font-weight: 500;">KML Entry</span>
-                                @endif
-                                @if($loc->user->is_admin)
-                                    <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem; font-weight: 500;">Master Admin</span>
-                                @endif
                             </td>
                             <td class="searchable" style="max-width: 300px;">{{ $loc->address }}</td>
                             <td class="searchable">{{ $loc->office ?? 'N/A' }}</td>
