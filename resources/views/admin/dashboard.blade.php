@@ -261,9 +261,17 @@
         // Standard timeout fallback
         const safetyTimeout = setTimeout(hideLoading, 5000); 
 
-        try {
-            const officeData = @json($officeDistribution);
-            const typeData = @json($typeDistribution);
+        // Ensure Chart.js is loaded
+        function initCharts() {
+            if (typeof Chart === 'undefined') {
+                console.log('Chart.js not ready, retrying...');
+                setTimeout(initCharts, 100);
+                return;
+            }
+
+            try {
+                const officeData = @json($officeDistribution);
+                const typeData = @json($typeDistribution);
 
             console.log('Office Distribution Data:', officeData);
             console.log('Type Distribution Data:', typeData);
@@ -378,6 +386,10 @@
             console.error('Chart initialization failed:', e);
             hideLoading();
         }
+    }
+
+    // Call init on DOM load
+    document.addEventListener('DOMContentLoaded', initCharts);
 
     function toggleDashboardSection(sectionId) {
         const sections = ['locations', 'offices'];

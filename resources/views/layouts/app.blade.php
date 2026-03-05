@@ -56,7 +56,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Keep it in row even if it's tight */
         }
 
         .nav-hamburger {
@@ -81,11 +81,15 @@
             align-items: center;
             gap: 1rem;
             text-decoration: none;
+            flex-shrink: 0;
+            margin-right: auto; /* Push links to the right */
         }
         
         .logo-img {
-            height: 40px;
+            height: 48px; /* Slightly larger for better visibility */
             width: auto;
+            object-fit: contain;
+            display: block;
         }
 
         .logo-text {
@@ -95,6 +99,7 @@
             background: linear-gradient(to right, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            white-space: nowrap;
         }
 
         .nav-links {
@@ -377,14 +382,20 @@
         #global-loader {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
             z-index: 9999;
-            display: none;
+            display: flex; /* Show by default on load */
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
+            transition: opacity 0.4s ease;
+        }
+        
+        #global-loader.fade-out {
+            opacity: 0;
+            pointer-events: none;
         }
 
         @keyframes spin {
@@ -478,6 +489,17 @@
         </div>
     </main>
     <script>
+        // Global loading feedback
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 400);
+            }
+        });
+
         function toggleProfileModal() {
             const modal = document.getElementById('profile-modal');
             if (modal) {
@@ -494,23 +516,55 @@
             });
         }
 
-        // Global loading feedback for links and forms
-        document.addEventListener('submit', function(e) {
+        // Show loader on navigation and form submissions
+        function showGlobalLoader() {
             const loader = document.getElementById('global-loader');
-            if (loader) loader.style.display = 'flex';
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.style.opacity = '1';
+                loader.classList.remove('fade-out');
+            }
+        }
+
+        document.addEventListener('submit', function(e) {
+            // Don't show for AJAX or specific small forms if needed
+            showGlobalLoader();
         });
 
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href && !href.startsWith('#') && !href.startsWith('javascript') && !this.hasAttribute('onclick') && this.target !== '_blank') {
-                    // Only show for main navigation links/buttons that might be slow
-                    if (this.classList.contains('btn') || this.parentElement.classList.contains('nav-links') || this.classList.contains('stat-card')) {
-                        const loader = document.getElementById('global-loader');
-                        if (loader) loader.style.display = 'flex';
-                    }
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link) {
+                const href = link.getAttribute('href');
+                const target = link.getAttribute('target');
+                
+                // Conditions for showing redirect loader:
+                // 1. Has href
+                // 2. Not a hash link
+                // 3. Not a javascript: link
+                // 4. Not opening in new tab
+                // 5. Not a download link
+                if (href && 
+                    !href.startsWith('#') && 
+                    !href.startsWith('javascript:') && 
+                    target !== '_blank' && 
+                    !link.hasAttribute('download') &&
+                    !link.classList.contains('no-loader')) {
+                    
+                    // Small delay to prevent flashing on very fast links
+                    // but most page navigations are slow enough where this is appreciated
+                    setTimeout(showGlobalLoader, 50);
                 }
-            });
+            }
+        });
+
+        // Handle browser back button (hide loader if it was showing)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const loader = document.getElementById('global-loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+            }
         });
     </script>
     @yield('scripts')
