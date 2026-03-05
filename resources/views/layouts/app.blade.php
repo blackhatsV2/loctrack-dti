@@ -393,7 +393,7 @@
 <body>
     <div id="global-loader">
         <div class="spinner" style="width: 48px; height: 48px; border-width: 4px;"></div>
-        <div class="spinner-text" style="color: white; font-weight: 500;">Redirecting...</div>
+        <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
     </div>
     <nav>
         <a href="{{ url('/') }}" class="logo-container">
