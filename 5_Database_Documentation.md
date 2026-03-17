@@ -1,54 +1,53 @@
-# Database Documentation
+[← Back to README](README.md) | [← Previous: System Architecture](4_System_Architecture.md) | [Next: Deployment Guide →](6_Deployment_Guide.md)
+
+# Database Documentation: Loctrack DTI
 
 This document provides a detailed description of the physical database schema for the Employee Location Tracking System.
 
 ## Schema Overview
-The system uses a relational schema designed to store user information and their associated periodic location updates.
+The system uses a relational schema designed to store user authentication data and associated periodic location telemetry.
 
 ---
 
 ## 1. `users` Table
-Stores basic profile and authentication data for all users.
+Stores profile and login data for all staff and administrators.
 
 | Column | Type | Nullable | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | bigint | No | Primary Key |
-| `name` | string | No | Full name of the user |
+| `name` | string | No | User's full name |
 | `email` | string | No | Primary login identifier (Unique) |
-| `email_verified_at` | timestamp | Yes | Verification check |
-| `password` | string | No | Hashed password |
+| `password` | string | No | Hashed credential storage |
 | `is_admin` | boolean | No | Role identifier (True = Admin, False = Employee) |
-| `remember_token` | string | Yes | Persistence session token |
-| `created_at` | timestamp | Yes | Record creation time |
-| `updated_at` | timestamp | Yes | Record update time |
+| `email_verified_at` | timestamp | Yes | Verification timestamp |
+| `remember_token` | string | Yes | persistent session token |
 
 ---
 
 ## 2. `employee_locations` Table
-The core table storing tracking data.
+The core repository for geographical tracking data.
 
 | Column | Type | Nullable | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | bigint | No | Primary Key |
-| `user_id` | foreignId | No | Link to `users.id` (onDelete: cascade) |
-| `employee_id_no` | string | Yes | Unique corporate employee identifier |
-| `address` | string | Yes | Last known physical address |
+| `user_id` | foreignId | No | Reference to `users.id` (onDelete: cascade) |
 | `latitude` | decimal (10,8) | No | GPS Latitude |
 | `longitude` | decimal (11,8) | No | GPS Longitude |
-| `mobile_no` | string | Yes | Contact number |
-| `office` | string | Yes | Assigned branch or office location |
-| `employee_type` | string | Yes | Status (e.g., Permanent, Probation) |
-| `recorded_at` | timestamp | No | Exact time location was reported |
-| `created_at` | timestamp | Yes | Database entry time |
-| `updated_at` | timestamp | Yes | Record modification time |
+| `recorded_at` | timestamp | No | Exact time of location capture |
+| `address` | string | Yes | Reverse-geocoded physical location |
+| `employee_id_no` | string | Yes | Corporate employee identifier |
+| `mobile_no` | string | Yes | Primary contact number |
+| `office` | string | Yes | Assigned office or department |
+| `employee_type` | string | Yes | Employment status (e.g., Regular, Contract) |
 
 ---
 
-## 3. Supplementary Tables
-*   **`cache`**: Standard Laravel cache storage for performance optimization.
-*   **`jobs`**: Table for queuing background tasks (if implemented).
-*   **`migrations`**: Internal Laravel table for tracking schema versions.
+## 3. Infrastructure Tables
+*   **`cache`**: Standard Laravel cache storage.
+*   **`jobs`**: Table for processing background tasks.
+*   **`migrations`**: Internal version control for the database schema.
 
-## Indexes
-- **`employee_locations_user_id_foreign`**: Speeds up lookups for a specific user's history.
-- **`employee_locations_recorded_at_index`**: (Created via migration `add_indexes_to_employee_locations_table`) Optimizes time-series queries for dashboards and reports.
+## Key Performance Indexes
+- **`user_history_idx`**: (on `user_id`) Speeds up individual historical queries.
+- **`time_series_idx`**: (on `recorded_at`) Optimizes dashboard activity feeds and time-range reports.
+

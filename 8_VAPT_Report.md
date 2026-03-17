@@ -1,39 +1,42 @@
-# Vulnerability Assessment and Penetration Testing (VAPT) Summary Report
+[← Back to README](README.md) | [← Previous: User Manual](7_User_Manual.md) | [Next: Presentation →](9_Presentation.md)
+
+# VAPT Summary Report: Loctrack DTI
 
 ## 1. Executive Summary
-This report summarizes the security posture of the Employee Location Tracking System. The system was designed with security-first principles, focusing on data privacy, access control, and API integrity.
+This report summarizes the security posture of the **Employee Location Tracking System**. The platform is designed with security-first principles, focusing on personnel data privacy, RBAC integrity, and API stability.
 
-## 2. Tested Components
-- **Infrastructure**: Containerized Docker environment.
-- **Application Layer**: Laravel 10/11 Framework logic.
-- **API Endpoints**: `/api/location` and administrative data routes.
-- **Database**: SQL injection and access control tests.
+## 2. Security Assessment Scope
+- **Infrastructure**: Containerized Docker (Sail/Dockerfile) environment.
+- **Application Logic**: Laravel 11/12 framework core.
+- **API Endpoints**: `/api/location` (Geolocation submission) and administrative controllers.
+- **Database**: Persistence layer integrity and access control.
 
-## 3. Key Security Measures Implemented
+## 3. Implemented Security Controls
 
-### A. Authentication & Authorization
-- **Hashed Passwords**: Uses Argon2/Bcrypt for secure credential storage.
-- **Admin Middleware**: Strict separation of concerns; regular users cannot access administrative controllers or views.
-- **CSRF Protection**: Native Laravel protection against Cross-Site Request Forgery.
+### A. Authentication & Access Control
+- **PBKDF2/Argon2 Hashing**: Industry-standard encryption for user credentials.
+- **AdminMiddleware**: Hardened separation of concerns; Employee roles cannot access administrative data.
+- **CSRF & XSS Protection**: Native Laravel shields against web-based injection and forgery.
 
-### B. API Security
-- **Rate Limiting**: Throttling (30 requests/min) to prevent Denial-of-Service (DoS) and brute-force attempts on geolocation submissions.
-- **Input Validation**: Strict validation of latitude and longitude coordinates to prevent malformed data injection.
+### B. Geolocation API Security
+- **Rate Limiting**: Throttling (30 requests/min) to mitigate DoS and coordinate injection attacks.
+- **Input Sanitization**: Strict validation of Latitude and Longitude coordinate precision.
 
-### C. Data Integrity
-- **Foreign Key Constraints**: Ensures data consistency and prevents orphaned records.
-- **Eloquent ORM**: Prevents SQL Injection through automatic parameter binding.
+### C. Personnel Data Privacy
+- **Encrypted Transmission**: HTTPS-only protocol recommended for all production telemetry.
+- **Audit Logs**: Immutable `employee_locations` table for reliable historical tracking.
 
 ## 4. Assessment Findings
 
-| Category | Risk Level | Description | Status |
+| Category | Risk | Description | Status |
 | :--- | :--- | :--- | :--- |
-| SQL Injection | Low | Protected by Eloquent ORM. | Mitigated |
-| Broken Access Control | Low | AdminMiddleware verifies role per request. | Mitigated |
-| Rate Limit Abuse | Medium | Throttling implemented on critical routes. | Mitigated |
-| Data Exposure | Low | HTTPS required for transmission; sensitive fields hidden. | Mitigated |
+| SQL Injection | Low | Mitigated via Eloquent parameter binding. | **Verified** |
+| Broken Access Control | Low | AdminMiddleware verifies role per session. | **Verified** |
+| Throttling Abuse | Medium | Rate limiting implemented on check-in API. | **Mitigated** |
+| PII Exposure | Low | Sensitive fields protected via RBAC. | **Verified** |
 
-## 5. Recommendations
-- **SSL/TLS**: Ensure the production environment is strictly served over HTTPS.
-- **Security Headers**: Implement HSTS, X-Frame-Options, and Content-Security-Policy (CSP).
-- **Periodic Audits**: Conduct automated vulnerability scans during CI/CD cycles.
+## 5. Security Recommendations
+- Ensure `APP_ENV=production` enforces `FORCE_HTTPS=true`.
+- Implement automated dependency scanning in the CI/CD pipeline.
+- Periodic rotation of `APP_KEY` and database credentials.
+

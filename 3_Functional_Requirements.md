@@ -1,39 +1,34 @@
-# Functional Requirements
+[← Back to README](README.md) | [← Previous: Process Workflow](2_Process_Workflow.md) | [Next: System Architecture →](4_System_Architecture.md)
 
-This document specifies the core functionalities required for the Employee Location Tracking System.
+# Functional Requirements: Employee Location Tracking
+
+This document specifies the core functionalities for the Employee Location Tracking System.
 
 ## 1. Authentication & Authorization
-- **User Login**: Users must be able to securely log in with email and password.
-- **Role-Based Access**:
-    - **Employees**: Can access their own dashboard and submit location data.
-    - **Admins**: Can access the administrative dashboard, view all employee data, and manage users.
-- **Profile Updates**: Admins can update their own profile and employee profiles.
+- **Secure Login**: Users must authenticate via email and password.
+- **Role-Based Access Control (RBAC)**:
+    - **Employees**: Can submit location data and view their own limited dashboard.
+    - **Admins**: Full access to the command center, live map, and all employee track logs.
+- **Admin Management**: Capability for admins to manage user roles and profiles.
 
-## 2. Location Tracking
-- **Automated/Manual Capture**: The system must capture device GPS coordinates (Latitude/Longitude).
-- **Metadata Storage**: Every record must include:
-    - User ID
-    - Latitude (precision 10,8)
-    - Longitude (precision 11,8)
-    - Timestamp of recording
-- **Extended Information**: The system should store supplemental data:
-    - Employee ID Number
-    - Physical Address
-    - Mobile Contact Number
-    - Assigned Office/Department
-    - Employee Type (e.g., Regular, Contractual)
+## 2. Real-time Location Tracking
+- **GPS Capture**: The system handles browser-based Geolocation API coordinates.
+- **Core Tracking Data**: Every entry must include:
+    - `user_id`: Reference to the reporting staff.
+    - `latitude` / `longitude`: High-precision GPS data.
+    - `recorded_at`: The server-side or device-captured timestamp.
+- **Supplemental Meta**:
+    - `address`: Automatically reverse-geocoded physical location.
+    - `employee_id_no`, `mobile_no`, `office`, `employee_type`.
 
-## 3. Administrative Capabilities
-- **Admin Dashboard**: Centralized view of system activity and stats.
-- **Employee Directory**: A searchable and editable list of all staff members.
-- **Live/Recent Map View**: Visual representation of employee locations on a map.
-- **Location History Logs**: A comprehensive log of all location points for each employee, sorted by time.
+## 3. Administrative Terminal
+- **Live Monitoring Map**: An interactive map plotting the most recent reported locations.
+- **Employee Directory**: Searchable and editable database of all registered staff.
+- **History Audit Logs**: Access to comprehensive, time-stamped location history for each user.
+- **Data Filtering**: Ability to filter records by employee, date range, or department.
 
-## 4. Performance & Security
-- **Rate Limiting**: Throttling on location submission API to prevent abuse (e.g., max 30 requests per minute).
-- **Data Integrity**: Foreign key constraints to ensure location data is always linked to a valid user.
-- **Auditability**: Records are stored with timestamps and are immutable for auditing purposes.
+## 4. System Integrity & Security
+- **API Throttling**: Rate limiting (e.g., 30 requests/min per user) to prevent system abuse.
+- **Data Persistence**: Immutable audit logs for compliance following initial submission.
+- **Responsive Interface**: Full functionality across mobile and desktop environments.
 
-## 5. User Interface
-- **Responsive Design**: The application must be accessible on both desktop and mobile browsers.
-- **Dynamic Feedback**: Users should receive immediate success/error messages after actions.

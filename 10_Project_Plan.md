@@ -1,74 +1,59 @@
+[← Back to README](README.md) | [← Previous: Presentation](9_Presentation.md)
+
 # Master Project Plan: Employee Location Tracking System
 
-The comprehensive "Master Plan" for the Employee Location Tracking System is outlined in this document, consolidating all key project components into a unified strategic guide.
+The **Master Plan** consolidates all strategic initiatives for the Employee Location Tracking System (Loctrack DTI) into a unified development and operations guide.
 
 ---
 
-## 1. Project Overview (The "Big Picture")
-The Employee Location Tracking System is a modern Laravel-based solution designed to provide real-time visibility into field workforce locations.
-- **Primary Objective**: To ensure operational efficiency and employee safety through accurate location monitoring.
-- **Scope**: Includes automated GPS capture, administrative oversight, historical auditing, and secure data management.
-- **Core Value**: Transforms raw coordinate data into actionable insights for logistics and management.
+## 1. Strategic Project Overview
+Loctrack DTI is a modern workforce visibility solution designed to provide real-time location telemetry for field-based teams.
+- **Objective**: Maximize operational efficiency through accurate, real-time location snapshots.
+- **Value Proposition**: Replaces manual check-ins with automated, geocoded, and immutable tracking logs.
 
 ---
 
-## 2. Unified Features & Capabilities
-The system is built around three core functional modules:
+## 2. Core Functional Modules
 
-### A. Dynamic Dashboard
-- **Admin Command Center**: Real-time stats, recent activity feeds, and employee distribution overviews.
-- **Interactive Mapping**: Visual representation of staff locations using geographical plotting.
-- **Responsive Employee View**: A streamlined interface for staff to report locations from any device.
+### A. Real-time Command Center
+- **Live Fleet Map**: Visual distribution of the active workforce using Leaflet.js.
+- **Reporting Feed**: Instant visibility into the latest check-ins across the organization.
 
-### B. Reporting & PDF Engine (Strategic Module)
-- **Automated Generation**: Capability to export location history and audit logs into formal document formats.
-- **Compliance Tracking**: Ensures that location records are permanently stored and retrievable for regulatory or internal audits.
-- **Data Export**: Support for Excel and PDF formats for offline analysis and reporting.
+### B. Audit & Compliance Engine
+- **Personnel History**: Comprehensive track logs for every employee.
+- **Geocoding Service**: Automated translation of GPS coordinates into human-readable addresses.
+- **Data Integrity**: Immutable reporting logs coupled with API rate limiting.
 
-### C. Content & Management System (CMS)
-- **User Directory**: Centralized management of employee profiles, contact details, and assigned offices.
-- **Role Control**: Fine-grained access management (Admin vs. Employee permissions).
-- **System Configuration**: Tools to adjust tracking parameters, rate limits, and site settings.
+### C. Workforce CRM
+- **User Management**: Centralized directory of employees, office assignments, and contact data.
+- **Role Control**: Strict separation between Employee (Reporting) and Admin (Monitoring) roles.
 
 ---
 
-## 3. Workflow & Process
-How the tool is used daily by different stakeholders:
+## 3. Technical Roadmap
 
-### Admin Workflow
-1.  **Monitor**: Review the live map and recent activity dashboard for anomalies.
-2.  **Manage**: Update employee profiles or adjust access permissions.
-3.  **Audit**: Retrieve historical location reports for specific date ranges or staff members.
+### Phase 1: Core Deployment (Current)
+- [x] GPS Capture via browser Geolocation API.
+- [x] Admin dashboard with live activity feed.
+- [x] Responsive design for field mobile use.
+- [x] Containerized deployment (Docker/Sail).
 
-### Employee/Investor Workflow
-1.  **Report**: Log in and submit current coordinates via a secure, one-click interface.
-2.  **Verify**: Receive immediate confirmation of data submission.
-3.  **Sync**: Ensure all field activities are aligned with the central tracking system.
+### Phase 2: Enhanced Visualization
+- [ ] Sector-based heatmaps for workforce density.
+- [ ] Advanced date-range filtering for history logs.
+- [ ] Exportable PDF/Excel reports for compliance auditing.
 
----
-
-## 4. Architecture & Tech Stack
-The technical foundation that ensures scalability and performance:
-
-- **Logic Layer**: **Laravel MVC Architecture** (Models for data, Views for UI, Controllers for logic).
-- **Database**: Relational schema with optimized indexing for time-series location data.
-- **Frontend**: Clean, responsive design using **Blade** templates and modern CSS.
-- **Build & Ops**: Containerized via **Docker** and **Nixpacks** for seamless deployment on cloud platforms like Northflank.
+### Phase 3: Automation & Integration
+- [ ] **Geofencing**: Automated alerts when entering/exiting specific office zones.
+- [ ] **Mobile App**: Native iOS/Android builds for background tracking.
+- [ ] **Third-party Sync**: API integration with existing HR and Payroll systems.
 
 ---
 
-## 5. Security & Compliance (VAPT)
-The system has undergone a security check to ensure the safety of sensitive location data:
-- **Authentication**: High-security password hashing and CSRF protection.
-- **Authorization**: Strict role-based access control (RBAC) via `AdminMiddleware`.
-- **Integrity**: Input validation and rate limiting (30 req/min) to prevent API abuse.
-- **VAPT Status**: All checked categories (SQLi, CSRF, Access Control) are verified as mitigated.
+## 4. Security & VAPT Highlights
+The system implements high-security standards for PII and location data:
+- **RBAC**: AdminMiddleware ensures unauthorized users cannot access location logs.
+- **Throttling**: 30 requests per minute limit to prevent DoS on the tracking API.
+- **Encryption**: HTTPS-only transmission for all coordinate telemetry.
+- **VAPT Status**: All identified categories (SQLi, CSRF, Access Control) are verified as **Mitigated**.
 
----
-
-## 6. Strategic Roadmap (Next Steps)
-Where we are going next:
-1.  **Geofencing**: Automated alerts when employees enter/leave designated zones.
-2.  **Advanced Analytics**: Heatmaps and route optimization suggestions.
-3.  **Mobile App**: Native iOS/Android applications for even smoother background tracking.
-4.  **Integration**: API hooks for third-party logistics and CRM platforms.

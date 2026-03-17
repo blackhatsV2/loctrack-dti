@@ -1,47 +1,35 @@
-# Deployment Guide
+[← Back to README](README.md) | [← Previous: Database Documentation](5_Database_Documentation.md) | [Next: User Manual →](7_User_Manual.md)
+
+# Deployment Guide: Loctrack DTI
 
 This document provides instructions for deploying the Employee Location Tracking System.
 
 ## Prerequisites
-- **Docker**: For containerized environments.
-- **Nixpacks**: For automatic build configuration.
-- **PHP 8.2+**: If running locally without Docker.
-- **Composer**: For dependency management.
-- **Database**: PostgreSQL or MySQL instance.
+- **Local Environment**: PHP 8.2+, Composer, Node.js & NPM, MySQL.
+- **Docker**: Optional but recommended (uses Laravel Sail).
 
 ## Deployment Options
 
-### 1. Docker Deployment (Recommended)
-The repository includes a `Dockerfile` for standardized deployment.
-
-1.  **Clone the repository**:
+### 1. Docker Deployment (Laravel Sail)
+1.  **Clone**: `git clone https://github.com/blackhatsV1/loctrack-dti`
+2.  **Environment**: `cp .env.example .env`
+3.  **Start Sail**: `./vendor/bin/sail up -d`
+4.  **Initialize**:
     ```bash
-    git clone <repository_url>
-    cd employee_locs
-    ```
-2.  **Configure environment**:
-    ```bash
-    cp .env.example .env
-    # Edit .env with production database credentials and APP_KEY
-    ```
-3.  **Build and Run**:
-    ```bash
-    docker build -t loctrack .
-    docker run -p 80:80 loctrack
+    ./vendor/bin/sail artisan migrate --seed
+    ./vendor/bin/sail npm run build
     ```
 
-### 2. PaaS Deployment (e.g., Northflank/Render)
-The project is configured for PaaS detection via `nixpacks.toml`.
+### 2. Cloud-Native / PaaS (e.g., Northflank)
+The system is optimized for **Nixpacks** detection.
 
-1.  Connect your Git repository to the platform.
-2.  Set the following **Environment Variables**:
-    *   `APP_KEY`: Base64 generated Laravel key.
-    *   `DB_CONNECTION`: e.g., `pgsql`
-    *   `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
-3.  The build system will automatically detect the Laravel environment and run migrations.
+1.  Connect the `loctrack-dti` repository.
+2.  Define **Environment Variables**:
+    *   `APP_KEY`, `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
+3.  The build process will automatically handle `composer install` and `npm install`.
 
-## Post-Deployment Steps
-After the initial deployment, ensure the following commands are executed (automated in most CI/CD pipelines):
+## Post-Deployment Hooks
+Ensure the following are run in production:
 
 ```bash
 php artisan migrate --force
@@ -50,7 +38,8 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-## Maintenance
-- **Backups**: Ensure regular backups of the location data in the database.
-- **Logs**: Monitor storage logs via `storage/logs/laravel.log`.
-- **Throttling**: Adjust API rate limits in `routes/web.php` if high traffic is expected.
+## Security & Maintenance
+- **SSL**: Force HTTPS in production `APP_URL`.
+- **Backups**: Regular dumps of the `employee_locations` table.
+- **Logs**: Monitor `storage/logs/laravel.log` for geolocation failures.
+

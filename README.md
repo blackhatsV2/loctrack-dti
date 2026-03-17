@@ -1,6 +1,20 @@
-# Western Visayas Industry Profile - Investment Funnel
+# Employee Location Tracking System - Loctrack DTI
 
-A premium, data-driven web application showcasing the investment potential and economic profile of Western Visayas (Region VI), Philippines. Built with Laravel, Tailwind CSS, and Alpine.js.
+A premium, real-time location monitoring and management system for workforce visibility. Built with Laravel, Tailwind CSS, and Alpine.js.
+
+---
+
+### 🧭 Quick Navigation
+
+| Section | Description |
+| :--- | :--- |
+| [📚 Documentation](#-documentation) | Project docs (Overview, Architecture, VAPT, etc.) |
+| [🚀 Getting Started](#-getting-started) | Docker & Manual setup instructions |
+| [📊 Data Management](#-data-management) | Seeders and data handling |
+| [🛠 Tech Stack](#-tech-stack) | Technologies used |
+| [📄 License](#-license) | MIT License |
+
+---
 
 ## 📚 Documentation
 
@@ -115,16 +129,17 @@ The app will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ## 📊 Data Management
 
-This project is highly data-driven. The content is managed through seeders:
+This project handles employee data and location logs. The initial setup is managed through seeders:
 
-- **Seeder File**: `database/seeders/ProjectContentSeeder.php`
-- **Re-seeding**: If you update the seeder, run `php artisan db:seed --class=ProjectContentSeeder`.
+- **Seeder File**: `database/seeders/EmployeeLocationSeeder.php`
+- **Re-seeding**: If you update the seeder, run `php artisan db:seed --class=EmployeeLocationSeeder`.
 
 ## 🛠 Tech Stack
-- **Backend**: Laravel 12
-- **Frontend**: Tailwind CSS, Alpine.js, ApexCharts
-- **Maps**: Leaflet.js
-- **Database**: MySQL
+- **Backend**: Laravel 11/12
+- **Frontend**: Tailwind CSS, Alpine.js, Leaflet.js (Maps)
+- **Database**: MySQL / PostgreSQL
+- **Tracking**: HTML5 Geolocation API
 
 ## 📄 License
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+

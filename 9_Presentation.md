@@ -1,58 +1,58 @@
-# Project Presentation: Employee Location Tracking System
+[← Back to README](README.md) | [← Previous: VAPT Report](8_VAPT_Report.md) | [Next: Project Plan →](10_Project_Plan.md)
 
-## Slide 1: Title
+# Project Presentation: Loctrack DTI
+
+## Slide 1: Welcome
 **Employee Location Tracking System**
-*Streamlined Workforce Visibility and Management*
+*Next-Gen Workforce Visibility and Real-time Monitoring*
 
 ---
 
 ## Slide 2: The Challenge
-- Managing field employees across multiple locations.
-- Lack of real-time data for logistical planning.
-- Manual location reporting is error-prone and slow.
-- Need for a centralized, secure history of movements.
+- Difficulty managing field personnel across multiple geographical zones.
+- Error-prone manual check-ins and delayed reporting.
+- Lack of centralized, real-time data for logistical planning.
+- High risk of data inconsistency in historical logs.
 
 ---
 
-## Slide 3: The Solution
-- **Real-time Capture**: Simple mobile-responsive dashboard for instant reporting.
-- **Admin Oversight**: Interactive maps and sorting tools for managers.
-- **Data-Driven**: Historical logs for audit and performance analysis.
-- **Modern Stack**: Built for reliability using Laravel.
+## Slide 3: Our Solution: Loctrack DTI
+- **Real-time Snapshots**: Effortless mobile check-ins with high-accuracy GPS.
+- **Interactive Command Center**: Instant visualization of field distribution.
+- **Immutable History**: Comprehensive audit logs for compliance and safety.
+- **Modern Tech**: Built for scale using the Laravel 11/12 ecosystem.
 
 ---
 
-## Slide 4: Key Features (Employee)
-- Single-click location submission.
-- High-accuracy GPS tracking.
-- Automatic address detection.
-- Mobile-first, friendly user interface.
+## Slide 4: Personnel Features
+- **One-Click Reporting**: Simplified mobile UI for rapid submits.
+- **Automatic Addressing**: Instant reverse-geocoding of GPS data.
+- **Privacy First**: Secure authentication and session management.
 
 ---
 
-## Slide 5: Key Features (Admin)
-- **Live Map Visualization**.
-- **Employee Directory** with detailed profiles.
-- **Complete History** for compliance and strategy.
-- **Secure Controls** to manage access.
+## Slide 5: Administrative Control
+- **Live Fleet Map**: Plotting workforce locations on a dynamic canvas.
+- **Audit Terminal**: Drill-down into personnel movement and reporting patterns.
+- **CRM Integration**: Manage employee profiles, offices, and contact data.
 
 ---
 
-## Slide 6: System Highlights
-- **Security**: Built-in protection against common web threats.
-- **Performance**: Scalable architecture ready for growing teams.
-- **Deployment**: Fast, containerized setup via Docker and Nixpacks.
+## Slide 6: Security Highlights
+- **RBAC**: Multi-tier access control (Admin vs. Employee).
+- **API Guard**: Rate limiting and strict input validation.
+- **Containerization**: Standardized Docker-ready environment for rapid scaling.
 
 ---
 
-## Slide 7: Future Roadmap
-- Geofencing alerts.
-- Automated report generation (PDF/Excel).
-- Integrated team messaging.
-- Native mobile app for offline tracking.
+## Slide 7: Future Vision
+- **Geofencing**: Automated zone-based alerts.
+- **Analytical Intelligence**: Workforce density heatmaps and route optimization.
+- **Native Experience**: Dedicated mobile applications for background tracking.
 
 ---
 
-## Slide 8: Q&A
+## Slide 8: Closing
 **Thank you!**
-*Efficiency through visibility.*
+*Efficiency through Visibility.*
+
