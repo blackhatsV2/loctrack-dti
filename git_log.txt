@@ -1,5 +1,0 @@
-e4c6809 resolved the production data discrepancy.
-103ff45 resolved the employee count discrepancy
-e1004a7 remove temp file
-9320029 feat: Improve dashboard chart reliability and functionality by adding data validation, error handling, and updating Content Security Policy.
-c6518d4 added cache prevention headers in middleware
