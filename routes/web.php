@@ -16,12 +16,10 @@ Route::get('/', function () {
 
 // Employee routes (authenticated)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        if (auth()->user()->is_admin) {
-            return redirect()->route('admin.dashboard');
-        }
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [LocationController::class, 'dashboard'])->name('dashboard');
+
+    Route::post('/api/address', [LocationController::class, 'updateAddress'])
+        ->name('location.updateAddress');
 
     Route::post('/api/location', [LocationController::class, 'store'])
         ->middleware('throttle:30,1')

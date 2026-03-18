@@ -27,7 +27,7 @@ class LocationController extends Controller
 
     public function index()
     {
-        // Define admin email to exclude
+        // Define admin email to include/exclude
         $adminEmail = 'admin@dti6.gov.ph';
         $adminIds = \App\Models\User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
 
@@ -42,5 +42,60 @@ class LocationController extends Controller
             ->get();
 
         return response()->json($locations);
+    }
+
+    /**
+     * Show the employee dashboard.
+     */
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $location = EmployeeLocation::where('user_id', $user->id)->latest('id')->first();
+        
+        return view('dashboard', compact('user', 'location'));
+    }
+
+    /**
+     * Update employee address (Home or Office).
+     */
+    public function updateAddress(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string|max:500',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'type' => 'required|in:home,office',
+        ]);
+
+        $user = Auth::user();
+        $latest = EmployeeLocation::where('user_id', $user->id)->latest('id')->first();
+
+        $data = [
+            'user_id' => $user->id,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'recorded_at' => now(),
+        ];
+
+        if ($request->type === 'home') {
+            $data['address'] = $request->address;
+            $data['office'] = $latest ? $latest->office : null;
+            $data['employee_id_no'] = $latest ? $latest->employee_id_no : null;
+            $data['mobile_no'] = $latest ? $latest->mobile_no : null;
+            $data['employee_type'] = $latest ? $latest->employee_type : null;
+        } else {
+            $data['office'] = $request->address; // Update office location
+            $data['address'] = $latest ? $latest->address : null;
+            $data['employee_id_no'] = $latest ? $latest->employee_id_no : null;
+            $data['mobile_no'] = $latest ? $latest->mobile_no : null;
+            $data['employee_type'] = $latest ? $latest->employee_type : null;
+        }
+
+        EmployeeLocation::create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ucfirst($request->type) . ' address updated successfully.'
+        ]);
     }
 }
