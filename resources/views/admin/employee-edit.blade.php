@@ -86,12 +86,12 @@
 
                 <div class="form-group">
                     <label>Employee ID No.</label>
-                    <input type="text" name="employee_id_no" value="{{ old('employee_id_no', $location->employee_id_no ?? '') }}">
+                    <input type="text" name="employee_id_no" value="{{ old('employee_id_no', $location->employee_id_no ?? $user->employee_id_no ?? '') }}">
                 </div>
 
                 <div class="form-group">
                     <label>Employee Type</label>
-                    <input type="text" name="employee_type" value="{{ old('employee_type', $location->employee_type ?? '') }}">
+                    <input type="text" name="employee_type" value="{{ old('employee_type', $location->employee_type ?? $user->employee_type ?? '') }}">
                 </div>
             </div>
 
@@ -103,12 +103,12 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Mobile No.</label>
-                    <input type="text" name="mobile_no" value="{{ old('mobile_no', $location->mobile_no ?? '') }}">
+                    <input type="text" name="mobile_no" value="{{ old('mobile_no', $location->mobile_no ?? $user->mobile_no ?? '') }}">
                 </div>
 
                 <div class="form-group">
                     <label>Office</label>
-                    <input type="text" name="office" value="{{ old('office', $location->office ?? '') }}">
+                    <input type="text" name="office" value="{{ old('office', $location->office ?? $user->office ?? '') }}">
                 </div>
 
                 <div class="form-group">

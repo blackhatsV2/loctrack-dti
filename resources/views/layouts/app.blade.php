@@ -405,6 +405,8 @@
     @yield('styles')
 </head>
 <body>
+    <div id="global-loader">
+        <div class="spinner"></div>
         <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
     </div>
     <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;"></div>
@@ -492,6 +494,8 @@
             const loader = document.getElementById('global-loader');
             if (loader) {
                 loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.style.display = 'none';
                 }, 400);
             }
         });
