@@ -431,8 +431,8 @@
                             <td class="searchable">
                                 {{ $loc->user->name }}
                             </td>
-                            <td class="searchable" style="max-width: 300px;">{{ $loc->address }}</td>
-                            <td class="searchable">{{ $loc->office ?? 'N/A' }}</td>
+                            <td class="searchable" style="max-width: 300px;">{{ $loc->address ?? 'GPS Check-in' }}</td>
+                            <td class="searchable">{{ $loc->office ?? $loc->user->office ?? 'N/A' }}</td>
                             <td>{{ $loc->recorded_at->format('M d, Y h:i A') }}</td>
                         </tr>
                         @endforeach

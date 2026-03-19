@@ -15,11 +15,19 @@ class LocationController extends Controller
             'longitude' => 'required|numeric',
         ]);
 
+        $user = Auth::user();
+        $latest = EmployeeLocation::where('user_id', $user->id)->latest('recorded_at')->first();
+
         EmployeeLocation::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'recorded_at' => now(),
+            'address' => $latest?->address,
+            'office' => $latest ? $latest->office : $user->office,
+            'employee_id_no' => $latest ? $latest->employee_id_no : $user->employee_id_no,
+            'mobile_no' => $latest ? $latest->mobile_no : $user->mobile_no,
+            'employee_type' => $latest ? $latest->employee_type : $user->employee_type,
         ]);
 
         return response()->json(['status' => 'success']);
@@ -127,16 +135,16 @@ class LocationController extends Controller
 
         if ($request->type === 'home') {
             $data['address'] = $request->address;
-            $data['office'] = $latest ? $latest->office : null;
-            $data['employee_id_no'] = $latest ? $latest->employee_id_no : null;
-            $data['mobile_no'] = $latest ? $latest->mobile_no : null;
-            $data['employee_type'] = $latest ? $latest->employee_type : null;
+            $data['office'] = $latest ? $latest->office : $user->office;
+            $data['employee_id_no'] = $latest ? $latest->employee_id_no : $user->employee_id_no;
+            $data['mobile_no'] = $latest ? $latest->mobile_no : $user->mobile_no;
+            $data['employee_type'] = $latest ? $latest->employee_type : $user->employee_type;
         } else {
             $data['office'] = $request->address; // Update office location
-            $data['address'] = $latest ? $latest->address : null;
-            $data['employee_id_no'] = $latest ? $latest->employee_id_no : null;
-            $data['mobile_no'] = $latest ? $latest->mobile_no : null;
-            $data['employee_type'] = $latest ? $latest->employee_type : null;
+            $data['address'] = $latest ? $latest->address : null; // address is specific to home location
+            $data['employee_id_no'] = $latest ? $latest->employee_id_no : $user->employee_id_no;
+            $data['mobile_no'] = $latest ? $latest->mobile_no : $user->mobile_no;
+            $data['employee_type'] = $latest ? $latest->employee_type : $user->employee_type;
         }
 
         EmployeeLocation::create($data);
@@ -216,11 +224,11 @@ class LocationController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'recorded_at' => now(),
-            'address' => $latest?->address,
-            'office' => $latest?->office,
-            'employee_id_no' => $latest?->employee_id_no,
-            'mobile_no' => $latest?->mobile_no,
-            'employee_type' => $latest?->employee_type,
+            'address' => $latest ? $latest->address : null,
+            'office' => $latest ? $latest->office : $user->office,
+            'employee_id_no' => $latest ? $latest->employee_id_no : $user->employee_id_no,
+            'mobile_no' => $latest ? $latest->mobile_no : $user->mobile_no,
+            'employee_type' => $latest ? $latest->employee_type : $user->employee_type,
             'type' => 'broadcast',
         ]);
 
@@ -244,6 +252,17 @@ class LocationController extends Controller
         ]);
 
         $user->update($validated);
+        
+        // Sync with latest location record to ensure dashboard reflects changes immediately
+        $latest = EmployeeLocation::where('user_id', $user->id)->latest('id')->first();
+        if ($latest) {
+            $latest->update([
+                'employee_id_no' => $request->employee_id_no,
+                'mobile_no' => $request->mobile_no,
+                'office' => $request->office,
+                'employee_type' => $request->employee_type,
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',

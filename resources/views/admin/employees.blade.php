@@ -186,9 +186,9 @@
                             </div>
                             <div style="color: var(--text-muted); font-size: 0.8rem;">{{ $emp->email }}</div>
                         </td>
-                        <td>{{ $loc->employee_id_no ?? '—' }}</td>
-                        <td>{{ $loc->office ?? '—' }}</td>
-                        <td>{{ $loc->mobile_no ?? '—' }}</td>
+                        <td>{{ $loc->employee_id_no ?? $emp->employee_id_no ?? '—' }}</td>
+                        <td>{{ $loc->office ?? $emp->office ?? '—' }}</td>
+                        <td>{{ $loc->mobile_no ?? $emp->mobile_no ?? '—' }}</td>
                         <td style="white-space: nowrap;">
                             <a href="{{ route('admin.employees.edit', $emp) }}" class="action-link">Edit</a>
                             <a href="{{ route('admin.employees.history', $emp) }}" class="action-link">History</a>
