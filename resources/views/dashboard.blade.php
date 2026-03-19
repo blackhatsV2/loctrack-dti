@@ -177,34 +177,312 @@
         pointer-events: none;
     }
 
-    .profile-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
+    /* Profile Card Redesign */
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .profile-item {
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35),
+                    0 0 0 4px rgba(99, 102, 241, 0.15);
+        letter-spacing: 0.05em;
+    }
+
+    .profile-header-info h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        letter-spacing: -0.01em;
+    }
+
+    .profile-header-info .profile-email {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 0.6rem;
+    }
+
+    .profile-role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.3rem 0.85rem;
+        border-radius: 2rem;
+        background: rgba(99, 102, 241, 0.12);
+        color: #a5b4fc;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .profile-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .profile-info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.15rem;
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1rem;
+        transition: all 0.25s ease;
+    }
+
+    .profile-info-item:hover {
+        background: rgba(99, 102, 241, 0.05);
+        border-color: rgba(99, 102, 241, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .profile-info-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+
+    .profile-info-icon.icon-id {
+        background: rgba(99, 102, 241, 0.12);
+        color: #818cf8;
+    }
+    .profile-info-icon.icon-phone {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+    }
+    .profile-info-icon.icon-office {
+        background: rgba(192, 132, 252, 0.12);
+        color: #c084fc;
+    }
+    .profile-info-icon.icon-type {
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+    }
+
+    .profile-info-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    .profile-info-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+    }
+
+    .profile-info-value {
+        font-size: 1rem;
+        color: var(--text-light);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .profile-info-value.empty {
+        color: var(--text-muted);
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    /* Profile Edit Form */
+    .profile-edit-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .profile-edit-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
 
-    .profile-label {
+    .profile-edit-group label {
         font-size: 0.75rem;
-        color: var(--primary);
+        color: var(--text-muted);
         text-transform: uppercase;
         font-weight: 600;
         letter-spacing: 0.05em;
     }
 
-    .profile-value {
-        font-size: 1.1rem;
+    .profile-edit-group .form-control {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .profile-edit-group .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .profile-edit-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .btn-save-profile {
+        flex: 1;
+        padding: 0.8rem;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save-profile:hover {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-cancel-profile {
+        flex: 1;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+        font-weight: 500;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel-profile:hover {
+        background: rgba(255, 255, 255, 0.08);
         color: var(--text-light);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-edit-profile {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.8rem;
+        background: rgba(99, 102, 241, 0.15);
+        color: #a5b4fc;
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-radius: 2rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
         font-weight: 500;
     }
 
+    .btn-edit-profile:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Metadata Section Styles */
+    .profile-meta-section {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .meta-title {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .meta-label {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .meta-value {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        font-family: monospace;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 0.15rem 0.5rem;
+        border-radius: 0.4rem;
+        text-transform: uppercase;
+    }
+
+    .status-verified { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+    .privilege-badge {
+        background: linear-gradient(to right, #f43f5e, #fb7185);
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 0.4rem;
+        font-size: 0.65rem;
+        font-weight: 800;
+        margin-left: 0.5rem;
+    }
+
     @media (max-width: 768px) {
-        .profile-grid { grid-template-columns: 1fr; }
+        .profile-header { flex-direction: column; text-align: center; gap: 1rem; }
+        .profile-info-grid { grid-template-columns: 1fr; }
+        .profile-edit-grid { grid-template-columns: 1fr; }
+        .profile-avatar { width: 72px; height: 72px; font-size: 1.6rem; }
+        .profile-meta-grid { grid-template-columns: 1fr; }
     }
 </style>
 @endsection
@@ -233,70 +511,138 @@
 
     <!-- My Professional Profile Card -->
     <div class="glass-card" style="margin-bottom: 2rem; padding: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">📋 My Professional Profile</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your official identity and contact details.</p>
+        <div id="profile-display">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">
+                    {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $user->name)[1] ?? '', 0, 1)) }}
+                </div>
+                <div class="profile-header-info" style="flex:1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <h2 id="disp-name" style="margin-bottom: 0;">{{ $user->name }}</h2>
+                        @if($user->is_admin)
+                            <span class="privilege-badge">ADMIN</span>
+                        @endif
+                    </div>
+                    <div class="profile-email" id="disp-email" style="margin-top: 0.2rem;">{{ $user->email }}</div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        @if($user->employee_type)
+                            <span class="profile-role-badge">
+                                <span>⚡</span> {{ $user->employee_type }}
+                            </span>
+                        @else
+                            <span class="profile-role-badge">
+                                <span>👤</span> Employee
+                            </span>
+                        @endif
+
+                        @if($user->email_verified_at)
+                            <span class="status-pill status-verified">✓ Verified Account</span>
+                        @else
+                            <span class="status-pill status-pending">⚠ Pending Verification</span>
+                        @endif
+                    </div>
+                </div>
+                <button class="btn-edit-profile" id="edit-profile-btn" onclick="toggleProfileEdit(true)">✏️ Edit Profile</button>
             </div>
-            <button class="btn-small" id="edit-profile-btn" onclick="toggleProfileEdit(true)" style="background: var(--primary);">Edit Profile</button>
+
+            <!-- Info Grid -->
+            <div class="profile-info-grid">
+                <div class="profile-info-item">
+                    <div class="profile-info-icon icon-id">🪪</div>
+                    <div class="profile-info-details">
+                        <span class="profile-info-label">Employee ID</span>
+                        <span class="profile-info-value {{ !($latestLocation->employee_id_no ?? $user->employee_id_no) ? 'empty' : '' }}" id="disp-employee_id_no">{{ $latestLocation->employee_id_no ?? $user->employee_id_no ?? 'Not set' }}</span>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon icon-phone">📱</div>
+                    <div class="profile-info-details">
+                        <span class="profile-info-label">Mobile Number</span>
+                        <span class="profile-info-value {{ !($latestLocation->mobile_no ?? $user->mobile_no) ? 'empty' : '' }}" id="disp-mobile_no">{{ $latestLocation->mobile_no ?? $user->mobile_no ?? 'Not set' }}</span>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon icon-office">🏢</div>
+                    <div class="profile-info-details">
+                        <span class="profile-info-label">Office Assignment</span>
+                        <span class="profile-info-value {{ !($latestLocation->office ?? $user->office) ? 'empty' : '' }}" id="disp-office">{{ $latestLocation->office ?? $user->office ?? 'Not set' }}</span>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon icon-type">💼</div>
+                    <div class="profile-info-details">
+                        <span class="profile-info-label">Employee Category</span>
+                        <span class="profile-info-value {{ !($latestLocation->employee_type ?? $user->employee_type) ? 'empty' : '' }}" id="disp-employee_type">{{ $latestLocation->employee_type ?? $user->employee_type ?? 'Not set' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata Section (Everything in Database) -->
+            <div class="profile-meta-section">
+                <h3 class="meta-title">⚙️ Account System Metadata</h3>
+                <div class="profile-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">System User ID</span>
+                        <span class="meta-value">#{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Member Since</span>
+                        <span class="meta-value">{{ $user->created_at->format('M d, Y') }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Last Observed Activity</span>
+                        <span class="meta-value">{{ $user->last_activity_at ? $user->last_activity_at->diffForHumans() : 'No activity logged' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Profile Last Updated</span>
+                        <span class="meta-value">{{ $user->updated_at->diffForHumans() }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Total Position Logs</span>
+                        <span class="meta-value">{{ number_format($totalCheckins) }} records</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="profile-display" class="profile-grid">
-            <div class="profile-item">
-                <span class="profile-label">Full Name</span>
-                <span class="profile-value" id="disp-name">{{ $user->name }}</span>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Email Address</span>
-                <span class="profile-value" id="disp-email">{{ $user->email }}</span>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Employee ID No</span>
-                <span class="profile-value" id="disp-employee_id_no">{{ $user->employee_id_no ?? '--' }}</span>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Mobile No</span>
-                <span class="profile-value" id="disp-mobile_no">{{ $user->mobile_no ?? '--' }}</span>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Office Assignment</span>
-                <span class="profile-value" id="disp-office">{{ $user->office ?? '--' }}</span>
-            </div>
-            <div class="profile-item">
-                <span class="profile-label">Employee Type</span>
-                <span class="profile-value" id="disp-employee_type">{{ $user->employee_type ?? '--' }}</span>
-            </div>
-        </div>
-
+        <!-- Edit Form -->
         <div id="profile-edit" style="display: none;">
-            <form id="profile-form" onsubmit="saveProfile(event)" class="profile-grid">
-                <div class="profile-item">
-                    <label class="profile-label">Full Name</label>
+            <div style="margin-bottom: 1.75rem;">
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">✏️ Edit Profile</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Update your official identity and contact details.</p>
+            </div>
+            <form id="profile-form" onsubmit="saveProfile(event)" class="profile-edit-grid">
+                <div class="profile-edit-group">
+                    <label>Full Name</label>
                     <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
                 </div>
-                <div class="profile-item">
-                    <label class="profile-label">Email Address</label>
+                <div class="profile-edit-group">
+                    <label>Email Address</label>
                     <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
                 </div>
-                <div class="profile-item">
-                    <label class="profile-label">Employee ID No</label>
-                    <input type="text" name="employee_id_no" class="form-control" value="{{ $user->employee_id_no }}">
+                <div class="profile-edit-group">
+                    <label>Employee ID</label>
+                    <input type="text" name="employee_id_no" class="form-control" value="{{ $user->employee_id_no ?? $latestLocation?->employee_id_no }}" placeholder="e.g. DTI-2024-001">
                 </div>
-                <div class="profile-item">
-                    <label class="profile-label">Mobile No</label>
-                    <input type="text" name="mobile_no" class="form-control" value="{{ $user->mobile_no }}">
+                <div class="profile-edit-group">
+                    <label>Mobile Number</label>
+                    <input type="text" name="mobile_no" class="form-control" value="{{ $user->mobile_no ?? $latestLocation?->mobile_no }}" placeholder="e.g. 0917-123-4567">
                 </div>
-                <div class="profile-item">
-                    <label class="profile-label">Office Assignment</label>
-                    <input type="text" name="office" class="form-control" value="{{ $user->office }}">
+                <div class="profile-edit-group">
+                    <label>Office Assignment</label>
+                    <input type="text" name="office" class="form-control" value="{{ $user->office ?? $latestLocation?->office }}" placeholder="e.g. DTI Region 6">
                 </div>
-                <div class="profile-item">
-                    <label class="profile-label">Employee Type</label>
-                    <input type="text" name="employee_type" class="form-control" value="{{ $user->employee_type }}">
+                <div class="profile-edit-group">
+                    <label>Employee Type</label>
+                    <input type="text" name="employee_type" class="form-control" value="{{ $user->employee_type ?? $latestLocation?->employee_type }}" placeholder="e.g. Regular, COS, JO">
                 </div>
-                <div style="grid-column: 1 / -1; display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button type="submit" class="btn" style="background: var(--primary); flex: 1; padding: 0.75rem;">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" onclick="toggleProfileEdit(false)" style="flex: 1; padding: 0.75rem;">Cancel</button>
+                <div class="profile-edit-actions">
+                    <button type="submit" class="btn-save-profile">💾 Save Changes</button>
+                    <button type="button" class="btn-cancel-profile" onclick="toggleProfileEdit(false)">Cancel</button>
                 </div>
             </form>
         </div>
@@ -603,9 +949,8 @@
     }
 
     function toggleProfileEdit(show) {
-        document.getElementById('profile-display').style.display = show ? 'none' : 'grid';
+        document.getElementById('profile-display').style.display = show ? 'none' : 'block';
         document.getElementById('profile-edit').style.display = show ? 'block' : 'none';
-        document.getElementById('edit-profile-btn').style.display = show ? 'none' : 'block';
     }
 
     async function saveProfile(event) {
