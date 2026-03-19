@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/history', [LocationController::class, 'history'])->name('location.history');
     Route::post('/api/location/reuse/{id}', [LocationController::class, 'reuse'])
         ->name('location.reuse');
+    Route::post('/profile/update', [LocationController::class, 'updateProfile'])->name('profile.update');
 });
 
 // Admin routes (authenticated + admin)

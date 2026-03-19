@@ -405,10 +405,9 @@
     @yield('styles')
 </head>
 <body>
-    <div id="global-loader">
-        <div class="spinner" style="width: 48px; height: 48px; border-width: 4px;"></div>
         <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
     </div>
+    <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;"></div>
     <nav>
         <a href="{{ url('/') }}" class="logo-container">
             <picture>
@@ -493,11 +492,36 @@
             const loader = document.getElementById('global-loader');
             if (loader) {
                 loader.classList.add('fade-out');
-                setTimeout(() => {
-                    loader.style.display = 'none';
                 }, 400);
             }
         });
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'glass-card animate-fade-in';
+            toast.style.padding = '1rem 1.5rem';
+            toast.style.minWidth = '300px';
+            toast.style.borderLeft = `4px solid ${type === 'success' ? '#4ade80' : '#f43f5e'}`;
+            toast.style.boxShadow = '0 20px 40px rgba(0,0,0,0.6)';
+            toast.style.marginBottom = '0'; /* Reset padding from glass-card if any */
+            
+            toast.innerHTML = `
+                <div style="font-weight: 600; color: var(--text-light); margin-bottom: 0.25rem;">${title}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.4s ease';
+                setTimeout(() => toast.remove(), 450);
+            }, 4000);
+        }
 
         function toggleProfileModal() {
             const modal = document.getElementById('profile-modal');

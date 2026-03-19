@@ -176,6 +176,36 @@
         font-weight: 500;
         pointer-events: none;
     }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .profile-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .profile-label {
+        font-size: 0.75rem;
+        color: var(--primary);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    .profile-value {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .profile-grid { grid-template-columns: 1fr; }
+    }
 </style>
 @endsection
 
@@ -198,6 +228,77 @@
         <div class="glass-card stat-card" style="flex: 1;">
             <div class="stat-value">{{ $totalCheckins }}</div>
             <div class="stat-label">Total Check-ins</div>
+        </div>
+    </div>
+
+    <!-- My Professional Profile Card -->
+    <div class="glass-card" style="margin-bottom: 2rem; padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">📋 My Professional Profile</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your official identity and contact details.</p>
+            </div>
+            <button class="btn-small" id="edit-profile-btn" onclick="toggleProfileEdit(true)" style="background: var(--primary);">Edit Profile</button>
+        </div>
+
+        <div id="profile-display" class="profile-grid">
+            <div class="profile-item">
+                <span class="profile-label">Full Name</span>
+                <span class="profile-value" id="disp-name">{{ $user->name }}</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Email Address</span>
+                <span class="profile-value" id="disp-email">{{ $user->email }}</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Employee ID No</span>
+                <span class="profile-value" id="disp-employee_id_no">{{ $user->employee_id_no ?? '--' }}</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Mobile No</span>
+                <span class="profile-value" id="disp-mobile_no">{{ $user->mobile_no ?? '--' }}</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Office Assignment</span>
+                <span class="profile-value" id="disp-office">{{ $user->office ?? '--' }}</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Employee Type</span>
+                <span class="profile-value" id="disp-employee_type">{{ $user->employee_type ?? '--' }}</span>
+            </div>
+        </div>
+
+        <div id="profile-edit" style="display: none;">
+            <form id="profile-form" onsubmit="saveProfile(event)" class="profile-grid">
+                <div class="profile-item">
+                    <label class="profile-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
+                </div>
+                <div class="profile-item">
+                    <label class="profile-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
+                </div>
+                <div class="profile-item">
+                    <label class="profile-label">Employee ID No</label>
+                    <input type="text" name="employee_id_no" class="form-control" value="{{ $user->employee_id_no }}">
+                </div>
+                <div class="profile-item">
+                    <label class="profile-label">Mobile No</label>
+                    <input type="text" name="mobile_no" class="form-control" value="{{ $user->mobile_no }}">
+                </div>
+                <div class="profile-item">
+                    <label class="profile-label">Office Assignment</label>
+                    <input type="text" name="office" class="form-control" value="{{ $user->office }}">
+                </div>
+                <div class="profile-item">
+                    <label class="profile-label">Employee Type</label>
+                    <input type="text" name="employee_type" class="form-control" value="{{ $user->employee_type }}">
+                </div>
+                <div style="grid-column: 1 / -1; display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn" style="background: var(--primary); flex: 1; padding: 0.75rem;">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleProfileEdit(false)" style="flex: 1; padding: 0.75rem;">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -499,6 +600,69 @@
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: JSON.stringify({ type, address, latitude: lat, longitude: lng })
         }).then(r => r.ok ? window.location.reload() : alert('Failed to save.'));
+    }
+
+    function toggleProfileEdit(show) {
+        document.getElementById('profile-display').style.display = show ? 'none' : 'grid';
+        document.getElementById('profile-edit').style.display = show ? 'block' : 'none';
+        document.getElementById('edit-profile-btn').style.display = show ? 'none' : 'block';
+    }
+
+    async function saveProfile(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = 'Saving...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch("{{ route('profile.update') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Update display values
+                for (const [key, value] of Object.entries(data)) {
+                    const dispEl = document.getElementById(`disp-${key}`);
+                    if (dispEl) dispEl.innerText = value || '--';
+                }
+                
+                // Update welcome message if name changed
+                if (data.name) {
+                    const welcomeName = document.querySelector('.welcome-section span');
+                    if (welcomeName) welcomeName.innerText = data.name;
+                }
+
+                if (typeof showToast === 'function') {
+                    showToast('Success', 'Profile updated successfully', 'success');
+                }
+                toggleProfileEdit(false);
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast('Error', result.message || 'Failed to update profile', 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'An unexpected error occurred', 'error');
+            }
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 </script>
 @endsection

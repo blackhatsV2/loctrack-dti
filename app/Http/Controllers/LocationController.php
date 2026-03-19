@@ -226,4 +226,29 @@ class LocationController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
+    /**
+     * Update the user's professional profile.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'employee_id_no' => 'nullable|string|max:50',
+            'mobile_no' => 'nullable|string|max:20',
+            'office' => 'nullable|string|max:100',
+            'employee_type' => 'nullable|string|max:50',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'user' => $user
+        ]);
+    }
 }
