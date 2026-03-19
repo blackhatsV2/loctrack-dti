@@ -74,6 +74,7 @@ class AdminController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($password),
+            'mobile_no' => $request->mobile_no,
             'is_admin' => false,
         ]);
 
@@ -119,6 +120,10 @@ class AdminController extends Controller
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'employee_id_no' => $request->employee_id_no,
+            'mobile_no' => $request->mobile_no,
+            'office' => $request->office,
+            'employee_type' => $request->employee_type,
         ]);
 
         // Update or create location record
