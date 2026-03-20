@@ -182,7 +182,6 @@ class AdminController extends Controller
 
         // Total employees count should be all non-admin users (all KML entries)
         $totalEmployees = User::whereNotIn('id', $adminIds)->count();
-        \Log::info("Dashboard: Total non-admin users count: " . $totalEmployees);
         
         $totalLocations = $totalEmployees; // One location per KML entry
         $recentUpdatesCount = EmployeeLocation::whereNotIn('user_id', $adminIds)

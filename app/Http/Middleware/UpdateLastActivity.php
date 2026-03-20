@@ -18,7 +18,6 @@ class UpdateLastActivity
     {
         if (auth()->check()) {
             $user = auth()->user();
-            \Log::debug("UpdateLastActivity: Updating for user " . $user->name);
             $user->update(['last_activity_at' => now()]);
         }
         return $next($request);
