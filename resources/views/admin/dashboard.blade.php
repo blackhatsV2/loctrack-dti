@@ -11,29 +11,36 @@
         text-decoration: none;
         color: inherit;
     }
+
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
     }
+
     .stat-card.active {
         border-color: var(--primary);
     }
+
     .dashboard-section {
         display: none;
         margin-top: 2rem;
         margin-bottom: 3rem;
     }
+
     .dashboard-section.active {
         display: block;
     }
+
     .hidden {
         display: none !important;
     }
+
     .chart-container {
         position: relative;
         height: 300px;
         width: 100%;
     }
+
     .table-container {
         max-height: 400px;
         overflow-y: auto;
@@ -41,20 +48,25 @@
         background: rgba(0, 0, 0, 0.1);
         border: 1px solid var(--glass-border);
     }
+
     .table-container::-webkit-scrollbar {
         width: 6px;
     }
+
     .table-container::-webkit-scrollbar-thumb {
         background: rgba(99, 102, 241, 0.3);
         border-radius: 10px;
     }
+
     .table-container::-webkit-scrollbar-track {
         background: transparent;
     }
+
     .data-table {
         width: 100%;
         border-collapse: collapse;
     }
+
     .data-table th {
         text-align: left;
         padding: 0.75rem 1rem;
@@ -64,11 +76,13 @@
         font-size: 0.85rem;
         text-transform: uppercase;
     }
+
     .data-table td {
         padding: 1rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         font-size: 0.9rem;
     }
+
     .search-input {
         width: 100%;
         padding: 0.75rem 1rem;
@@ -79,59 +93,72 @@
         margin-bottom: 1rem;
         font-family: 'Outfit', sans-serif;
     }
+
     .search-input:focus {
         outline: none;
         border-color: var(--primary);
     }
+
     .stat-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
+
     .analytics-grid {
         display: grid;
         grid-template-columns: 1fr 1.5fr;
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
+
     @media (max-width: 768px) {
         .stat-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
         }
+
         .analytics-grid {
             grid-template-columns: 1fr;
         }
+
         .chart-container {
             height: 220px;
         }
+
         .stat-card {
             padding: 1rem !important;
         }
-        .stat-card > div:first-child {
+
+        .stat-card>div:first-child {
             font-size: 2rem !important;
         }
+
         .data-table {
             min-width: 600px;
         }
     }
+
     @media (max-width: 480px) {
         .stat-grid {
             grid-template-columns: 1fr;
             gap: 0.75rem;
         }
     }
+
     .address-card-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
     }
+
     .address-column {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
     }
+
     .address-list {
         max-height: 350px;
         overflow-y: auto;
@@ -139,6 +166,7 @@
         background: rgba(0, 0, 0, 0.15);
         border: 1px solid var(--glass-border);
     }
+
     .address-item {
         padding: 0.85rem 1rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -147,19 +175,23 @@
         display: flex;
         flex-direction: column;
     }
+
     .address-item:hover {
         background: rgba(99, 102, 241, 0.1);
         padding-left: 1.25rem;
     }
+
     .address-item.active {
         background: rgba(99, 102, 241, 0.2);
         border-left: 3px solid var(--primary);
     }
+
     .address-item .emp-name {
         font-weight: 600;
         color: var(--text-light);
         font-size: 0.95rem;
     }
+
     .address-item .emp-addr {
         font-size: 0.8rem;
         color: var(--text-muted);
@@ -167,6 +199,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .minimap-container {
         height: 400px;
         width: 100%;
@@ -176,6 +209,7 @@
         position: relative;
         z-index: 1;
     }
+
     .custom-leaflet-icon {
         background: transparent !important;
         border: none !important;
@@ -184,6 +218,7 @@
         justify-content: center;
         font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
     }
+
     .map-reset-btn {
         position: absolute;
         top: 15px;
@@ -204,16 +239,19 @@
         gap: 8px;
         transition: all 0.2s ease;
     }
+
     .map-reset-btn:hover {
         background: var(--primary);
         transform: scale(1.05);
     }
+
     .filter-bar {
         display: flex;
         gap: 1rem;
         margin-bottom: 1.5rem;
         flex-wrap: wrap;
     }
+
     .filter-select {
         flex: 1;
         min-width: 150px;
@@ -224,11 +262,13 @@
         color: white;
         font-family: 'Outfit', sans-serif;
     }
+
     .no-address-section {
         margin-top: 1.5rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--glass-border);
     }
+
     @media (max-width: 768px) {
         .address-card-grid {
             grid-template-columns: 1fr;
@@ -266,47 +306,53 @@
             <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Global View</div>
         </a>
     </div>
-    
+
     <!-- Online Presence Section -->
     <div class="glass-card animate-fade-in" style="margin-bottom: 2rem;">
         <div style="margin-bottom: 1.5rem;">
             <h2 style="margin-bottom: 0.25rem;">📡 Online Personnel</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Employees currently active within the last 15 minutes.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Employees currently active within the last 15
+                minutes.</p>
         </div>
 
         <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
             @forelse($onlineUsers as $onlineUser)
-                <div class="glass-card" style="padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.05);">
-                    <div class="pulse-dot" style="background: #34d399; width: 8px; height: 8px;"></div>
-                    <span style="font-weight: 600; font-size: 0.95rem;">{{ $onlineUser->name }}</span>
-                </div>
+            <div class="glass-card"
+                style="padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.05);">
+                <div class="pulse-dot" style="background: #34d399; width: 8px; height: 8px;"></div>
+                <span style="font-weight: 600; font-size: 0.95rem;">{{ $onlineUser->name }}</span>
+            </div>
             @empty
-                <div style="padding: 2rem; text-align: center; width: 100%; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 1rem;">
-                    No employees are currently online.
-                </div>
+            <div
+                style="padding: 2rem; text-align: center; width: 100%; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 1rem;">
+                No employees are currently online.
+            </div>
             @endforelse
         </div>
     </div>
 
     <!-- Workforce Geography Card -->
     <div class="glass-card animate-fade-in" style="margin-bottom: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <div>
                 <h2 style="margin-bottom: 0.25rem;">🌍 Workforce Geography</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Categorized address tracking and distribution.</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Categorized address tracking and distribution.
+                </p>
             </div>
             <div style="display: flex; gap: 0.75rem; flex-grow: 1; justify-content: flex-end; min-width: 300px;">
-                <input type="text" id="geo-search" class="search-input" style="margin-bottom: 0; max-width: 300px;" placeholder="Search names or addresses..." onkeyup="filterGeoList()">
+                <input type="text" id="geo-search" class="search-input" style="margin-bottom: 0; max-width: 300px;"
+                    placeholder="Search names or addresses..." onkeyup="filterGeoList()">
                 <select id="filter-office" class="filter-select" style="max-width: 200px;" onchange="filterGeoList()">
                     <option value="">All Offices</option>
                     @foreach($allOffices as $office)
-                        <option value="{{ $office }}">{{ $office }}</option>
+                    <option value="{{ $office }}">{{ $office }}</option>
                     @endforeach
                 </select>
                 <select id="filter-type" class="filter-select" style="max-width: 150px;" onchange="filterGeoList()">
                     <option value="">All Types</option>
                     @foreach($employeeTypes as $type)
-                        <option value="{{ $type }}">{{ $type }}</option>
+                    <option value="{{ $type }}">{{ $type }}</option>
                     @endforeach
                 </select>
             </div>
@@ -315,16 +361,15 @@
         <div class="address-card-grid">
             <!-- Left: Home Addresses -->
             <div class="address-column">
-                <h4 style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏠 Home Addresses</h4>
+                <h4
+                    style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    🏠 Home Addresses</h4>
                 <div class="address-list" id="home-list">
                     @foreach($latestLocations->whereNotNull('address') as $loc)
-                    <div class="address-item geo-item" 
-                         data-user-id="{{ $loc->user_id }}" 
-                         data-name="{{ strtolower($loc->user->name) }}" 
-                         data-addr="{{ strtolower($loc->address) }}"
-                         data-office="{{ $loc->office }}"
-                         data-type="{{ $loc->employee_type }}"
-                         onclick="focusOnMap(this, {{ $loc->user_id }}, {{ $loc->latitude }}, {{ $loc->longitude }}, 'home')">
+                    <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
+                        data-name="{{ strtolower($loc->user->name) }}" data-addr="{{ strtolower($loc->address) }}"
+                        data-office="{{ $loc->office }}" data-type="{{ $loc->employee_type }}"
+                        onclick="focusOnMap(this, {{ $loc->user_id }}, {{ $loc->latitude }}, {{ $loc->longitude }}, 'home')">
                         <span class="emp-name">{{ $loc->user->name }}</span>
                         <span class="emp-addr" title="{{ $loc->address }}">{{ $loc->address }}</span>
                     </div>
@@ -334,16 +379,14 @@
 
             <!-- Right: Office Addresses -->
             <div class="address-column">
-                <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Office Assignments</h4>
+                <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢
+                    Office Assignments</h4>
                 <div class="address-list" id="office-list">
                     @foreach($latestLocations->whereNotNull('office') as $loc)
-                    <div class="address-item geo-item" 
-                         data-user-id="{{ $loc->user_id }}" 
-                         data-name="{{ strtolower($loc->user->name) }}" 
-                         data-addr="{{ strtolower($loc->office) }}"
-                         data-office="{{ $loc->office }}"
-                         data-type="{{ $loc->employee_type }}"
-                         onclick="focusOnMap(this, {{ $loc->user_id }}, null, null, 'office', '{{ $loc->office }}')">
+                    <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
+                        data-name="{{ strtolower($loc->user->name) }}" data-addr="{{ strtolower($loc->office) }}"
+                        data-office="{{ $loc->office }}" data-type="{{ $loc->employee_type }}"
+                        onclick="focusOnMap(this, {{ $loc->user_id }}, null, null, 'office', '{{ $loc->office }}')">
                         <span class="emp-name">{{ $loc->user->name }}</span>
                         <span class="emp-addr" title="{{ $loc->office }}">{{ $loc->office }}</span>
                     </div>
@@ -354,17 +397,18 @@
 
         <!-- Bottom: Unmapped/No Address Personnel -->
         @php
-            $unmapped = $latestLocations->whereNull('address')->whereNull('office');
+        $unmapped = $latestLocations->whereNull('address')->whereNull('office');
         @endphp
         @if($unmapped->count() > 0)
         <div class="no-address-section">
-            <h4 style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">⚠️ Unmapped Personnel (Missing Home & Office)</h4>
+            <h4
+                style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                ⚠️ Unmapped Personnel (Missing Home & Office)</h4>
             <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 @foreach($unmapped as $loc)
-                <div class="glass-card geo-item" 
-                     data-user-id="{{ $loc->user_id }}"
-                     data-name="{{ strtolower($loc->user->name) }}"
-                     style="padding: 0.5rem 0.75rem; font-size: 0.85rem; background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.2);">
+                <div class="glass-card geo-item" data-user-id="{{ $loc->user_id }}"
+                    data-name="{{ strtolower($loc->user->name) }}"
+                    style="padding: 0.5rem 0.75rem; font-size: 0.85rem; background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.2);">
                     {{ $loc->user->name }}
                 </div>
                 @endforeach
@@ -394,7 +438,8 @@
             </div>
         </div>
         <div class="glass-card">
-            <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-light);">Personnel Type Breakdown</h3>
+            <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-light);">Personnel Type Breakdown
+            </h3>
             <div class="chart-container">
                 <div class="page-loading" id="type-chart-loading">
                     <div class="spinner"></div>
@@ -411,9 +456,12 @@
             <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                 📍 Location Records
             </h2>
-            <input type="text" id="power-search" class="search-input" placeholder="Power Search: Find by name, address, or office..." onkeyup="powerSearch('location-table', 'power-search')">
+            <input type="text" id="power-search" class="search-input"
+                placeholder="Power Search: Find by name, address, or office..."
+                onkeyup="powerSearch('location-table', 'power-search')">
             <div class="table-container" style="position: relative;">
-                <div class="page-loading" id="table-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(15, 23, 42, 0.8);">
+                <div class="page-loading" id="table-loading"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(15, 23, 42, 0.8);">
                     <div class="spinner"></div>
                 </div>
                 <table class="data-table" id="location-table">
@@ -448,14 +496,18 @@
             <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                 🏢 Office Locations
             </h2>
-            <input type="text" id="office-search" class="search-input" placeholder="Search offices..." onkeyup="powerSearch('office-table', 'office-search')">
+            <input type="text" id="office-search" class="search-input" placeholder="Search offices..."
+                onkeyup="powerSearch('office-table', 'office-search')">
             <div class="table-container">
                 <table class="data-table" id="office-table">
                     <thead>
                         <tr>
-                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Office Name</th>
-                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Coordinates (Lat, Lng)</th>
-                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Active Personnel</th>
+                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Office Name
+                            </th>
+                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Coordinates
+                                (Lat, Lng)</th>
+                            <th style="position: sticky; top: 0; background: var(--bg-dark); z-index: 1;">Active
+                                Personnel</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -464,9 +516,10 @@
                             <td class="searchable">{{ $office }}</td>
                             <td>
                                 @php
-                                    $officeLoc = $latestLocations->where('office', $office)->first();
+                                $officeLoc = $latestLocations->where('office', $office)->first();
                                 @endphp
-                                {{ $officeLoc ? round($officeLoc->latitude, 4) . ', ' . round($officeLoc->longitude, 4) : 'N/A' }}
+                                {{ $officeLoc ? round($officeLoc->latitude, 4) . ', ' . round($officeLoc->longitude, 4)
+                                : 'N/A' }}
                             </td>
                             <td>{{ $latestLocations->where('office', $office)->count() }}</td>
                         </tr>
@@ -482,26 +535,26 @@
 
 @section('scripts')
 <script>
-        const hideLoading = () => {
-            document.getElementById('office-chart-loading')?.classList.add('hidden');
-            document.getElementById('type-chart-loading')?.classList.add('hidden');
-            document.getElementById('table-loading')?.classList.add('hidden');
-        };
+    const hideLoading = () => {
+        document.getElementById('office-chart-loading')?.classList.add('hidden');
+        document.getElementById('type-chart-loading')?.classList.add('hidden');
+        document.getElementById('table-loading')?.classList.add('hidden');
+    };
 
-        // Standard timeout fallback
-        const safetyTimeout = setTimeout(hideLoading, 5000); 
+    // Standard timeout fallback
+    const safetyTimeout = setTimeout(hideLoading, 5000);
 
-        // Ensure Chart.js is loaded
-        function initCharts() {
-            if (typeof Chart === 'undefined') {
-                console.log('Chart.js not ready, retrying...');
-                setTimeout(initCharts, 100);
-                return;
-            }
+    // Ensure Chart.js is loaded
+    function initCharts() {
+        if (typeof Chart === 'undefined') {
+            console.log('Chart.js not ready, retrying...');
+            setTimeout(initCharts, 100);
+            return;
+        }
 
-            try {
-                const officeData = @json($officeDistribution);
-                const typeData = @json($typeDistribution);
+        try {
+            const officeData = @json($officeDistribution);
+            const typeData = @json($typeDistribution);
 
             console.log('Office Distribution Data:', officeData);
             console.log('Type Distribution Data:', typeData);
@@ -608,7 +661,7 @@
             } else {
                 console.warn('No personnel type distribution data available.');
             }
-            
+
             // Hide loading states immediately after successful initialization
             clearTimeout(safetyTimeout);
             hideLoading();
@@ -622,12 +675,12 @@
 
     function toggleDashboardSection(sectionId) {
         const sections = ['locations', 'offices'];
-        
+
         sections.forEach(s => {
             const section = document.getElementById('section-' + s);
             const cardId = s === 'locations' ? 'card-updates' : 'card-' + s;
             const card = document.getElementById(cardId);
-            
+
             if (s === sectionId) {
                 if (section.classList.contains('active')) {
                     section.classList.remove('active');
@@ -654,7 +707,7 @@
             const text = Array.from(row.querySelectorAll('.searchable'))
                 .map(td => td.textContent.toLowerCase())
                 .join(' ');
-            
+
             if (text.includes(filter)) {
                 row.style.display = '';
             } else {
@@ -717,8 +770,8 @@
         try {
             minimap = L.map('minimap', {
                 scrollWheelZoom: false
-            }).setView([10.7202, 122.5621], 9); 
-            
+            }).setView([10.7202, 122.5621], 9);
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(minimap);
@@ -740,12 +793,12 @@
     function syncMapMarkers(userIds) {
         if (!minimap) return;
         if (markerCluster) minimap.removeLayer(markerCluster);
-        
+
         markerCluster = L.markerClusterGroup({
             showCoverageOnHover: false,
             disableClusteringAtZoom: 16
         });
-        
+
         allLocations.forEach(loc => {
             if (userIds.has(loc.user_id.toString()) && loc.latitude && loc.longitude) {
                 const marker = L.marker([loc.latitude, loc.longitude], { icon: createCustomIcon('🏠') })
@@ -762,7 +815,7 @@
         document.querySelectorAll('.address-item').forEach(el => el.classList.remove('active'));
         const selector = `.address-item[data-user-id="${userId}"]`;
         const items = document.querySelectorAll(selector);
-        
+
         let relativeOffset = 0;
         if (clickedEl) {
             const container = clickedEl.closest('.address-list');
@@ -788,7 +841,7 @@
         if (minimap) {
             // Clear existing markers for "show only what is clicked"
             if (markerCluster) minimap.removeLayer(markerCluster);
-            
+
             let focusLat = lat;
             let focusLng = lng;
             let iconEmoji = '🏠';
@@ -814,7 +867,7 @@
                 .addTo(minimap)
                 .bindPopup(`<strong>${name}</strong><br>${label}<br><span style="font-size:0.8rem;">${detail}</span>`)
                 .openPopup();
-            
+
             // MarkerCluster becomes a simple Group for the solo marker
             markerCluster = L.layerGroup([soloMarker]).addTo(minimap);
             minimap.setView([focusLat, focusLng], 15, { animate: true });
@@ -841,7 +894,7 @@
 
             if (matchSearch && matchOffice && matchType) {
                 item.style.display = '';
-                if(item.dataset.userId) visibleUserIds.add(item.dataset.userId);
+                if (item.dataset.userId) visibleUserIds.add(item.dataset.userId);
             } else {
                 item.style.display = 'none';
             }
@@ -858,16 +911,4 @@
     });
 </script>
 
-    <!-- Debug Online Status (Admin only) -->
-    <div class="glass-card" style="margin-top: 2rem; border-color: rgba(255, 255, 255, 0.05); background: rgba(0, 0, 0, 0.2); padding: 1rem;">
-        <h4 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">🛠 Debug: User Activity</h4>
-        <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;">
-            @foreach(App\Models\User::where('is_admin', false)->get() as $u)
-                <div>{{ $u->name }}: {{ $u->last_activity_at ? $u->last_activity_at->toDateTimeString() : 'NEVER' }}</div>
-            @endforeach
-            <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 5px;">
-                Server Now: {{ now()->toDateTimeString() }}
-            </div>
-        </div>
-    </div>
 @endsection
