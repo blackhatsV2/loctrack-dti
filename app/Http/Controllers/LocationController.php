@@ -99,6 +99,15 @@ class LocationController extends Controller
             ->get()
             ->pluck('count', 'date');
 
+        // Distinct offices and employee types for searchable dropdowns
+        $offices = EmployeeLocation::select('office')->distinct()
+            ->whereNotNull('office')->where('office', '!=', '')
+            ->orderBy('office')->pluck('office');
+
+        $employeeTypes = EmployeeLocation::select('employee_type')->distinct()
+            ->whereNotNull('employee_type')->where('employee_type', '!=', '')
+            ->orderBy('employee_type')->pluck('employee_type');
+
         return view('dashboard', compact(
             'user', 
             'homeLocation', 
@@ -106,7 +115,9 @@ class LocationController extends Controller
             'latestLocation', 
             'totalCheckins', 
             'recentHistory', 
-            'activityData'
+            'activityData',
+            'offices',
+            'employeeTypes'
         ));
     }
 
