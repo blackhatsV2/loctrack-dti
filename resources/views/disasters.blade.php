@@ -273,7 +273,7 @@
 
         // NASA Events
         nasaData.forEach(event => {
-            const geo = event.geometries[0];
+            const geo = event.geometry?.[0];
             if (!geo || geo.type !== 'Point') return;
 
             const [lon, lat] = geo.coordinates;
@@ -323,9 +323,9 @@
                 type: 'nasa',
                 title: e.title,
                 category: e.categories[0]?.title,
-                time: new Date(e.geometries[0]?.date).getTime(),
-                lat: e.geometries[0]?.coordinates[1],
-                lon: e.geometries[0]?.coordinates[0],
+                time: new Date(e.geometry?.[0]?.date).getTime(),
+                lat: e.geometry?.[0]?.coordinates[1],
+                lon: e.geometry?.[0]?.coordinates[0],
                 raw: e
             }))
         ].sort((a, b) => b.time - a.time);

@@ -26,13 +26,14 @@ class DisasterController extends Controller
             // Get past 7 days by default
             $startTime = now()->subDays(7)->format('Y-m-d');
             
-            $response = Http::timeout(10)->get('https://earthquake.usgs.gov/fdsnws/event/1/query', [
+            $response = Http::timeout(30)->get('https://earthquake.usgs.gov/fdsnws/event/1/query', [
                 'format' => 'geojson',
                 'starttime' => $startTime,
                 'minlatitude' => 4.5,
                 'maxlatitude' => 21.5,
                 'minlongitude' => 116.0,
                 'maxlongitude' => 127.0,
+                'minmagnitude' => 2.5,
                 'orderby' => 'time',
             ]);
 
@@ -54,7 +55,7 @@ class DisasterController extends Controller
     {
         try {
             // NASA EONET v3
-            $response = Http::timeout(10)->get('https://eonet.gsfc.nasa.gov/api/v3/events', [
+            $response = Http::timeout(30)->get('https://eonet.gsfc.nasa.gov/api/v3/events', [
                 'status' => 'open',
                 'limit' => 50,
             ]);
