@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\DisasterController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/location/reuse/{id}', [LocationController::class, 'reuse'])
         ->name('location.reuse');
     Route::post('/profile/update', [LocationController::class, 'updateProfile'])->name('profile.update');
+
+    // Disaster Tracker Routes
+    Route::get('/disasters', [DisasterController::class, 'index'])->name('disasters.index');
+    Route::get('/api/disasters/earthquakes', [DisasterController::class, 'getEarthquakes'])->name('api.disasters.earthquakes');
+    Route::get('/api/disasters/events', [DisasterController::class, 'getNaturalEvents'])->name('api.disasters.events');
 });
 
 // Admin routes (authenticated + admin)
