@@ -238,6 +238,24 @@
         }
     }
 
+    function formatDisasterTime(timestamp) {
+        const date = new Date(timestamp);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        const ss = String(date.getSeconds()).padStart(2, '0');
+        
+        const offset = -date.getTimezoneOffset();
+        const absOffset = Math.abs(offset);
+        const offsetHours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+        const offsetMin = String(absOffset % 60).padStart(2, '0');
+        const offsetStr = `UTC${offset >= 0 ? '+' : '-'}${offsetHours}:${offsetMin}`;
+        
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss} (${offsetStr})`;
+    }
+
     function renderMarkers() {
         // Clear old markers
         markers.forEach(m => map.removeLayer(m));
@@ -260,11 +278,22 @@
                 className: mag > 5.0 ? 'pulsing-marker' : ''
             }).addTo(map);
 
+            const depth = eq.geometry.coordinates[2];
             marker.bindPopup(`
-                <div style="font-family: 'Outfit', sans-serif; padding: 0.5rem;">
-                    <div style="font-weight: 600; color: #fb7185; margin-bottom: 0.25rem;">Earthquake M${mag}</div>
-                    <div style="font-size: 0.9rem; margin-bottom: 0.25rem;">${place}</div>
-                    <div style="font-size: 0.75rem; color: #94a3b8;">${time}</div>
+                <div class="popup-content" style="min-width: 200px; font-family: 'Outfit', sans-serif;">
+                    <div style="font-weight: 700; color: #fb7185; margin-bottom: 0.6rem; font-size: 1rem; line-height: 1.4;">
+                        M ${mag} - ${place}
+                    </div>
+                    <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 0.8rem; font-size: 0.85rem;">
+                        <span style="color: #94a3b8;">Time</span>
+                        <span>${formatDisasterTime(eq.properties.time)}</span>
+                        
+                        <span style="color: #94a3b8;">Location</span>
+                        <span>${lat.toFixed(3)}°N ${lon.toFixed(3)}°E</span>
+                        
+                        <span style="color: #94a3b8;">Depth</span>
+                        <span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span>
+                    </div>
                 </div>
             `);
 
@@ -294,10 +323,15 @@
             }).addTo(map);
 
             marker.bindPopup(`
-                <div style="font-family: 'Outfit', sans-serif; padding: 0.5rem;">
-                    <div style="font-weight: 600; color: #60a5fa; margin-bottom: 0.25rem;">${category}</div>
-                    <div style="font-size: 0.9rem; margin-bottom: 0.25rem;">${title}</div>
-                    <a href="${event.sources[0]?.url}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: none;">View Source ↗</a>
+                <div style="font-family: 'Outfit', sans-serif; min-width: 200px;">
+                    <div style="font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; font-size: 1rem;">${category}</div>
+                    <div style="font-size: 0.9rem; margin-bottom: 0.6rem; line-height: 1.4;">${title}</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.6rem;">
+                        ${formatDisasterTime(new Date(event.geometry?.[0]?.date).getTime())}
+                    </div>
+                    <a href="${event.sources[0]?.url}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+                        View USGS/NASA Source <span style="font-size: 1rem;">↗</span>
+                    </a>
                 </div>
             `);
 
@@ -317,6 +351,7 @@
                 time: e.properties.time,
                 lat: e.geometry.coordinates[1],
                 lon: e.geometry.coordinates[0],
+                depth: e.geometry.coordinates[2],
                 raw: e
             })),
             ...nasaData.map(e => ({
@@ -342,17 +377,17 @@
             if (event.type === 'earthquake') {
                 card.innerHTML = `
                     <div class="badge badge-earthquake">Earthquake</div>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="font-weight: 600; font-size: 0.95rem; flex: 1;">${event.title}</div>
-                        <div class="magnitude">${event.mag.toFixed(1)}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+                        <div style="font-weight: 600; font-size: 0.95rem; flex: 1; color: var(--text-bright); line-height: 1.3;">M ${event.mag} - ${event.title}</div>
                     </div>
-                    <div class="event-time">${new Date(event.time).toLocaleString()}</div>
+                    <div class="event-time" style="margin-bottom: 0.3rem;">${formatDisasterTime(event.time)}</div>
+                    <div style="font-size: 0.75rem; opacity: 0.5;">Depth: ${event.depth ? event.depth.toFixed(1) + ' km' : 'N/A'}</div>
                 `;
             } else {
                 card.innerHTML = `
                     <div class="badge badge-nasa">${event.category || 'Event'}</div>
-                    <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem;">${event.title}</div>
-                    <div class="event-time">${new Date(event.time).toLocaleString()}</div>
+                    <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--text-bright); line-height: 1.3;">${event.title}</div>
+                    <div class="event-time">${formatDisasterTime(event.time)}</div>
                 `;
             }
 
