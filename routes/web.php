@@ -38,7 +38,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/disasters', [DisasterController::class, 'index'])->name('disasters.index');
     Route::get('/api/disasters/earthquakes', [DisasterController::class, 'getEarthquakes'])->name('api.disasters.earthquakes');
     Route::get('/api/disasters/events', [DisasterController::class, 'getNaturalEvents'])->name('api.disasters.events');
+    
+    // Serve KMZ files with correct MIME type
+    Route::get('/api/maps/{filename}', function ($filename) {
+        $path = public_path('maps/' . $filename);
+        if (!file_exists($path)) abort(404);
+        return response()->file($path, [
+            'Content-Type' => 'application/vnd.google-earth.kmz',
+            'Access-Control-Allow-Origin' => '*'
+        ]);
+    })->where('filename', '.*\.kmz$');
+
 });
+
 
 // Admin routes (authenticated + admin)
 Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(function () {

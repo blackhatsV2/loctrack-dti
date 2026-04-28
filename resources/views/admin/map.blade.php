@@ -218,6 +218,7 @@
 
 @section('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
     // Mobile sidebar toggle
     window.toggleMobileSidebar = function() {
@@ -234,12 +235,54 @@
             document.getElementById('map-loading')?.classList.add('hidden');
             return;
         }
+
         const map = L.map('map', { preferCanvas: true }).setView([10.69, 122.52], 8);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19
+        const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; CARTO'
         }).addTo(map);
+
+        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OSM'
+        });
+
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri'
+        });
+
+        const baseMaps = {
+            "Dark Mode": dark,
+            "Streets": streets,
+            "Satellite": satellite
+        };
+
+        const overlayMaps = {};
+        const layerControl = L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
+
+        // 1. GEM Active Faults (LOCAL optimized file)
+        fetch('/maps/ph_faults.json')
+            .then(r => r.json())
+            .then(data => {
+                const faultsLayer = L.geoJSON(data, {
+                    style: { color: '#f87171', weight: 2, opacity: 0.8, dashArray: '5, 5' },
+                    onEachFeature: (f, l) => l.bindPopup(`<b>Fault:</b> ${f.properties.name || 'Unnamed'}`)
+                });
+                layerControl.addOverlay(faultsLayer, "Active Faults");
+            });
+
+        // 2. Volcanoes from GVP
+        fetch('https://webservices.volcano.si.edu/geoserver/GVP-VOTW/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=GVP-VOTW:E3WebApp_HoloceneVolcanoes&outputFormat=application/json&CQL_FILTER=Country=%27Philippines%27')
+            .then(r => r.json())
+            .then(data => {
+                const volcanoLayer = L.geoJSON(data, {
+                    pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: '#fbbf24', color: '#d97706', weight: 2, opacity: 1, fillOpacity: 0.8 }),
+                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.Volcano_Name}`)
+                });
+                layerControl.addOverlay(volcanoLayer, "Active Volcanoes");
+            });
+
 
         const categories = [
             { key: 'NC Negros Occidental',  label: 'NC Negros Occidental', color: '#3b82f6' },
@@ -309,7 +352,10 @@
         let catFilters = {};
 
         function updateCount() {
-            document.getElementById('visible-count').textContent = allMarkers.filter(m => map.hasLayer(m.marker)).length;
+            const visibleCountEl = document.getElementById('visible-count');
+            if (visibleCountEl) {
+                visibleCountEl.textContent = allMarkers.filter(m => map.hasLayer(m.marker)).length;
+            }
         }
 
         function buildSidebar() {
@@ -317,6 +363,7 @@
             categories.forEach(c => counts[c.key] = 0);
             allMarkers.forEach(m => counts[m.catKey]++);
             const list = document.getElementById('filter-list');
+            if (!list) return;
             list.innerHTML = '';
             categories.forEach(cat => {
                 catFilters[cat.key] = true;
@@ -373,6 +420,7 @@
 
         function renderResults(query) {
             const list = document.getElementById('results-list');
+            if (!list) return;
             list.innerHTML = '';
             if (!query) {
                 list.innerHTML = '<div style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.85rem;">Type to search...</div>';
@@ -400,7 +448,8 @@
                     map.setView(m.marker.getLatLng(), 15);
                     if (!map.hasLayer(m.marker)) {
                         catFilters[m.catKey] = true;
-                        document.querySelector(`.filter-item input[data-key="${m.catKey}"]`).checked = true;
+                        const cb = document.querySelector(`.filter-item input[data-key="${m.catKey}"]`);
+                        if (cb) cb.checked = true;
                         applyFilters();
                     }
                     setTimeout(() => m.marker.openPopup(), 100);
@@ -409,12 +458,17 @@
             });
         }
 
-        document.getElementById('power-search').addEventListener('input', (e) => renderResults(e.target.value));
+        const powerSearchEl = document.getElementById('power-search');
+        if (powerSearchEl) {
+            powerSearchEl.addEventListener('input', (e) => renderResults(e.target.value));
+        }
 
         fetch('{{ route("location.index") }}')
             .then(r => r.json())
             .then(data => {
-                document.getElementById('total-count').textContent = data.length;
+                const totalCountEl = document.getElementById('total-count');
+                if (totalCountEl) totalCountEl.textContent = data.length;
+                
                 const markerLayer = L.layerGroup().addTo(map);
                 data.forEach(loc => {
                     const catKey = getCategory(loc);
