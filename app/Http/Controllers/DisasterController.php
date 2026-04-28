@@ -22,17 +22,12 @@ class DisasterController extends Controller
     public function getEarthquakes()
     {
         try {
-            // PH Bounding Box: minlat=4.5, maxlat=21.5, minlon=116.0, maxlon=127.0
-            // Get past 7 days by default
-            $startTime = now()->subDays(7)->format('Y-m-d');
+            // Fetch global earthquakes from the past 3 days
+            $startTime = now()->subDays(3)->format('Y-m-d');
             
             $response = Http::timeout(30)->get('https://earthquake.usgs.gov/fdsnws/event/1/query', [
                 'format' => 'geojson',
                 'starttime' => $startTime,
-                'minlatitude' => 4.5,
-                'maxlatitude' => 21.5,
-                'minlongitude' => 116.0,
-                'maxlongitude' => 127.0,
                 'minmagnitude' => 2.5,
                 'orderby' => 'time',
             ]);

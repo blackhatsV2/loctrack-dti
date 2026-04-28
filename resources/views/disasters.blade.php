@@ -281,6 +281,11 @@
         <div class="map-section">
             <div id="disaster-map"></div>
             
+            <button onclick="recenterPH()" class="btn btn-primary" style="position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1000; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 0.5rem;">
+                📍 Recenter PH
+            </button>
+
+            
             <div class="legend">
                 <div style="font-weight: 600; margin-bottom: 0.5rem;">Legend</div>
                 <div class="legend-item"><span class="dot" style="background: #fb7185;"></span> Earthquakes (USGS)</div>
@@ -312,11 +317,15 @@
         }).setView([12.8797, 121.7740], 6);
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
         }).addTo(map);
 
-
         L.control.zoom({ position: 'topright' }).addTo(map);
+    }
+
+    function recenterPH() {
+        map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 });
     }
 
 
@@ -421,12 +430,12 @@
             // For now show all NASA events returned by API (limited to 50).
 
             const marker = L.circleMarker([lat, lon], {
-                radius: 8,
+                radius: 5,
                 fillColor: '#60a5fa',
                 color: '#3b82f6',
-                weight: 2,
-                opacity: 0.9,
-                fillOpacity: 0.3
+                weight: 1,
+                opacity: 0.6,
+                fillOpacity: 0.2
             }).addTo(map);
 
             marker.bindPopup(`
@@ -470,7 +479,13 @@
                 lon: e.geometry?.[0]?.coordinates[0],
                 raw: e
             }))
-        ].sort((a, b) => b.time - a.time);
+        ].sort((a, b) => {
+            // Prioritize Earthquakes
+            if (a.type === 'earthquake' && b.type !== 'earthquake') return -1;
+            if (a.type !== 'earthquake' && b.type === 'earthquake') return 1;
+            // Then sort by time
+            return b.time - a.time;
+        });
 
         if (allEvents.length === 0) {
             listContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No recent events found.</div>';
@@ -482,13 +497,22 @@
             card.className = 'event-card';
             
             if (event.type === 'earthquake') {
+                const isPH = event.lat >= 4.5 && event.lat <= 21.5 && event.lon >= 116.0 && event.lon <= 127.0;
+                card.style.borderLeft = isPH ? '4px solid #fb7185' : '1px solid var(--glass-border)';
+                
                 card.innerHTML = `
-                    <div class="badge badge-earthquake">Earthquake</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+                        <div class="badge badge-earthquake">Earthquake</div>
+                        ${isPH ? '<div class="badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);">LOCAL</div>' : ''}
+                    </div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
                         <div style="font-weight: 600; font-size: 0.95rem; flex: 1; color: var(--text-bright); line-height: 1.3;">M ${event.mag} - ${event.title}</div>
                     </div>
                     <div class="event-time" style="margin-bottom: 0.3rem;">${formatDisasterTime(event.time)}</div>
-                    <div style="font-size: 0.75rem; opacity: 0.5;">Depth: ${event.depth ? event.depth.toFixed(1) + ' km' : 'N/A'}</div>
+                    <div style="font-size: 0.75rem; opacity: 0.5; display: flex; justify-content: space-between;">
+                        <span>Depth: ${event.depth ? event.depth.toFixed(1) + ' km' : 'N/A'}</span>
+                        <span>${event.lat.toFixed(2)}°, ${event.lon.toFixed(2)}°</span>
+                    </div>
                 `;
             } else {
                 card.innerHTML = `
