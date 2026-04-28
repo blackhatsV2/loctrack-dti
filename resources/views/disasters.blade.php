@@ -106,6 +106,111 @@
         100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
     }
 
+    /* Custom Map Controls */
+    .map-overlay-control {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1rem;
+        color: var(--text-light);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        pointer-events: auto;
+        min-width: 220px;
+    }
+
+    .control-header {
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 0.5rem;
+    }
+
+    .control-item {
+        margin-bottom: 0.75rem;
+    }
+
+    .control-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .control-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 0.4rem;
+    }
+
+    .range-input {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        appearance: none;
+        outline: none;
+    }
+
+    .range-input::-webkit-slider-thumb {
+        appearance: none;
+        width: 12px;
+        height: 12px;
+        background: var(--primary);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .range-input::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 10px var(--primary);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 32px;
+        height: 18px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(255,255,255,0.1);
+        transition: .4s;
+        border-radius: 18px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(14px);
+    }
+
     .legend {
         position: absolute;
         bottom: 1.5rem;
@@ -151,7 +256,7 @@
 <div class="animate-fade-in">
     <div style="margin-bottom: 2rem;">
         <h1 style="font-size: 2rem; background: linear-gradient(to right, #f87171, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Live Disaster Tracker</h1>
-        <p style="color: var(--text-muted);">Real-time alerts from USGS, NASA EONET, and local observers.</p>
+        <p style="color: var(--text-muted);">Real-time alerts from USGS and NASA EONET.</p>
     </div>
 
     <div class="disaster-container">
@@ -180,7 +285,6 @@
                 <div style="font-weight: 600; margin-bottom: 0.5rem;">Legend</div>
                 <div class="legend-item"><span class="dot" style="background: #fb7185;"></span> Earthquakes (USGS)</div>
                 <div class="legend-item"><span class="dot" style="background: #60a5fa;"></span> Natural Events (NASA)</div>
-                <div class="legend-item"><span class="dot" style="background: #a855f7;"></span> Local Alerts (PHIVOLCS/PAGASA)</div>
             </div>
         </div>
     </div>
@@ -211,8 +315,11 @@
             maxZoom: 19
         }).addTo(map);
 
+
         L.control.zoom({ position: 'topright' }).addTo(map);
     }
+
+
 
     async function refreshData() {
         const refreshIcon = document.getElementById('refresh-icon');
