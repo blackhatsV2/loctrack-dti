@@ -237,19 +237,43 @@
         border-radius: 50%;
     }
 
-    @media (max-width: 1024px) {
-        .disaster-container {
-            flex-direction: column;
-            height: auto;
+        @media (max-width: 1024px) {
+            .disaster-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar-section {
+                width: 100%;
+            }
+            .map-section {
+                height: 500px;
+            }
         }
-        .sidebar-section {
-            width: 100%;
+
+        .filter-pill {
+            padding: 0.4rem 0.9rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
         }
-        .map-section {
-            height: 500px;
+
+        .filter-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
         }
-    }
-</style>
+
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -267,6 +291,12 @@
                     <button onclick="refreshData()" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
                         <span id="refresh-icon">🔄</span> Refresh
                     </button>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--glass-border);">
+                    <button onclick="setFilter('all')" class="filter-pill active" id="filter-all">All</button>
+                    <button onclick="setFilter('earthquake')" class="filter-pill" id="filter-earthquake">USGS Only</button>
+                    <button onclick="setFilter('nasa')" class="filter-pill" id="filter-nasa">NASA Only</button>
                 </div>
                 
                 <div class="event-list" id="event-list">
@@ -303,6 +333,7 @@
     let markers = [];
     let earthquakeData = [];
     let nasaData = [];
+    let activeFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', function() {
         initMap();
@@ -354,6 +385,18 @@
         }
     }
 
+    function setFilter(filter) {
+        activeFilter = filter;
+        
+        // Update UI pills
+        document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`filter-${filter}`).classList.add('active');
+        
+        // Re-render
+        renderMarkers();
+        renderList();
+    }
+
     function formatDisasterTime(timestamp) {
         const date = new Date(timestamp);
         const yyyy = date.getFullYear();
@@ -377,82 +420,81 @@
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
-        // Earthquakes
-        earthquakeData.forEach(eq => {
-            const [lon, lat] = eq.geometry.coordinates;
-            const mag = eq.properties.mag;
-            const place = eq.properties.place;
-            const time = new Date(eq.properties.time).toLocaleString();
+        // Earthquakes (USGS)
+        if (activeFilter === 'all' || activeFilter === 'earthquake') {
+            earthquakeData.forEach(eq => {
+                const [lon, lat] = eq.geometry.coordinates;
+                const mag = eq.properties.mag;
+                const place = eq.properties.place;
 
-            const marker = L.circleMarker([lat, lon], {
-                radius: Math.max(mag * 3, 5),
-                fillColor: '#fb7185',
-                color: '#f43f5e',
-                weight: 1,
-                opacity: 0.8,
-                fillOpacity: 0.4,
-                className: mag > 5.0 ? 'pulsing-marker' : ''
-            }).addTo(map);
+                const marker = L.circleMarker([lat, lon], {
+                    radius: Math.max(mag * 3, 5),
+                    fillColor: '#fb7185',
+                    color: '#f43f5e',
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.4,
+                    className: mag > 5.0 ? 'pulsing-marker' : ''
+                }).addTo(map);
 
-            const depth = eq.geometry.coordinates[2];
-            marker.bindPopup(`
-                <div class="popup-content" style="min-width: 200px; font-family: 'Outfit', sans-serif;">
-                    <div style="font-weight: 700; color: #fb7185; margin-bottom: 0.6rem; font-size: 1rem; line-height: 1.4;">
-                        M ${mag} - ${place}
+                const depth = eq.geometry.coordinates[2];
+                marker.bindPopup(`
+                    <div class="popup-content" style="min-width: 200px; font-family: 'Outfit', sans-serif;">
+                        <div style="font-weight: 700; color: #fb7185; margin-bottom: 0.6rem; font-size: 1rem; line-height: 1.4;">
+                            M ${mag} - ${place}
+                        </div>
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            <span style="color: #94a3b8;">Time</span>
+                            <span>${formatDisasterTime(eq.properties.time)}</span>
+                            
+                            <span style="color: #94a3b8;">Location</span>
+                            <span>${lat.toFixed(3)}°N ${lon.toFixed(3)}°E</span>
+                            
+                            <span style="color: #94a3b8;">Depth</span>
+                            <span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span>
+                        </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 0.8rem; font-size: 0.85rem;">
-                        <span style="color: #94a3b8;">Time</span>
-                        <span>${formatDisasterTime(eq.properties.time)}</span>
-                        
-                        <span style="color: #94a3b8;">Location</span>
-                        <span>${lat.toFixed(3)}°N ${lon.toFixed(3)}°E</span>
-                        
-                        <span style="color: #94a3b8;">Depth</span>
-                        <span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span>
+                `);
+
+                markers.push(marker);
+            });
+        }
+
+        // Natural Events (NASA)
+        if (activeFilter === 'all' || activeFilter === 'nasa') {
+            nasaData.forEach(event => {
+                const geo = event.geometry?.[0];
+                if (!geo || geo.type !== 'Point') return;
+
+                const [lon, lat] = geo.coordinates;
+                const title = event.title;
+                const category = event.categories[0]?.title || 'Natural Event';
+
+                const marker = L.circleMarker([lat, lon], {
+                    radius: 5,
+                    fillColor: '#60a5fa',
+                    color: '#3b82f6',
+                    weight: 1,
+                    opacity: 0.6,
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <div style="font-family: 'Outfit', sans-serif; min-width: 200px;">
+                        <div style="font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; font-size: 1rem;">${category}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 0.6rem; line-height: 1.4;">${title}</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.6rem;">
+                            ${formatDisasterTime(new Date(event.geometry?.[0]?.date).getTime())}
+                        </div>
+                        <a href="${event.sources[0]?.url}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+                            View USGS/NASA Source <span style="font-size: 1rem;">↗</span>
+                        </a>
                     </div>
-                </div>
-            `);
+                `);
 
-            markers.push(marker);
-        });
-
-        // NASA Events
-        nasaData.forEach(event => {
-            const geo = event.geometry?.[0];
-            if (!geo || geo.type !== 'Point') return;
-
-            const [lon, lat] = geo.coordinates;
-            const title = event.title;
-            const category = event.categories[0]?.title || 'Natural Event';
-
-            // Check if in/near PH bounding box if you want to filter strictly
-            // But NASA events often cover large areas. 
-            // For now show all NASA events returned by API (limited to 50).
-
-            const marker = L.circleMarker([lat, lon], {
-                radius: 5,
-                fillColor: '#60a5fa',
-                color: '#3b82f6',
-                weight: 1,
-                opacity: 0.6,
-                fillOpacity: 0.2
-            }).addTo(map);
-
-            marker.bindPopup(`
-                <div style="font-family: 'Outfit', sans-serif; min-width: 200px;">
-                    <div style="font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; font-size: 1rem;">${category}</div>
-                    <div style="font-size: 0.9rem; margin-bottom: 0.6rem; line-height: 1.4;">${title}</div>
-                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.6rem;">
-                        ${formatDisasterTime(new Date(event.geometry?.[0]?.date).getTime())}
-                    </div>
-                    <a href="${event.sources[0]?.url}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
-                        View USGS/NASA Source <span style="font-size: 1rem;">↗</span>
-                    </a>
-                </div>
-            `);
-
-            markers.push(marker);
-        });
+                markers.push(marker);
+            });
+        }
     }
 
     function renderList() {
@@ -460,7 +502,7 @@
         listContainer.innerHTML = '';
 
         const allEvents = [
-            ...earthquakeData.map(e => ({
+            ...(activeFilter === 'all' || activeFilter === 'earthquake' ? earthquakeData.map(e => ({
                 type: 'earthquake',
                 title: e.properties.place,
                 mag: e.properties.mag,
@@ -469,8 +511,8 @@
                 lon: e.geometry.coordinates[0],
                 depth: e.geometry.coordinates[2],
                 raw: e
-            })),
-            ...nasaData.map(e => ({
+            })) : []),
+            ...(activeFilter === 'all' || activeFilter === 'nasa' ? nasaData.map(e => ({
                 type: 'nasa',
                 title: e.title,
                 category: e.categories[0]?.title,
@@ -478,7 +520,7 @@
                 lat: e.geometry?.[0]?.coordinates[1],
                 lon: e.geometry?.[0]?.coordinates[0],
                 raw: e
-            }))
+            })) : [])
         ].sort((a, b) => {
             // Prioritize Earthquakes
             if (a.type === 'earthquake' && b.type !== 'earthquake') return -1;
