@@ -46,7 +46,7 @@
     .map-container {
         flex: 1;
         position: relative;
-        background: #111;
+        background: #f1f5f9;
     }
 
     #unified-map {
@@ -121,7 +121,7 @@
     .loading-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(15, 23, 42, 0.9);
+        background: rgba(241, 245, 249, 0.9);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -258,10 +258,10 @@
         map = L.map('unified-map', { zoomControl: false, attributionControl: false, preferCanvas: true })
             .setView([12.8797, 121.7740], 6);
 
-        const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        const gray = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
         const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
         
-        L.control.layers({ "Dark Mode": dark, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
+        L.control.layers({ "Gray Map": gray, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
     }
 
