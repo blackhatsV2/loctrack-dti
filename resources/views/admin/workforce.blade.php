@@ -209,6 +209,25 @@
         display: none !important;
     }
 
+    /* Leaflet Popup Styling */
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(12px);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
+
+    .leaflet-popup-content {
+        margin: 12px 16px !important;
+        line-height: 1.4 !important;
+    }
+
+    .leaflet-container a.leaflet-popup-close-button {
+        color: #94a3b8 !important;
+        padding: 8px 8px 0 0 !important;
+    }
+
     @media (max-width: 768px) {
         .address-card-grid, .analytics-grid {
             grid-template-columns: 1fr;
@@ -534,8 +553,11 @@
 
     function createCustomIcon(emoji) {
         return L.divIcon({
-            html: `<div style="font-size: 24px;">${emoji}</div>`,
-            className: 'custom-leaflet-icon', iconSize: [30, 30], iconAnchor: [15, 15]
+            html: `<div style="font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${emoji}</div>`,
+            className: 'custom-leaflet-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -15]
         });
     }
 
@@ -563,20 +585,86 @@
             if (!userIds.has(loc.user_id.toString())) return;
             const isHome = loc.address != null;
             const coords = isHome ? [loc.latitude, loc.longitude] : getOfficeCoords(loc.office);
+            const label = isHome ? 'Home Address' : 'Office Assignment';
+            const addressText = isHome ? loc.address : loc.office;
+            
             const marker = L.marker(coords, { icon: createCustomIcon(isHome ? '🏠' : '🏢') });
-            marker.bindPopup(`<strong>${loc.user.name}</strong><br>${isHome ? loc.address : loc.office}`);
+            
+            marker.bindPopup(`
+                <div style="font-family: 'Outfit', sans-serif; min-width: 150px;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);">${loc.user.name}</strong>
+                    <div style="font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px;">${label}</div>
+                    <div style="font-size: 0.85rem; color: #f8fafc;">${addressText}</div>
+                </div>
+            `);
+            
             markerCluster.addLayer(marker);
             employeeMarkers[loc.user_id] = marker;
         });
         minimap.addLayer(markerCluster);
     }
 
-    function focusOnMap(element, userId, lat, lng, type, officeName) {
+    function focusOnMap(clickedEl, userId, lat, lng, type, officeName) {
+        // 1. Sync highlighting across both lists
         document.querySelectorAll('.address-item').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        const coords = type === 'home' ? [lat, lng] : getOfficeCoords(officeName);
-        minimap.setView(coords, 16, { animate: true });
-        if (employeeMarkers[userId]) employeeMarkers[userId].openPopup();
+        
+        const matchingItems = document.querySelectorAll(`.address-item[data-user-id="${userId}"]`);
+        
+        let relativeOffset = 0;
+        if (clickedEl) {
+            const container = clickedEl.closest('.address-list');
+            if (container) {
+                relativeOffset = clickedEl.offsetTop - container.scrollTop;
+            }
+        }
+
+        matchingItems.forEach(el => {
+            el.classList.add('active');
+            
+            // 2. Relative Sync scrolling
+            if (el !== clickedEl) {
+                const otherContainer = el.closest('.address-list');
+                if (otherContainer) {
+                    otherContainer.scrollTo({
+                        top: el.offsetTop - relativeOffset,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+
+        // 3. Map focus - Show prominent solo marker
+        if (minimap) {
+            // Clear existing marker cluster to focus on selection
+            if (markerCluster) minimap.removeLayer(markerCluster);
+
+            const coords = type === 'home' ? [lat, lng] : getOfficeCoords(officeName);
+            const iconEmoji = type === 'home' ? '🏠' : '🏢';
+            const label = type === 'home' ? 'Home Address' : 'Office Assignment';
+            const addressText = type === 'home' ? (clickedEl.querySelector('.emp-addr').title) : officeName;
+            
+            const emp = allLocations.find(l => l.user_id == userId);
+            const name = emp ? emp.user.name : 'Employee';
+
+            const focusMarker = L.marker(coords, { 
+                icon: createCustomIcon(iconEmoji),
+                zIndexOffset: 1000 
+            })
+            .addTo(minimap)
+            .bindPopup(`
+                <div style="font-family: 'Outfit', sans-serif; min-width: 150px;">
+                    <strong style="display: block; font-size: 1rem; margin-bottom: 4px; color: var(--primary);">${name}</strong>
+                    <div style="font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px;">${label}</div>
+                    <div style="font-size: 0.85rem; color: #f8fafc;">${addressText}</div>
+                </div>
+            `)
+            .openPopup();
+
+            // Wrap in a LayerGroup so resetMinimap can clear it easily
+            markerCluster = L.layerGroup([focusMarker]).addTo(minimap);
+            
+            minimap.setView(coords, 16, { animate: true });
+        }
     }
 
     function filterGeoList() {
