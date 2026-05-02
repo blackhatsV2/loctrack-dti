@@ -272,16 +272,17 @@
                 layerControl.addOverlay(faultsLayer, "Active Faults");
             });
 
-        // 2. Volcanoes from GVP
-        fetch('https://webservices.volcano.si.edu/geoserver/GVP-VOTW/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=GVP-VOTW:E3WebApp_HoloceneVolcanoes&outputFormat=application/json&CQL_FILTER=Country=%27Philippines%27')
+        // 2. Volcanoes (Loaded from LOCAL file to avoid CORS)
+        fetch('/maps/ph_volcanoes.json')
             .then(r => r.json())
             .then(data => {
                 const volcanoLayer = L.geoJSON(data, {
                     pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: '#fbbf24', color: '#d97706', weight: 2, opacity: 1, fillOpacity: 0.8 }),
-                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.Volcano_Name}`)
+                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.VolcanoName || f.properties.Volcano_Name || 'Unnamed'}`)
                 });
                 layerControl.addOverlay(volcanoLayer, "Active Volcanoes");
-            });
+            })
+            .catch(err => console.error('Error loading volcanoes:', err));
 
 
         const categories = [

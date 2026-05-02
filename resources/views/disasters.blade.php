@@ -233,10 +233,9 @@
                 }).addTo(map);
                 layerControl.addOverlay(faultsLayer, "Active Faults");
             })
-            .catch(err => console.error('Error loading local faults:', err));
-
-        // 2. Volcanoes from GVP
-        fetch('https://webservices.volcano.si.edu/geoserver/GVP-VOTW/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=GVP-VOTW:E3WebApp_HoloceneVolcanoes&outputFormat=application/json&CQL_FILTER=Country=%27Philippines%27')
+            .catch(e => console.error('Faults load error:', e));
+        // 2. Volcanoes (Loaded from LOCAL file to avoid CORS)
+        fetch('/maps/ph_volcanoes.json')
             .then(r => r.json())
             .then(data => {
                 const volcanoLayer = L.geoJSON(data, {
@@ -248,14 +247,14 @@
                         opacity: 1,
                         fillOpacity: 0.8
                     }),
-                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.Volcano_Name}`)
+                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.VolcanoName || f.properties.Volcano_Name || 'Unnamed'}`)
                 }).addTo(map);
                 layerControl.addOverlay(volcanoLayer, "Active Volcanoes");
-            });
+            })
+            .catch(err => console.error('Error loading volcanoes:', err));
     }
-
     function recenterPH() {
-        map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 });
+        map.flyTo([12.8797, 121.7740], 6);
     }
 
     async function refreshData() {
@@ -300,8 +299,30 @@
 
         if (activeFilter === 'all' || activeFilter === 'earthquake') {
             earthquakeData.forEach(eq => {
-                const [lon, lat] = eq.geometry.coordinates;
+                const [lon, lat, depth] = eq.geometry.coordinates;
                 const mag = eq.properties.mag;
+                const time = new Date(eq.properties.time);
+                
+                // Format coordinates
+                const latStr = Math.abs(lat).toFixed(3) + '°' + (lat >= 0 ? 'N' : 'S');
+                const lonStr = Math.abs(lon).toFixed(3) + '°' + (lon >= 0 ? 'E' : 'W');
+                
+                // Format time string to match user's request exactly
+                const year = time.getFullYear();
+                const month = String(time.getMonth() + 1).padStart(2, '0');
+                const day = String(time.getDate()).padStart(2, '0');
+                const hours = String(time.getHours()).padStart(2, '0');
+                const minutes = String(time.getMinutes()).padStart(2, '0');
+                const seconds = String(time.getSeconds()).padStart(2, '0');
+                
+                const timezoneOffset = -time.getTimezoneOffset();
+                const offsetHours = Math.floor(Math.abs(timezoneOffset) / 60);
+                const offsetMinutes = Math.abs(timezoneOffset) % 60;
+                const offsetSign = timezoneOffset >= 0 ? '+' : '-';
+                const offsetStr = `(UTC${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMinutes).padStart(2, '0')})`;
+                
+                const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${offsetStr}`;
+
                 const marker = L.circleMarker([lat, lon], {
                     radius: Math.max(mag * 3, 5),
                     fillColor: '#fb7185',
@@ -310,7 +331,18 @@
                     opacity: 0.8,
                     fillOpacity: 0.4
                 }).addTo(map);
-                marker.bindPopup(`<b>M ${mag} Earthquake</b><br>${eq.properties.place}`);
+
+                marker.bindPopup(`
+                    <div style="min-width: 200px;">
+                        <div style="font-weight: 600; color: #f43f5e; margin-bottom: 4px; font-size: 0.95rem;">M ${mag} Earthquake</div>
+                        <div style="font-size: 0.85rem; margin-bottom: 8px; font-weight: 500;">${eq.properties.place}</div>
+                        <div style="display: grid; grid-template-columns: 70px 1fr; gap: 4px; font-size: 0.8rem; line-height: 1.4;">
+                            <span style="color: #94a3b8;">Time</span><span>${formattedTime}</span>
+                            <span style="color: #94a3b8;">Location</span><span>${latStr} ${lonStr}</span>
+                            <span style="color: #94a3b8;">Depth</span><span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span>
+                        </div>
+                    </div>
+                `);
                 markers.push(marker);
             });
         }
@@ -321,14 +353,28 @@
                 if (!geo || geo.type !== 'Point') return;
                 const [lon, lat] = geo.coordinates;
                 const marker = L.circleMarker([lat, lon], {
-                    radius: 5,
+                    radius: 6,
                     fillColor: '#60a5fa',
                     color: '#3b82f6',
                     weight: 1,
-                    opacity: 0.6,
-                    fillOpacity: 0.2
+                    opacity: 0.8,
+                    fillOpacity: 0.4
                 }).addTo(map);
-                marker.bindPopup(`<b>${event.categories[0]?.title}</b><br>${event.title}`);
+
+                const eventTime = geo.date ? new Date(geo.date).toLocaleString() : 'Date N/A';
+                const latStr = Math.abs(lat).toFixed(3) + '°' + (lat >= 0 ? 'N' : 'S');
+                const lonStr = Math.abs(lon).toFixed(3) + '°' + (lon >= 0 ? 'E' : 'W');
+
+                marker.bindPopup(`
+                    <div style="min-width: 200px;">
+                        <div style="font-weight: 600; color: #3b82f6; margin-bottom: 4px; font-size: 0.95rem;">${event.categories[0]?.title || 'Natural Event'}</div>
+                        <div style="font-size: 0.85rem; margin-bottom: 8px; font-weight: 500;">${event.title}</div>
+                        <div style="display: grid; grid-template-columns: 70px 1fr; gap: 4px; font-size: 0.8rem; line-height: 1.4;">
+                            <span style="color: #94a3b8;">Time</span><span>${eventTime}</span>
+                            <span style="color: #94a3b8;">Location</span><span>${latStr} ${lonStr}</span>
+                        </div>
+                    </div>
+                `);
                 markers.push(marker);
             });
         }
