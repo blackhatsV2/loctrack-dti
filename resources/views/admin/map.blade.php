@@ -3,35 +3,71 @@
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    .map-wrapper {
+    :root {
+        --sidebar-width-left: 300px;
+        --sidebar-width-right: 360px;
+    }
+
+    .unified-container {
         display: flex;
         gap: 0;
-        width: 100%;
-        height: 600px;
+        height: calc(100vh - 140px);
+        min-height: 700px;
         border-radius: 1.5rem;
         overflow: hidden;
         border: 1px solid var(--glass-border);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        background: #0f172a;
     }
-    .filter-sidebar {
-        width: 300px;
-        min-width: 300px;
+
+    .sidebar-left {
+        width: var(--sidebar-width-left);
+        min-width: var(--sidebar-width-left);
         background: var(--glass);
         backdrop-filter: blur(12px);
         border-right: 1px solid var(--glass-border);
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        z-index: 10;
     }
-    .filter-header {
+
+    .sidebar-right {
+        width: var(--sidebar-width-right);
+        min-width: var(--sidebar-width-right);
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border-left: 1px solid var(--glass-border);
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+    }
+
+    .map-section {
+        flex: 1;
+        position: relative;
+        background: #111;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+
+    .sidebar-header {
         padding: 1.25rem;
         border-bottom: 1px solid var(--glass-border);
     }
-    .filter-header h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
-    .filter-header small { color: var(--text-muted); font-size: 0.8rem; }
-    .filter-list { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
-    .filter-list::-webkit-scrollbar { width: 4px; }
-    .filter-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .sidebar-header h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .sidebar-header small { color: var(--text-muted); font-size: 0.8rem; }
+
+    .scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem 0;
+    }
+    .scroll-area::-webkit-scrollbar { width: 4px; }
+    .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
     .filter-item {
         display: flex;
         align-items: center;
@@ -41,128 +77,79 @@
         transition: background 0.15s;
         font-size: 0.85rem;
     }
-    .filter-item:hover { background: rgba(99,102,241,0.08); }
-    .filter-item input[type="checkbox"] {
-        accent-color: var(--primary);
-        width: 15px;
-        height: 15px;
+    .filter-item:hover { background: rgba(255,255,255,0.03); }
+    .filter-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
+    .filter-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .filter-count { font-size: 0.7rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 1rem; margin-left: auto; }
+
+    .event-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 0.85rem;
+        margin: 0.5rem 1rem;
         cursor: pointer;
+        transition: all 0.2s;
     }
-    .filter-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .filter-item-label { flex: 1; }
-    .filter-count {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        background: rgba(255,255,255,0.06);
-        padding: 0.1rem 0.45rem;
-        border-radius: 1rem;
-        min-width: 20px;
-        text-align: center;
-    }
-    .filter-actions {
-        padding: 0.75rem 1.25rem;
-        border-top: 1px solid var(--glass-border);
-        display: flex;
-        gap: 0.5rem;
-    }
-    .filter-actions button { flex: 1; padding: 0.45rem 0.5rem; font-size: 0.8rem; border-radius: 0.4rem; }
-    .btn-ghost { background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); }
-    .btn-ghost:hover { background: rgba(255,255,255,0.06); transform: none; box-shadow: none; }
-    #map { flex: 1; background: #111; }
+    .event-card:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+    .event-card.active { border-color: var(--primary); background: rgba(99, 102, 241, 0.1); }
     
-    .leaflet-popup-content-wrapper {
-        background: var(--bg-dark); color: var(--text-light);
-        border: 1px solid var(--glass-border); border-radius: 12px;
-        backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); padding: 0;
+    .badge {
+        display: inline-block;
+        padding: 0.15rem 0.45rem;
+        border-radius: 0.4rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
     }
-    .leaflet-popup-content { margin: 0; font-family: 'Outfit', sans-serif; line-height: 1.5; }
-    .leaflet-popup-tip { background: var(--bg-dark); }
-    .popup-card { padding: 14px 16px; min-width: 240px; max-width: 280px; }
-    .popup-name { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
-    .popup-id { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; }
-    .popup-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; }
-    .popup-row { display: flex; gap: 8px; margin-bottom: 4px; font-size: 0.85rem; }
-    .popup-label { color: #64748b; min-width: 60px; flex-shrink: 0; }
-    .popup-value { color: #e2e8f0; word-break: break-word; }
-    .popup-office-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
-    /* Loading overlay */
+    .badge-earthquake { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+    .badge-nasa { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .event-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .search-container {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--glass-border);
+        color: white;
+        font-size: 0.85rem;
+    }
+
     .map-loading {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(15, 23, 42, 0.85);
+        background: rgba(15, 23, 42, 0.9);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 2000;
         gap: 1rem;
-        border-radius: 1.5rem;
         transition: opacity 0.4s ease;
     }
     .map-loading.hidden {
         opacity: 0;
         pointer-events: none;
     }
-    .loading-spinner {
-        width: 40px; height: 40px;
-        border: 3px solid rgba(99, 102, 241, 0.2);
-        border-top-color: #6366f1;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    .loading-text {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(99, 102, 241, 0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @media (max-width: 768px) {
-        .map-wrapper {
-            flex-direction: column;
-            height: calc(100vh - 140px);
-            border-radius: 1rem;
-        }
-        .filter-sidebar {
-            width: 100%;
-            min-width: 100%;
-            max-height: 250px;
-            border-right: none;
-            border-bottom: 1px solid var(--glass-border);
-            overflow-y: auto;
-        }
-        .filter-sidebar.mobile-collapsed {
-            display: none;
-        }
-        #map {
-            min-height: 300px !important;
-            height: auto !important;
-            flex: 1;
-        }
-        .sidebar-toggle {
-            display: flex;
-        }
-        .map-loading {
-            border-radius: 1rem;
-        }
+    .leaflet-popup-content-wrapper {
+        background: #1e293b; color: #f1f5f9; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
     }
-    .sidebar-toggle {
-        display: none;
-        width: 100%;
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
-        border-radius: 0;
-        border-bottom: 1px solid var(--glass-border);
-        background: var(--glass);
-        color: var(--text-light);
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
+    .leaflet-popup-tip { background: #1e293b; }
+
+    @media (max-width: 1200px) {
+        .sidebar-right { display: none; }
     }
-    .sidebar-toggle:hover {
-        transform: none;
-        box-shadow: none;
+    @media (max-width: 900px) {
+        .sidebar-left { display: none; }
     }
 </style>
 @endsection
@@ -171,322 +158,278 @@
 <div class="animate-fade-in">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem;">
         <div>
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Employee Locations</h1>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">
-                Showing <span id="visible-count">0</span> of <span id="total-count">0</span> employees
-            </p>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Unified Command Center</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Monitoring <span id="total-employees">0</span> employees and real-time global hazards</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                <span id="sync-icon">🔄</span> Sync Hazards
+            </button>
+            <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                📍 Recenter PH
+            </button>
         </div>
     </div>
-    <div class="map-wrapper" style="position: relative;">
-        <div class="map-loading" id="map-loading">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Loading employee locations...</div>
-        </div>
-        <button class="sidebar-toggle" onclick="toggleMobileSidebar()">
-            🗂️ <span id="sidebar-toggle-text">Hide Filters</span>
-        </button>
-        <div class="filter-sidebar" id="filter-sidebar">
-            <div class="filter-header">
-                <h3 style="display: flex; align-items: center; justify-content: space-between;">
-                    🗂️ Layers
-                    <div id="search-toggle" style="cursor: pointer; font-size: 0.9rem; color: var(--primary);" onclick="toggleSearch()">🔍 Search</div>
-                </h3>
-                <small>Toggle employee groups</small>
+
+    <div class="unified-container">
+        <!-- Left Sidebar: Employees -->
+        <div class="sidebar-left">
+            <div class="sidebar-header">
+                <h3>👥 Employee Layers</h3>
+                <small>Filter by office/category</small>
             </div>
             
-            <div id="power-search-container" style="padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--glass-border); display: none;">
-                <input type="text" id="power-search" placeholder="Search name, ID, or office..." 
-                    style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; font-size: 0.85rem; font-family: 'Outfit', sans-serif;">
+            <div class="search-container">
+                <input type="text" id="employee-search" class="search-input" placeholder="Search employees...">
             </div>
 
-            <div class="filter-list" id="filter-list"></div>
-            
-            <div id="search-results" style="display: none; flex: 1; overflow-y: auto; padding: 0.5rem 0; border-top: 1px solid var(--glass-border); background: rgba(0,0,0,0.1);">
-                <div style="padding: 0 1.25rem 0.5rem; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Search Results</div>
-                <div id="results-list"></div>
+            <div class="scroll-area" id="employee-filters">
+                <!-- Dynamic categories -->
             </div>
 
-            <div class="filter-actions">
-                <button class="btn-ghost" onclick="toggleAll(false)">Hide All</button>
-                <button onclick="toggleAll(true)">Show All</button>
+            <div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem;">
+                <button class="btn btn-ghost" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(false)">Hide All</button>
+                <button class="btn btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(true)">Show All</button>
             </div>
         </div>
-        <div id="map" style="height: 600px; width: 100%; min-height: 600px;"></div>
+
+        <!-- Main Map -->
+        <div class="map-section">
+            <div id="map"></div>
+            <div class="map-loading" id="map-loading">
+                <div class="loading-spinner"></div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">Initializing Unified Map...</div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Hazards -->
+        <div class="sidebar-right">
+            <div class="sidebar-header">
+                <h3>⚠️ Global Hazards</h3>
+                <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
+                    <button onclick="setHazardFilter('all')" class="btn btn-ghost active-hazard-filter" id="h-filter-all" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">All</button>
+                    <button onclick="setHazardFilter('earthquake')" class="btn btn-ghost" id="h-filter-earthquake" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">USGS</button>
+                    <button onclick="setHazardFilter('nasa')" class="btn btn-ghost" id="h-filter-nasa" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">NASA</button>
+                </div>
+            </div>
+
+            <div class="scroll-area" id="hazard-list">
+                <!-- Hazards list -->
+            </div>
+
+            <div style="padding: 1rem; border-top: 1px solid var(--glass-border);">
+                <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted);">STATIC LAYERS</div>
+                <div class="filter-item" onclick="toggleStaticLayer('faults')">
+                    <input type="checkbox" id="layer-faults" checked onclick="event.stopPropagation()">
+                    <span style="display:inline-block; width:12px; height:2px; background:#f87171; border-radius:1px;"></span>
+                    <span>Active Faults (PH)</span>
+                </div>
+                <div class="filter-item" onclick="toggleStaticLayer('volcanoes')">
+                    <input type="checkbox" id="layer-volcanoes" checked onclick="event.stopPropagation()">
+                    <span class="filter-dot" style="background:#fbbf24; border:1px solid #d97706;"></span>
+                    <span>Volcanoes (PH)</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-    // Mobile sidebar toggle
-    window.toggleMobileSidebar = function() {
-        const sidebar = document.getElementById('filter-sidebar');
-        const text = document.getElementById('sidebar-toggle-text');
-        sidebar.classList.toggle('mobile-collapsed');
-        text.textContent = sidebar.classList.contains('mobile-collapsed') ? 'Show Filters' : 'Hide Filters';
-    };
+    let map;
+    let employeeMarkers = [];
+    let earthquakeMarkers = [];
+    let nasaMarkers = [];
+    let earthquakeData = [];
+    let nasaData = [];
+    let faultLayer, volcanoLayer;
+    let staticLayersLoaded = false;
+    let activeHazardFilter = 'all';
+    let employeeFilters = {};
 
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof L === 'undefined') {
-            console.error('Leaflet failed to load from CDN');
-            document.getElementById('map').innerHTML = '<div style="color:white;padding:20px;">Error: Leaflet library failed to load. Please check your internet connection.</div>';
-            document.getElementById('map-loading')?.classList.add('hidden');
-            return;
-        }
+    const categories = [
+        { key: 'NC Negros Occidental',  label: 'NC Negros Occidental', color: '#3b82f6' },
+        { key: 'NC Ilolo',              label: 'NC Ilolo',             color: '#800000' },
+        { key: 'NC Guimaras',           label: 'NC Guimaras',           color: '#eab308' },
+        { key: 'NC Capiz',              label: 'NC Capiz',              color: '#8b5cf6' },
+        { key: 'NC Antique',            label: 'NC Antique',            color: '#22c55e' },
+        { key: 'NC AKlan',              label: 'NC AKlan',              color: '#f97316' },
+        { key: 'DTI6 Regular Employees', label: 'DTI6 Regular Employees', color: '#3b82f6' },
+        { key: 'other',                 label: 'other',                 color: '#94a3b8' },
+    ];
 
-        const map = L.map('map', { preferCanvas: true }).setView([10.69, 122.52], 8);
-
-        const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            attribution: '&copy; CARTO'
-        }).addTo(map);
-
-        const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OSM'
-        });
-
-        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; Esri'
-        });
-
-        const baseMaps = {
-            "Dark Mode": dark,
-            "Streets": streets,
-            "Satellite": satellite
-        };
-
-        const overlayMaps = {};
-        const layerControl = L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
-
-        // 1. GEM Active Faults (LOCAL optimized file)
-        fetch('/maps/ph_faults.json')
-            .then(r => r.json())
-            .then(data => {
-                const faultsLayer = L.geoJSON(data, {
-                    style: { color: '#f87171', weight: 2, opacity: 0.8, dashArray: '5, 5' },
-                    onEachFeature: (f, l) => l.bindPopup(`<b>Fault:</b> ${f.properties.name || 'Unnamed'}`)
-                });
-                layerControl.addOverlay(faultsLayer, "Active Faults");
-            });
-
-        // 2. Volcanoes (Loaded from LOCAL file to avoid CORS)
-        fetch('/maps/ph_volcanoes.json')
-            .then(r => r.json())
-            .then(data => {
-                const volcanoLayer = L.geoJSON(data, {
-                    pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: '#fbbf24', color: '#d97706', weight: 2, opacity: 1, fillOpacity: 0.8 }),
-                    onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.VolcanoName || f.properties.Volcano_Name || 'Unnamed'}`)
-                });
-                layerControl.addOverlay(volcanoLayer, "Active Volcanoes");
-            })
-            .catch(err => console.error('Error loading volcanoes:', err));
-
-
-        const categories = [
-            { key: 'NC Negros Occidental',  label: 'NC Negros Occidental', color: '#3b82f6' },
-            { key: 'NC Ilolo',              label: 'NC Ilolo',             color: '#800000' },
-            { key: 'NC Guimaras',           label: 'NC Guimaras',           color: '#eab308' },
-            { key: 'NC Capiz',              label: 'NC Capiz',              color: '#8b5cf6' },
-            { key: 'NC Antique',            label: 'NC Antique',            color: '#22c55e' },
-            { key: 'NC AKlan',              label: 'NC AKlan',              color: '#f97316' },
-            { key: 'DTI6 Regular Employees', label: 'DTI6 Regular Employees', color: '#3b82f6' },
-            { key: 'other',                 label: 'other',                 color: '#94a3b8' },
-        ];
-
-        function getCategory(loc) {
-            const type = (loc.employee_type || '').toLowerCase();
-            if (type.includes('negros occidental')) return 'NC Negros Occidental';
-            if (type.includes('iloilo') || type.includes('ilolo')) return 'NC Ilolo';
-            if (type.includes('guimaras')) return 'NC Guimaras';
-            if (type.includes('capiz')) return 'NC Capiz';
-            if (type.includes('antique')) return 'NC Antique';
-            if (type.includes('aklan')) return 'NC AKlan';
-            if (type.includes('dti6') || type.includes('regular')) return 'DTI6 Regular Employees';
-            return 'other';
-        }
-
-        function getCatColor(key) {
-            const cat = categories.find(c => c.key === key);
-            return cat ? cat.color : '#94a3b8';
-        }
-
-        function createHouseIcon(color) {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="28" height="32">
-                <polygon points="16,2 2,16 7,16 7,30 25,30 25,16 30,16" fill="${color}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-                <rect x="12" y="20" width="8" height="10" rx="1" fill="#fff" opacity="0.85"/>
-            </svg>`;
-            return L.divIcon({ html: svg, className: '', iconSize: [28, 32], iconAnchor: [14, 32], popupAnchor: [0, -32] });
-        }
-
-        const iconCache = {};
-        function getIcon(key) {
-            if (!iconCache[key]) iconCache[key] = createHouseIcon(getCatColor(key));
-            return iconCache[key];
-        }
-
-        function buildPopup(loc) {
-            const name = loc.user?.name || 'Unknown';
-            const idNo = loc.employee_id_no || 'N/A';
-            const empType = loc.employee_type || '';
-            const office = loc.office || 'Unassigned';
-            const address = loc.address || '—';
-            const mobile = loc.mobile_no || '—';
-            const color = getCatColor(getCategory(loc));
-
-            return `
-                <div class="popup-card">
-                    <div class="popup-name">${name}</div>
-                    <div class="popup-id">ID: ${idNo}${empType ? ' • ' + empType : ''}</div>
-                    <hr class="popup-divider">
-                    <div class="popup-row"><span class="popup-label">Type</span><span class="popup-value"><span class="popup-office-badge" style="background:${color}22;color:${color};border:1px solid ${color}44;">${empType}</span></span></div>
-                    <div class="popup-row"><span class="popup-label">Office</span><span class="popup-value">${office}</span></div>
-                    <div class="popup-row"><span class="popup-label">Address</span><span class="popup-value">${address}</span></div>
-                    <div class="popup-row"><span class="popup-label">Mobile</span><span class="popup-value">${mobile}</span></div>
-                </div>
-            `;
-        }
-
-        let allMarkers = [];
-        let catFilters = {};
-
-        function updateCount() {
-            const visibleCountEl = document.getElementById('visible-count');
-            if (visibleCountEl) {
-                visibleCountEl.textContent = allMarkers.filter(m => map.hasLayer(m.marker)).length;
-            }
-        }
-
-        function buildSidebar() {
-            const counts = {};
-            categories.forEach(c => counts[c.key] = 0);
-            allMarkers.forEach(m => counts[m.catKey]++);
-            const list = document.getElementById('filter-list');
-            if (!list) return;
-            list.innerHTML = '';
-            categories.forEach(cat => {
-                catFilters[cat.key] = true;
-                const item = document.createElement('label');
-                item.className = 'filter-item';
-                item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span class="filter-item-label">${cat.label}</span><span class="filter-count">${counts[cat.key]}</span>`;
-                item.querySelector('input').addEventListener('change', function() {
-                    catFilters[cat.key] = this.checked;
-                    applyFilters();
-                });
-                list.appendChild(item);
-            });
-        }
-
-        function applyFilters() {
-            allMarkers.forEach(m => {
-                const visible = catFilters[m.catKey];
-                if (visible && !map.hasLayer(m.marker)) {
-                    m.marker.addTo(map);
-                } else if (!visible && map.hasLayer(m.marker)) {
-                    map.removeLayer(m.marker);
-                }
-            });
-            updateCount();
-        }
-
-        window.toggleAll = function(state) {
-            Object.keys(catFilters).forEach(k => catFilters[k] = state);
-            document.querySelectorAll('.filter-item input').forEach(cb => cb.checked = state);
-            applyFilters();
-        };
-
-        window.toggleSearch = function() {
-            const container = document.getElementById('power-search-container');
-            const list = document.getElementById('filter-list');
-            const results = document.getElementById('search-results');
-            const toggle = document.getElementById('search-toggle');
-
-            if (container.style.display === 'none') {
-                container.style.display = 'block';
-                results.style.display = 'block';
-                list.style.display = 'none';
-                toggle.textContent = '🏠 Layers';
-                document.getElementById('power-search').focus();
-            } else {
-                container.style.display = 'none';
-                results.style.display = 'none';
-                list.style.display = 'block';
-                toggle.textContent = '🔍 Search';
-                document.getElementById('power-search').value = '';
-                renderResults('');
-            }
-        };
-
-        function renderResults(query) {
-            const list = document.getElementById('results-list');
-            if (!list) return;
-            list.innerHTML = '';
-            if (!query) {
-                list.innerHTML = '<div style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.85rem;">Type to search...</div>';
-                return;
-            }
-            const filtered = allMarkers.filter(m => {
-                const searchStr = `${m.data.user?.name} ${m.data.employee_id_no} ${m.data.office}`.toLowerCase();
-                return searchStr.includes(query.toLowerCase());
-            });
-            if (filtered.length === 0) {
-                list.innerHTML = '<div style="padding: 1rem 1.25rem; color: var(--text-muted); font-size: 0.85rem;">No results.</div>';
-                return;
-            }
-            filtered.slice(0, 50).forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'filter-item';
-                item.style.padding = '0.5rem 1.25rem';
-                item.innerHTML = `
-                    <div style="flex: 1;">
-                        <div style="font-weight: 500; font-size: 0.85rem;">${m.data.user?.name}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${m.data.office || 'No Office'}</div>
-                    </div>
-                `;
-                item.onclick = () => {
-                    map.setView(m.marker.getLatLng(), 15);
-                    if (!map.hasLayer(m.marker)) {
-                        catFilters[m.catKey] = true;
-                        const cb = document.querySelector(`.filter-item input[data-key="${m.catKey}"]`);
-                        if (cb) cb.checked = true;
-                        applyFilters();
-                    }
-                    setTimeout(() => m.marker.openPopup(), 100);
-                };
-                list.appendChild(item);
-            });
-        }
-
-        const powerSearchEl = document.getElementById('power-search');
-        if (powerSearchEl) {
-            powerSearchEl.addEventListener('input', (e) => renderResults(e.target.value));
-        }
-
-        fetch('{{ route("location.index") }}')
-            .then(r => r.json())
-            .then(data => {
-                const totalCountEl = document.getElementById('total-count');
-                if (totalCountEl) totalCountEl.textContent = data.length;
-                
-                const markerLayer = L.layerGroup().addTo(map);
-                data.forEach(loc => {
-                    const catKey = getCategory(loc);
-                    const marker = L.marker([parseFloat(loc.latitude), parseFloat(loc.longitude)], { icon: getIcon(catKey) });
-                    marker.bindPopup(buildPopup(loc), { maxWidth: 300 });
-                    markerLayer.addLayer(marker);
-                    allMarkers.push({ marker, catKey, data: loc });
-                });
-                buildSidebar();
-                updateCount();
-                // Hide loading overlay
-                document.getElementById('map-loading')?.classList.add('hidden');
-            })
-            .catch(err => {
-                console.error('Failed to load locations:', err);
-                document.getElementById('map-loading')?.classList.add('hidden');
-            });
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        loadEmployees();
+        refreshHazards();
     });
+
+    function initMap() {
+        map = L.map('map', { zoomControl: false, attributionControl: false, preferCanvas: true }).setView([12.8797, 121.7740], 6);
+        const dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
+        L.control.layers({ "Dark Mode": dark, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+    }
+
+    async function loadStaticLayers() {
+        try {
+            const [fRes, vRes] = await Promise.all([
+                fetch('/maps/ph_faults.json').then(r => r.json()),
+                fetch('/maps/ph_volcanoes.json').then(r => r.json())
+            ]);
+            faultLayer = L.geoJSON(fRes, {
+                style: { color: '#f87171', weight: 2, opacity: 0.8, dashArray: '5, 5' },
+                onEachFeature: (f, l) => l.bindPopup(`<b>Fault:</b> ${f.properties.name || 'Unnamed'}`)
+            }).addTo(map);
+            volcanoLayer = L.geoJSON(vRes, {
+                pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 6, fillColor: '#fbbf24', color: '#d97706', weight: 1.5, opacity: 1, fillOpacity: 0.8 }),
+                onEachFeature: (f, l) => l.bindPopup(`<b>Volcano:</b> ${f.properties.VolcanoName || 'Unnamed'}`)
+            }).addTo(map);
+            staticLayersLoaded = true;
+        } catch (err) { console.error('Static layers error:', err); }
+    }
+
+    async function refreshHazards() {
+        const syncIcon = document.getElementById('sync-icon');
+        const hazardContainer = document.getElementById('hazard-list');
+        syncIcon.style.animation = 'spin 1s linear infinite';
+        hazardContainer.innerHTML = `<div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+            <div class="loading-spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
+            <div style="font-weight: 500; color: white; margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
+        try {
+            const promises = [
+                fetch('{{ route("api.disasters.earthquakes") }}').then(r => r.json()),
+                fetch('{{ route("api.disasters.events") }}').then(r => r.json())
+            ];
+            if (!staticLayersLoaded) promises.push(loadStaticLayers());
+            const results = await Promise.all(promises);
+            earthquakeData = results[0].features || [];
+            nasaData = results[1].events || [];
+            renderHazardMarkers();
+            renderHazardList();
+        } catch (err) {
+            console.error('Hazard error:', err);
+            hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Sync failed.</div>';
+        } finally { syncIcon.style.animation = 'none'; }
+    }
+
+    async function loadEmployees() {
+        const loader = document.getElementById('map-loading');
+        try {
+            const res = await fetch('{{ route("location.index") }}');
+            const data = await res.json();
+            document.getElementById('total-employees').textContent = data.length;
+            data.forEach(loc => {
+                const lat = parseFloat(loc.latitude), lon = parseFloat(loc.longitude);
+                if (isNaN(lat) || isNaN(lon)) return;
+                const cat = getCategory(loc);
+                const marker = L.marker([lat, lon], { icon: getEmployeeIcon(cat) });
+                marker.bindPopup(buildEmployeePopup(loc), { maxWidth: 300 });
+                employeeMarkers.push({ marker, cat, data: loc });
+                marker.addTo(map);
+            });
+            buildEmployeeFilters();
+        } catch (err) { console.error(err); } finally { if (loader) loader.classList.add('hidden'); }
+    }
+
+    function getCategory(loc) {
+        const type = (loc.employee_type || '').toLowerCase();
+        if (type.includes('negros occidental')) return 'NC Negros Occidental';
+        if (type.includes('iloilo') || type.includes('ilolo')) return 'NC Ilolo';
+        if (type.includes('guimaras')) return 'NC Guimaras';
+        if (type.includes('capiz')) return 'NC Capiz';
+        if (type.includes('antique')) return 'NC Antique';
+        if (type.includes('aklan')) return 'NC AKlan';
+        return 'DTI6 Regular Employees';
+    }
+
+    function getEmployeeIcon(cat) {
+        const color = categories.find(c => c.key === cat)?.color || '#94a3b8';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="28" height="32"><polygon points="16,2 2,16 7,16 7,30 25,30 25,16 30,16" fill="${color}" stroke="#fff" stroke-width="1.5"/><rect x="12" y="20" width="8" height="10" rx="1" fill="#fff" opacity="0.85"/></svg>`;
+        return L.divIcon({ html: svg, className: '', iconSize: [28, 32], iconAnchor: [14, 32], popupAnchor: [0, -32] });
+    }
+
+    function buildEmployeePopup(loc) {
+        const name = loc.user?.name || 'Unknown', color = categories.find(c => c.key === getCategory(loc))?.color || '#94a3b8';
+        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;"><div style="font-weight: 600; font-size: 1rem; margin-bottom: 2px;">${name}</div><div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div><div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;"><div><span style="color:#64748b;">Office:</span> ${loc.office || 'Unassigned'}</div><div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div><div style="margin-top:4px; font-size: 0.75rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; display: inline-block;">${loc.employee_type}</div></div></div>`;
+    }
+
+    function buildEmployeeFilters() {
+        const counts = {}; categories.forEach(c => counts[c.key] = 0); employeeMarkers.forEach(m => counts[m.cat]++);
+        const container = document.getElementById('employee-filters'); container.innerHTML = '';
+        categories.forEach(cat => {
+            employeeFilters[cat.key] = true;
+            const item = document.createElement('div'); item.className = 'filter-item';
+            item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key]}</span>`;
+            item.onclick = (e) => { const cb = item.querySelector('input'); if (e.target !== cb) cb.checked = !cb.checked; employeeFilters[cat.key] = cb.checked; applyEmployeeFilters(); };
+            container.appendChild(item);
+        });
+    }
+
+    function applyEmployeeFilters() { employeeMarkers.forEach(m => { employeeFilters[m.cat] ? map.addLayer(m.marker) : map.removeLayer(m.marker); }); }
+    function toggleAllEmployees(state) { Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state); document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state); applyEmployeeFilters(); }
+    function toggleStaticLayer(type) { const checkbox = document.getElementById(`layer-${type}`); checkbox.checked = !checkbox.checked; if (type === 'faults') checkbox.checked ? map.addLayer(faultLayer) : map.removeLayer(faultLayer); else checkbox.checked ? map.addLayer(volcanoLayer) : map.removeLayer(volcanoLayer); }
+    function recenterPH() { map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); }
+
+    function renderHazardMarkers() {
+        earthquakeMarkers.forEach(m => map.removeLayer(m)); nasaMarkers.forEach(m => map.removeLayer(m));
+        earthquakeMarkers = []; nasaMarkers = [];
+        if (activeHazardFilter === 'all' || activeHazardFilter === 'earthquake') {
+            earthquakeData.forEach(eq => {
+                if (!eq.geometry || !eq.geometry.coordinates) return;
+                const [lon, lat, depth] = eq.geometry.coordinates, mag = eq.properties.mag, time = new Date(eq.properties.time);
+                const marker = L.circleMarker([lat, lon], { radius: Math.max(mag * 3, 5), fillColor: '#fb7185', color: '#f43f5e', weight: 1, opacity: 0.8, fillOpacity: 0.4 }).addTo(map);
+                marker.bindPopup(`<div style="min-width: 200px;"><div style="font-weight: 600; color: #f43f5e; margin-bottom: 4px; font-size: 0.95rem;">M ${mag} Earthquake</div><div style="font-size: 0.85rem; margin-bottom: 8px;">${eq.properties.place}</div><div style="display: grid; grid-template-columns: 70px 1fr; gap: 4px; font-size: 0.75rem;"><span style="color: #94a3b8;">Time</span><span>${time.toLocaleString()}</span><span style="color: #94a3b8;">Depth</span><span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span></div></div>`);
+                earthquakeMarkers.push(marker);
+            });
+        }
+        if (activeHazardFilter === 'all' || activeHazardFilter === 'nasa') {
+            nasaData.forEach(event => {
+                const geo = event.geometry?.[0]; if (!geo || geo.type !== 'Point') return;
+                const [lon, lat] = geo.coordinates;
+                const marker = L.circleMarker([lat, lon], { radius: 6, fillColor: '#60a5fa', color: '#3b82f6', weight: 1, opacity: 0.8, fillOpacity: 0.4 }).addTo(map);
+                marker.bindPopup(`<div style="min-width: 200px;"><div style="font-weight: 600; color: #3b82f6; margin-bottom: 4px; font-size: 0.95rem;">${event.categories[0]?.title}</div><div style="font-size: 0.85rem; margin-bottom: 8px;">${event.title}</div></div>`);
+                nasaMarkers.push(marker);
+            });
+        }
+    }
+
+    function renderHazardList() {
+        const container = document.getElementById('hazard-list'); container.innerHTML = '';
+        const all = [
+            ...(activeHazardFilter === 'all' || activeHazardFilter === 'earthquake' ? earthquakeData.filter(e => e.geometry && e.geometry.coordinates).map(e => ({ type: 'earthquake', title: e.properties.place, mag: e.properties.mag, time: e.properties.time, lat: e.geometry.coordinates[1], lon: e.geometry.coordinates[0] })) : []),
+            ...(activeHazardFilter === 'all' || activeHazardFilter === 'nasa' ? nasaData.filter(e => e.geometry && e.geometry[0] && e.geometry[0].coordinates).map(e => ({ type: 'nasa', title: e.title, category: e.categories[0]?.title, time: new Date(e.geometry?.[0]?.date).getTime(), lat: e.geometry?.[0]?.coordinates[1], lon: e.geometry?.[0]?.coordinates[0] })) : [])
+        ].sort((a, b) => b.time - a.time);
+        if (all.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No recent hazards.</div>'; return; }
+        all.forEach(ev => {
+            const card = document.createElement('div'); card.className = 'event-card';
+            card.innerHTML = `<div class="badge ${ev.type === 'earthquake' ? 'badge-earthquake' : 'badge-nasa'}">${ev.type === 'earthquake' ? 'Earthquake' : ev.category}</div><div style="font-weight: 600; font-size: 0.85rem;">${ev.type === 'earthquake' ? 'M ' + ev.mag + ' - ' : ''}${ev.title}</div><div class="event-time">${new Date(ev.time).toLocaleString()}</div>`;
+            card.onclick = () => { map.flyTo([ev.lat, ev.lon], 10); document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active')); card.classList.add('active'); };
+            container.appendChild(card);
+        });
+    }
+
+    function setHazardFilter(f) {
+        activeHazardFilter = f;
+        document.querySelectorAll('.sidebar-right .btn-ghost').forEach(b => b.classList.remove('active-hazard-filter', 'btn-primary'));
+        const btn = document.getElementById(`h-filter-${f}`);
+        if (btn) btn.classList.add('active-hazard-filter');
+        renderHazardMarkers(); renderHazardList();
+    }
+
+    const searchInput = document.getElementById('employee-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            employeeMarkers.forEach(m => {
+                const searchStr = `${m.data.user?.name} ${m.data.office}`.toLowerCase();
+                const visible = searchStr.includes(query) && employeeFilters[m.cat];
+                visible ? map.addLayer(m.marker) : map.removeLayer(m.marker);
+            });
+        });
+    }
 </script>
 @endsection
