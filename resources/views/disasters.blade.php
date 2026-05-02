@@ -208,12 +208,12 @@
             <div style="padding: 1.25rem; border-top: 1px solid var(--glass-border);">
                 <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase;">Static Overlays</div>
                 <div class="filter-item" onclick="toggleOverlay('faults')">
-                    <input type="checkbox" id="check-faults" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="check-faults" checked onclick="event.stopPropagation(); toggleOverlay('faults', true)">
                     <span style="display:inline-block; width:12px; height:2px; background:#f87171;"></span>
                     <span>Active Faults</span>
                 </div>
                 <div class="filter-item" onclick="toggleOverlay('volcanoes')">
-                    <input type="checkbox" id="check-volcanoes" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="check-volcanoes" checked onclick="event.stopPropagation(); toggleOverlay('volcanoes', true)">
                     <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#fbbf24; border:1px solid #d97706;"></span>
                     <span>Volcanoes</span>
                 </div>
@@ -288,9 +288,10 @@
         }
     }
 
-    function toggleOverlay(type) {
+    function toggleOverlay(type, isFromCheckbox = false) {
         const check = document.getElementById(`check-${type}`);
-        check.checked = !check.checked;
+        if (!isFromCheckbox) check.checked = !check.checked;
+        
         if (type === 'faults') check.checked ? map.addLayer(faultsLayer) : map.removeLayer(faultsLayer);
         else check.checked ? map.addLayer(volcanoesLayer) : map.removeLayer(volcanoesLayer);
     }

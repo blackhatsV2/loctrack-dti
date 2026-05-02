@@ -220,12 +220,12 @@
             <div style="padding: 1rem; border-top: 1px solid var(--glass-border);">
                 <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted);">STATIC LAYERS</div>
                 <div class="filter-item" onclick="toggleStaticLayer('faults')">
-                    <input type="checkbox" id="layer-faults" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="layer-faults" checked onclick="event.stopPropagation(); toggleStaticLayer('faults', true)">
                     <span style="display:inline-block; width:12px; height:2px; background:#f87171; border-radius:1px;"></span>
                     <span>Active Faults (PH)</span>
                 </div>
                 <div class="filter-item" onclick="toggleStaticLayer('volcanoes')">
-                    <input type="checkbox" id="layer-volcanoes" checked onclick="event.stopPropagation()">
+                    <input type="checkbox" id="layer-volcanoes" checked onclick="event.stopPropagation(); toggleStaticLayer('volcanoes', true)">
                     <span class="filter-dot" style="background:#fbbf24; border:1px solid #d97706;"></span>
                     <span>Volcanoes (PH)</span>
                 </div>
@@ -371,7 +371,12 @@
 
     function applyEmployeeFilters() { employeeMarkers.forEach(m => { employeeFilters[m.cat] ? map.addLayer(m.marker) : map.removeLayer(m.marker); }); }
     function toggleAllEmployees(state) { Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state); document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state); applyEmployeeFilters(); }
-    function toggleStaticLayer(type) { const checkbox = document.getElementById(`layer-${type}`); checkbox.checked = !checkbox.checked; if (type === 'faults') checkbox.checked ? map.addLayer(faultLayer) : map.removeLayer(faultLayer); else checkbox.checked ? map.addLayer(volcanoLayer) : map.removeLayer(volcanoLayer); }
+    function toggleStaticLayer(type, isFromCheckbox = false) {
+        const checkbox = document.getElementById(`layer-${type}`);
+        if (!isFromCheckbox) checkbox.checked = !checkbox.checked;
+        if (type === 'faults') checkbox.checked ? map.addLayer(faultLayer) : map.removeLayer(faultLayer);
+        else checkbox.checked ? map.addLayer(volcanoLayer) : map.removeLayer(volcanoLayer);
+    }
     function recenterPH() { map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); }
 
     function renderHazardMarkers() {
