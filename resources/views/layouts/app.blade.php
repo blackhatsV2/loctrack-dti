@@ -424,6 +424,7 @@
                 @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('admin.employees') }}" class="{{ request()->routeIs('admin.employees*') ? 'active' : '' }}">Employees</a>
+                    <a href="{{ route('admin.workforce') }}" class="{{ request()->routeIs('admin.workforce') ? 'active' : '' }}">Workforce</a>
                     <a href="{{ route('admin.map') }}" class="{{ request()->routeIs('admin.map') ? 'active' : '' }}">Command Center</a>
                     <span class="nav-badge" onclick="toggleProfileModal()">Admin</span>
                 @else

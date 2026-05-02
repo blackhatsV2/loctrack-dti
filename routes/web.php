@@ -58,6 +58,7 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::get('/map', function () {
         return view('admin.map');
     })->name('admin.map');
+    Route::get('/workforce', [AdminController::class, 'workforce'])->name('admin.workforce');
     Route::get('/employees', [AdminController::class, 'index'])->name('admin.employees');
     Route::post('/employees', [AdminController::class, 'store'])->name('admin.employees.store');
     Route::get('/employees/{user}/edit', [AdminController::class, 'edit'])->name('admin.employees.edit');

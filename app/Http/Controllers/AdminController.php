@@ -262,6 +262,55 @@ class AdminController extends Controller
     }
 
     /**
+     * Workforce geography and analytics view.
+     */
+    public function workforce()
+    {
+        $adminEmail = 'admin@dti6.gov.ph';
+        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+
+        $latestLocationIds = EmployeeLocation::whereNotIn('user_id', $adminIds)
+            ->selectRaw('MAX(id) as max_id')
+            ->groupBy('user_id')
+            ->pluck('max_id');
+
+        $latestLocations = EmployeeLocation::whereIn('id', $latestLocationIds)
+            ->with('user')
+            ->get();
+
+        $allOffices = $latestLocations->pluck('office')->unique()->filter()->values();
+        $employeeTypes = $latestLocations->pluck('employee_type')->unique()->filter()->values();
+
+        // Analytics Data
+        $officeDistribution = $latestLocations->groupBy('office')
+            ->map(fn($group) => $group->count())
+            ->filter(fn($count, $office) => !empty($office));
+
+        $typeDistribution = $latestLocations->groupBy('employee_type')
+            ->map(fn($group) => $group->count())
+            ->filter(fn($count, $type) => !empty($type));
+
+        // Records Data
+        $recentLocations = EmployeeLocation::whereNotIn('user_id', $adminIds)
+            ->with('user')
+            ->latest('id')
+            ->limit(300)
+            ->get();
+
+        $offices = $allOffices;
+
+        return view('admin.workforce', compact(
+            'latestLocations',
+            'allOffices',
+            'employeeTypes',
+            'officeDistribution',
+            'typeDistribution',
+            'recentLocations',
+            'offices'
+        ));
+    }
+
+    /**
      * Update current admin profile.
      */
     public function updateProfile(Request $request)
