@@ -664,6 +664,56 @@
             markerCluster = L.layerGroup([focusMarker]).addTo(minimap);
             
             minimap.setView(coords, 16, { animate: true });
+
+            // Show indicator if map is out of view
+            showMapHint();
+        }
+    }
+
+    function showMapHint() {
+        const mapEl = document.getElementById('minimap');
+        if (!mapEl) return;
+
+        const rect = mapEl.getBoundingClientRect();
+        const isInViewport = (
+            rect.top >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+        );
+
+        if (!isInViewport) {
+            let hint = document.getElementById('map-scroll-hint');
+            if (hint) hint.remove(); // Reset existing hint
+
+            hint = document.createElement('div');
+            hint.id = 'map-scroll-hint';
+            hint.innerHTML = `
+                <div style="background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);" 
+                     onclick="document.getElementById('minimap').scrollIntoView({behavior: 'smooth', block: 'center'}); this.parentElement.remove();">
+                    <span style="font-size: 1.2rem;">📍</span>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem;">Map Updated Below</div>
+                        <div style="font-size: 0.75rem; opacity: 0.9;">Click to scroll to location</div>
+                    </div>
+                </div>
+            `;
+            hint.style.position = 'fixed';
+            hint.style.bottom = '2.5rem';
+            hint.style.left = '50%';
+            hint.style.transform = 'translateX(-50%)';
+            hint.style.zIndex = '10000';
+            hint.style.transition = 'all 0.3s ease';
+            hint.className = 'animate-fade-in';
+            document.body.appendChild(hint);
+
+            // Auto-hide after 5 seconds
+            clearTimeout(window.mapHintTimeout);
+            window.mapHintTimeout = setTimeout(() => {
+                if (hint && hint.parentElement) {
+                    hint.style.opacity = '0';
+                    hint.style.transform = 'translateX(-50%) translateY(10px)';
+                    setTimeout(() => hint.remove(), 300);
+                }
+            }, 5000);
         }
     }
 

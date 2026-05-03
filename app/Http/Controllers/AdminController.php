@@ -189,23 +189,16 @@ class AdminController extends Controller
         $adminEmail = 'admin@dti6.gov.ph';
         $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
 
-        // Total employees count should be all non-admin users (all KML entries)
+        // Total employees count should be all non-admin users
         $totalEmployees = User::whereNotIn('id', $adminIds)->count();
-        
-        $totalLocations = $totalEmployees; // One location per KML entry
-        $recentUpdatesCount = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->where('recorded_at', '>=', now()->subDay())
-            ->count();
+        $totalLocations = $totalEmployees;
 
-        // Get latest location for each non-admin user
-        $latestLocationIds = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->selectRaw('MAX(id) as max_id')
-            ->groupBy('user_id')
-            ->pluck('max_id');
-
-        $latestLocations = EmployeeLocation::whereIn('id', $latestLocationIds)
-            ->with('user')
-            ->get();
+        // Get count of unique offices
+        $totalOffices = EmployeeLocation::whereNotIn('user_id', $adminIds)
+            ->whereNotNull('office')
+            ->where('office', '!=', '')
+            ->distinct('office')
+            ->count('office');
 
         // Filter for "Online" users (active in last 24 hours for testing)
         $activeThreshold = now()->subHours(24);
@@ -213,50 +206,10 @@ class AdminController extends Controller
             ->where('last_activity_at', '>=', $activeThreshold)
             ->get();
 
-        $offices = $latestLocations->pluck('office')->unique()->filter()->values();
-        $totalOffices = $offices->count();
-
-        // Data for Office Distribution Chart (KML entries only)
-        $officeDistribution = $latestLocations->groupBy('office')
-            ->map(function($group) {
-                return $group->count();
-            })
-            ->filter(function($count, $office) {
-                return !empty($office);
-            });
-
-        // Data for Employee Type Distribution Chart (KML entries only)
-        $typeDistribution = $latestLocations->groupBy('employee_type')
-            ->map(function($group) {
-                return $group->count();
-            })
-            ->filter(function($count, $type) {
-                return !empty($type);
-            });
-
-        // Get all location records for non-admins (for location records table)
-        $recentLocations = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->with('user')
-            ->latest('id')
-            ->limit(300)
-            ->get();
-
-        // Get all unique offices and types for filters
-        $allOffices = $latestLocations->pluck('office')->unique()->filter()->values();
-        $employeeTypes = $latestLocations->pluck('employee_type')->unique()->filter()->values();
-
         return view('admin.dashboard', compact(
             'totalEmployees', 
             'totalLocations', 
             'totalOffices', 
-            'recentUpdatesCount',
-            'latestLocations', 
-            'recentLocations',
-            'offices',
-            'officeDistribution',
-            'typeDistribution',
-            'allOffices',
-            'employeeTypes',
             'onlineUsers'
         ));
     }
