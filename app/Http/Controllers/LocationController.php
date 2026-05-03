@@ -39,13 +39,14 @@ class LocationController extends Controller
         $adminEmail = 'admin@dti6.gov.ph';
         $adminIds = \App\Models\User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
 
-        // Get latest location ID for each non-admin user
-        $latestLocationIds = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->selectRaw('MAX(id) as max_id')
-            ->groupBy('user_id')
-            ->pluck('max_id');
-
-        $locations = EmployeeLocation::whereIn('id', $latestLocationIds)
+        // Get latest location for each non-admin user using a more efficient join
+        $locations = EmployeeLocation::select('employee_locations.*')
+            ->joinSub(function ($query) {
+                $query->selectRaw('MAX(id) as max_id')
+                    ->from('employee_locations')
+                    ->groupBy('user_id');
+            }, 'latest', 'employee_locations.id', '=', 'latest.max_id')
+            ->whereNotIn('user_id', $adminIds)
             ->with('user')
             ->get();
 

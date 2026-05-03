@@ -385,12 +385,13 @@
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(8px);
             z-index: 9999;
-            display: flex; /* Show by default on load */
+            display: none; /* Hidden by default */
             justify-content: center;
             align-items: center;
             flex-direction: column;
             gap: 1.25rem;
             transition: opacity 0.4s ease;
+            opacity: 0;
         }
         
         #global-loader.fade-out {
@@ -409,6 +410,16 @@
         <div class="spinner"></div>
         <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
     </div>
+    <script>
+        // Only show loader on initial page load if it takes longer than 1 second
+        window.loaderTimeout = setTimeout(function() {
+            const loader = document.getElementById('global-loader');
+            if (loader && !window.pageLoaded) {
+                loader.style.display = 'flex';
+                setTimeout(() => loader.style.opacity = '1', 10);
+            }
+        }, 1000);
+    </script>
     <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;"></div>
     <nav>
         <a href="{{ url('/') }}" class="logo-container">
@@ -495,11 +506,15 @@
     <script>
         // Global loading feedback
         window.addEventListener('load', function() {
+            window.pageLoaded = true;
+            if (window.loaderTimeout) clearTimeout(window.loaderTimeout);
+            
             const loader = document.getElementById('global-loader');
             if (loader) {
                 loader.classList.add('fade-out');
                 setTimeout(() => {
                     loader.style.display = 'none';
+                    loader.classList.remove('fade-out');
                 }, 400);
             }
         });
@@ -572,12 +587,6 @@
                 const href = link.getAttribute('href');
                 const target = link.getAttribute('target');
                 
-                // Conditions for showing redirect loader:
-                // 1. Has href
-                // 2. Not a hash link
-                // 3. Not a javascript: link
-                // 4. Not opening in new tab
-                // 5. Not a download link
                 if (href && 
                     !href.startsWith('#') && 
                     !href.startsWith('javascript:') && 
@@ -585,9 +594,24 @@
                     !link.hasAttribute('download') &&
                     !link.classList.contains('no-loader')) {
                     
-                    // Small delay to prevent flashing on very fast links
-                    // but most page navigations are slow enough where this is appreciated
-                    setTimeout(showGlobalLoader, 50);
+                    // Increased delay to 800ms - only show for slow transitions
+                    if (window.clickLoaderTimeout) clearTimeout(window.clickLoaderTimeout);
+                    window.clickLoaderTimeout = setTimeout(showGlobalLoader, 800);
+                }
+            }
+        });
+
+        // InstantClick-like prefetching
+        document.addEventListener('mouseover', function(e) {
+            const link = e.target.closest('a');
+            if (link && link.href && link.origin === window.location.origin && !link.dataset.prefetched) {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                    const prefetchLink = document.createElement('link');
+                    prefetchLink.rel = 'prefetch';
+                    prefetchLink.href = href;
+                    document.head.appendChild(prefetchLink);
+                    link.dataset.prefetched = 'true';
                 }
             }
         });

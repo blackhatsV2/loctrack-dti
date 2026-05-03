@@ -237,9 +237,8 @@
         }
     }
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+{{-- Leaflet and MarkerCluster are now bundled in app.js via Vite --}}
+
 @endsection
 
 @section('content')
@@ -433,9 +432,8 @@
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{-- Libraries are bundled in app.js --}}
+
 <script>
     // --- Tabs Logic ---
     function switchTab(tabId) {

@@ -222,12 +222,12 @@ class AdminController extends Controller
         $adminEmail = 'admin@dti6.gov.ph';
         $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
 
-        $latestLocationIds = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->selectRaw('MAX(id) as max_id')
-            ->groupBy('user_id')
-            ->pluck('max_id');
-
-        $latestLocations = EmployeeLocation::whereIn('id', $latestLocationIds)
+        $latestLocations = EmployeeLocation::whereIn('id', function($query) {
+                $query->selectRaw('MAX(id)')
+                    ->from('employee_locations')
+                    ->groupBy('user_id');
+            })
+            ->whereNotIn('user_id', $adminIds)
             ->with('user')
             ->get();
 
