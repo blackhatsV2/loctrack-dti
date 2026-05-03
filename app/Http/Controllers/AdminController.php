@@ -189,16 +189,26 @@ class AdminController extends Controller
         $adminEmail = 'admin@dti6.gov.ph';
         $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
 
-        // Total employees count should be all non-admin users
-        $totalEmployees = User::whereNotIn('id', $adminIds)->count();
-        $totalLocations = $totalEmployees;
+        // Cache statistics for 5 minutes to ensure snappy dashboard loads
+        $stats = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_stats', 300, function() use ($adminIds) {
+            return [
+                'totalEmployees' => User::whereNotIn('id', $adminIds)->count(),
+                'totalOffices' => EmployeeLocation::whereIn('id', function($query) {
+                        $query->selectRaw('MAX(id)')
+                            ->from('employee_locations')
+                            ->groupBy('user_id');
+                    })
+                    ->whereNotIn('user_id', $adminIds)
+                    ->whereNotNull('office')
+                    ->where('office', '!=', '')
+                    ->distinct()
+                    ->count('office')
+            ];
+        });
 
-        // Get count of unique offices
-        $totalOffices = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->whereNotNull('office')
-            ->where('office', '!=', '')
-            ->distinct('office')
-            ->count('office');
+        $totalEmployees = $stats['totalEmployees'];
+        $totalOffices = $stats['totalOffices'];
+        $totalLocations = $totalEmployees;
 
         // Filter for "Online" users (active in last 24 hours for testing)
         $activeThreshold = now()->subHours(24);

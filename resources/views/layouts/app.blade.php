@@ -399,13 +399,45 @@
             pointer-events: none;
         }
 
+        #top-progress {
+            position: fixed;
+            top: 0; left: 0;
+            width: 0; height: 3px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            z-index: 10001;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
+            display: none;
+            pointer-events: none;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Skeleton Shimmer Utility */
+        .skeleton {
+            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05) 25%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 0.75rem;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
     @yield('styles')
 </head>
 <body>
+    <div id="top-progress"></div>
     <div id="global-loader">
         <div class="spinner"></div>
         <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
@@ -581,6 +613,17 @@
             }, 10);
         });
 
+        function startProgressBar() {
+            const bar = document.getElementById('top-progress');
+            if (bar) {
+                bar.style.display = 'block';
+                bar.style.width = '0%';
+                setTimeout(() => bar.style.width = '40%', 10);
+                setTimeout(() => bar.style.width = '70%', 300);
+                setTimeout(() => bar.style.width = '90%', 1000);
+            }
+        }
+
         document.addEventListener('click', function(e) {
             const link = e.target.closest('a');
             if (link) {
@@ -594,9 +637,8 @@
                     !link.hasAttribute('download') &&
                     !link.classList.contains('no-loader')) {
                     
-                    // Increased delay to 800ms - only show for slow transitions
-                    if (window.clickLoaderTimeout) clearTimeout(window.clickLoaderTimeout);
-                    window.clickLoaderTimeout = setTimeout(showGlobalLoader, 800);
+                    // Show progress bar instead of full-screen loader for immediate feedback
+                    startProgressBar();
                 }
             }
         });

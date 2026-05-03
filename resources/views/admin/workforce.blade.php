@@ -345,8 +345,8 @@
                 <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-light);">Office Distribution</h3>
                 <div class="chart-container">
                     <div class="page-loading" id="office-chart-loading">
-                        <div class="spinner"></div>
-                        <div class="spinner-text">Loading distribution...</div>
+                        <div class="skeleton" style="width: 200px; height: 200px; border-radius: 50%;"></div>
+                        <div class="skeleton" style="width: 140px; height: 12px; margin-top: 1rem;"></div>
                     </div>
                     <canvas id="officeChart"></canvas>
                 </div>
@@ -355,8 +355,14 @@
                 <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-light);">Personnel Type Breakdown</h3>
                 <div class="chart-container">
                     <div class="page-loading" id="type-chart-loading">
-                        <div class="spinner"></div>
-                        <div class="spinner-text">Loading breakdown...</div>
+                        <div style="display: flex; align-items: flex-end; gap: 8px; height: 150px; width: 100%; padding: 0 20px;">
+                            <div class="skeleton" style="flex: 1; height: 60%;"></div>
+                            <div class="skeleton" style="flex: 1; height: 90%;"></div>
+                            <div class="skeleton" style="flex: 1; height: 40%;"></div>
+                            <div class="skeleton" style="flex: 1; height: 75%;"></div>
+                            <div class="skeleton" style="flex: 1; height: 55%;"></div>
+                        </div>
+                        <div class="skeleton" style="width: 140px; height: 12px; margin-top: 1rem;"></div>
                     </div>
                     <canvas id="typeChart"></canvas>
                 </div>
@@ -402,8 +408,12 @@
                 placeholder="Power Search: Find by name, address, or office..."
                 onkeyup="powerSearch('location-table', 'power-search')">
             <div class="table-container" style="position: relative;">
-                <div class="page-loading" id="table-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(15, 23, 42, 0.8);">
-                    <div class="spinner"></div>
+                <div class="page-loading" id="table-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(15, 23, 42, 0.9); flex-direction: column; gap: 0.75rem; padding: 2rem;">
+                    <div class="skeleton" style="width: 100%; height: 40px;"></div>
+                    <div class="skeleton" style="width: 100%; height: 40px; opacity: 0.8;"></div>
+                    <div class="skeleton" style="width: 100%; height: 40px; opacity: 0.6;"></div>
+                    <div class="skeleton" style="width: 100%; height: 40px; opacity: 0.4;"></div>
+                    <div class="skeleton" style="width: 100%; height: 40px; opacity: 0.2;"></div>
                 </div>
                 <table class="data-table" id="location-table">
                     <thead>

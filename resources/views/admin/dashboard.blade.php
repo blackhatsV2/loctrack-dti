@@ -22,7 +22,7 @@
 
     .stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
@@ -69,10 +69,7 @@
             <div style="font-size: 2.5rem; font-weight: 600; color: #f472b6;">{{ $totalOffices }}</div>
             <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Active Offices</div>
         </a>
-        <a href="{{ route('admin.map') }}" class="glass-card stat-card">
-            <div style="font-size: 2.5rem; font-weight: 600;">🌍</div>
-            <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Global View</div>
-        </a>
+
     </div>
 
     <!-- Online Presence Section -->
