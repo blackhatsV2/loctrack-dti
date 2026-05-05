@@ -30,6 +30,10 @@ class ResetPasswordsToDefault extends Command
         $users = User::where('is_admin', false)->get();
         $count = 0;
 
+        $this->info("Resetting passwords for {$users->count()} users...");
+        $bar = $this->output->createProgressBar($users->count());
+        $bar->start();
+
         foreach ($users as $user) {
             $name = trim($user->name);
             
@@ -46,9 +50,13 @@ class ResetPasswordsToDefault extends Command
             $password = strtolower(str_replace(' ', '', $lastName . $firstName)) . '06';
             $user->password = Hash::make($password);
             $user->save();
+            
+            $bar->advance();
             $count++;
         }
 
+        $bar->finish();
+        $this->newLine();
         $this->info("Successfully reset {$count} passwords.");
     }
 }
