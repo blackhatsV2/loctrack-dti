@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <style>
     .address-card-grid {
         display: grid;
@@ -442,7 +445,10 @@
 @endsection
 
 @section('scripts')
-{{-- Libraries are bundled in app.js --}}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{-- Libraries are also bundled in app.js --}}
 
 <script>
     // --- Tabs Logic ---
@@ -751,8 +757,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        initCharts();
-        initMinimap();
+        try { initCharts(); } catch (e) { console.error('Charts init failed:', e); }
+        try { initMinimap(); } catch (e) { console.error('Minimap init failed:', e); }
 
         // Handle initial tab from URL hash
         const hash = window.location.hash.replace('#', '');

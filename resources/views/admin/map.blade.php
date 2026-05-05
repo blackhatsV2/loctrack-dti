@@ -268,9 +268,12 @@
 
     function initMap() {
         map = L.map('map', { zoomControl: false, attributionControl: false, preferCanvas: true }).setView([12.8797, 121.7740], 6);
-        const gray = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        const gray = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
         const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-        L.control.layers({ "Gray Map": gray, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
+        L.control.layers({ "Standard Map": gray, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
     }
 
