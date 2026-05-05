@@ -251,8 +251,16 @@
                 <input type="text" id="employee-search" class="search-input" placeholder="Search employees...">
             </div>
 
-            <div class="scroll-area" id="employee-filters">
+            <div class="scroll-area" id="employee-filters" style="flex: none; max-height: 220px; border-bottom: 1px solid var(--glass-border);">
                 <!-- Dynamic categories -->
+            </div>
+
+            <div class="sidebar-header" style="background: rgba(255,255,255,0.02); padding: 0.75rem 1.25rem;">
+                <h3 style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Personnel Directory</h3>
+            </div>
+
+            <div class="scroll-area" id="employee-names-list" style="flex: 1;">
+                <!-- Dynamic employee names -->
             </div>
 
             <div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem;">
@@ -415,16 +423,28 @@
         try {
             const res = await fetch('{{ route("location.index") }}');
             const data = await res.json();
+            
+            // Clear existing markers
+            employeeMarkers.forEach(m => map.removeLayer(m.marker));
+            employeeMarkers = [];
+
             data.forEach(loc => {
                 const lat = parseFloat(loc.latitude), lon = parseFloat(loc.longitude);
                 if (isNaN(lat) || isNaN(lon)) return;
                 const cat = getCategory(loc);
-                const marker = L.marker([lat, lon], { icon: getEmployeeIcon(cat) });
+                
+                let icon;
+                if (loc.type === 'home') icon = getHomeIcon(cat);
+                else if (loc.type === 'office') icon = getOfficeMarkerIcon(cat);
+                else icon = getEmployeeIcon(cat);
+
+                const marker = L.marker([lat, lon], { icon: icon });
                 marker.bindPopup(buildEmployeePopup(loc), { maxWidth: 300 });
                 employeeMarkers.push({ marker, cat, data: loc });
                 marker.addTo(map);
             });
             buildEmployeeFilters();
+            updateEmployeeVisibility();
         } catch (err) { console.error(err); } finally { if (loader) loader.classList.add('hidden'); }
     }
 
@@ -445,9 +465,33 @@
         return L.divIcon({ html: svg, className: '', iconSize: [28, 32], iconAnchor: [14, 32], popupAnchor: [0, -32] });
     }
 
+    function getHomeIcon(cat) {
+        const color = categories.find(c => c.key === cat)?.color || '#94a3b8';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="28" height="32"><path d="M16 4L4 14V28H12V20H20V28H28V14L16 4Z" fill="${color}" stroke="#fff" stroke-width="1.5"/><rect x="12" y="20" width="8" height="8" fill="#fff" opacity="0.3"/></svg>`;
+        return L.divIcon({ html: svg, className: '', iconSize: [28, 32], iconAnchor: [14, 32], popupAnchor: [0, -32] });
+    }
+
+    function getOfficeMarkerIcon(cat) {
+        const color = categories.find(c => c.key === cat)?.color || '#94a3b8';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="28" height="32"><path d="M6 30V6H20V30M20 14H26V30H20M10 10H16M10 16H16M10 22H16" fill="${color}" stroke="#fff" stroke-width="1.5"/><rect x="8" y="8" width="10" height="20" fill="#fff" opacity="0.1"/></svg>`;
+        return L.divIcon({ html: svg, className: '', iconSize: [28, 32], iconAnchor: [14, 32], popupAnchor: [0, -32] });
+    }
+
     function buildEmployeePopup(loc) {
         const name = loc.user?.name || 'Unknown', color = categories.find(c => c.key === getCategory(loc))?.color || '#94a3b8';
-        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;"><div style="font-weight: 600; font-size: 1rem; margin-bottom: 2px;">${name}</div><div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div><div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;"><div><span style="color:#64748b;">Office:</span> ${loc.office || 'Unassigned'}</div><div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div><div style="margin-top:4px; font-size: 0.75rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; display: inline-block;">${loc.employee_type}</div></div></div>`;
+        const typeLabel = loc.type === 'home' ? '🏠 Home Address' : (loc.type === 'office' ? '🏢 Office Location' : '📍 Personnel Location');
+        const address = loc.type === 'office' ? loc.office : (loc.address || 'Not set');
+        
+        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;">
+            <div style="font-size: 0.65rem; color: ${color}; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">${typeLabel}</div>
+            <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 2px;">${name}</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                <div><span style="color:#64748b;">Location:</span> ${address}</div>
+                <div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div>
+                <div style="margin-top:4px; font-size: 0.75rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; display: inline-block;">${loc.employee_type}</div>
+            </div>
+        </div>`;
     }
 
     function buildEmployeeFilters() {
@@ -457,13 +501,136 @@
             employeeFilters[cat.key] = true;
             const item = document.createElement('div'); item.className = 'filter-item';
             item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key]}</span>`;
-            item.onclick = (e) => { const cb = item.querySelector('input'); if (e.target !== cb) cb.checked = !cb.checked; employeeFilters[cat.key] = cb.checked; applyEmployeeFilters(); };
+            item.onclick = (e) => { const cb = item.querySelector('input'); if (e.target !== cb) cb.checked = !cb.checked; employeeFilters[cat.key] = cb.checked; updateEmployeeVisibility(); };
             container.appendChild(item);
         });
     }
 
-    function applyEmployeeFilters() { employeeMarkers.forEach(m => { employeeFilters[m.cat] ? map.addLayer(m.marker) : map.removeLayer(m.marker); }); }
-    function toggleAllEmployees(state) { Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state); document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state); applyEmployeeFilters(); }
+    function updateEmployeeVisibility() {
+        const query = document.getElementById('employee-search')?.value.toLowerCase() || '';
+        const container = document.getElementById('employee-names-list');
+        if (container) container.innerHTML = '';
+
+        const userGroups = {};
+
+        employeeMarkers.forEach(m => {
+            const searchStr = `${m.data.user?.name} ${m.data.office} ${m.data.address || ''}`.toLowerCase();
+            const matchesSearch = searchStr.includes(query);
+            const matchesFilter = employeeFilters[m.cat];
+            const isVisible = matchesSearch && matchesFilter;
+
+            if (isVisible) {
+                map.addLayer(m.marker);
+                
+                const userId = m.data.user_id;
+                if (!userGroups[userId]) {
+                    userGroups[userId] = {
+                        name: m.data.user?.name || 'Unknown',
+                        cat: m.cat,
+                        locations: []
+                    };
+                }
+                userGroups[userId].locations.push(m);
+            } else {
+                map.removeLayer(m.marker);
+            }
+        });
+
+        if (container) {
+            Object.values(userGroups).sort((a, b) => a.name.localeCompare(b.name)).forEach(group => {
+                const item = document.createElement('div');
+                item.className = 'filter-item';
+                item.style.padding = '1rem 1.25rem';
+                item.style.flexDirection = 'column';
+                item.style.alignItems = 'stretch';
+                item.style.borderBottom = '1px solid var(--glass-border)';
+                item.style.background = 'rgba(255,255,255,0.01)';
+                
+                let locationHtml = '';
+                const homeLoc = group.locations.find(m => m.data.type === 'home');
+                const officeLoc = group.locations.find(m => m.data.type === 'office');
+                const otherLoc = group.locations.find(m => !m.data.type || m.data.type === 'broadcast' || m.data.type === 'regular');
+
+                if (homeLoc) {
+                    locationHtml += `
+                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: rgba(244, 63, 94, 0.04); border: 1px solid rgba(244, 63, 94, 0.1); display: flex; align-items: center; gap: 12px;"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(homeLoc)}, this)"
+                             onmouseover="this.style.background='rgba(244, 63, 94, 0.08)'; this.style.borderColor='rgba(244, 63, 94, 0.3)'; this.style.transform='translateX(4px)'"
+                             onmouseout="this.style.background='rgba(244, 63, 94, 0.04)'; this.style.borderColor='rgba(244, 63, 94, 0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🏠</span>
+                            <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                <span style="font-size: 0.65rem; font-weight: 800; color: #fb7185; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Home Address</span>
+                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${homeLoc.data.address || 'Address not set'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (officeLoc) {
+                    locationHtml += `
+                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.25s; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.1); display: flex; align-items: center; gap: 12px;"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(officeLoc)}, this)"
+                             onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'; this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.transform='translateX(4px)'"
+                             onmouseout="this.style.background='rgba(99, 102, 241, 0.04)'; this.style.borderColor='rgba(99, 102, 241, 0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🏢</span>
+                            <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                <span style="font-size: 0.65rem; font-weight: 800; color: #818cf8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Office Location</span>
+                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${officeLoc.data.office || 'Office not set'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (!homeLoc && !officeLoc && otherLoc) {
+                    locationHtml += `
+                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; gap: 12px;"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(otherLoc)}, this)"
+                             onmouseover="this.style.background='rgba(255, 255, 255, 0.08)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.transform='translateX(4px)'"
+                             onmouseout="this.style.background='rgba(255, 255, 255, 0.04)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.25rem;">📍</span>
+                            <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                <span style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Latest Activity</span>
+                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${otherLoc.data.office || 'Details not set'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 4px;">
+                        <div class="filter-dot" style="background:${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}; width: 10px; height: 10px; box-shadow: 0 0 10px ${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}44;"></div>
+                        <span style="font-weight: 700; font-size: 1rem; color: white;">${group.name}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        ${locationHtml}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.75rem;">No personnel found.</div>';
+            }
+        }
+    }
+
+    function focusMarker(index, el) {
+        const m = employeeMarkers[index];
+        if (m) {
+            map.flyTo(m.marker.getLatLng(), 15);
+            m.marker.openPopup();
+            
+            // Highlight in list
+            document.querySelectorAll('.loc-sub-item').forEach(item => {
+                item.style.background = 'rgba(255,255,255,0.03)';
+                item.style.borderColor = 'transparent';
+            });
+            el.style.background = 'rgba(99, 102, 241, 0.1)';
+            el.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+        }
+    }
+
+    function toggleAllEmployees(state) { Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state); document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state); updateEmployeeVisibility(); }
     function toggleStaticLayer(type, isFromCheckbox = false) {
         const checkbox = document.getElementById(`layer-${type}`);
         if (!isFromCheckbox) checkbox.checked = !checkbox.checked;
@@ -520,13 +687,8 @@
 
     const searchInput = document.getElementById('employee-search');
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            employeeMarkers.forEach(m => {
-                const searchStr = `${m.data.user?.name} ${m.data.office}`.toLowerCase();
-                const visible = searchStr.includes(query) && employeeFilters[m.cat];
-                visible ? map.addLayer(m.marker) : map.removeLayer(m.marker);
-            });
+        searchInput.addEventListener('input', () => {
+            updateEmployeeVisibility();
         });
     }
 </script>
