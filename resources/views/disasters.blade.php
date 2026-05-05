@@ -380,12 +380,7 @@
     }
 
     function recenterPH() { 
-        if (!isAdmin && empMarkers.length > 0) {
-            const first = empMarkers[0].marker.getLatLng();
-            map.flyTo(first, 12, { duration: 1.5 });
-        } else {
-            map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); 
-        }
+        map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); 
     }
 
     // Personnel Logic
@@ -519,7 +514,9 @@
     }
 
     function updateEmpCount() {
-        document.getElementById('emp-visible-count').textContent = empMarkers.filter(m => map.hasLayer(m.marker)).length;
+        const visibleMarkers = empMarkers.filter(m => map.hasLayer(m.marker));
+        const uniqueUserIds = new Set(visibleMarkers.map(m => m.data.user_id));
+        document.getElementById('emp-visible-count').textContent = uniqueUserIds.size;
     }
 
     function setAllEmployees(s) {

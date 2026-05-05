@@ -495,12 +495,17 @@
     }
 
     function buildEmployeeFilters() {
-        const counts = {}; categories.forEach(c => counts[c.key] = 0); employeeMarkers.forEach(m => counts[m.cat]++);
+        const counts = {}; 
+        categories.forEach(c => counts[c.key] = new Set()); 
+        employeeMarkers.forEach(m => {
+            if (counts[m.cat]) counts[m.cat].add(m.data.user_id);
+        });
+
         const container = document.getElementById('employee-filters'); container.innerHTML = '';
         categories.forEach(cat => {
             employeeFilters[cat.key] = true;
             const item = document.createElement('div'); item.className = 'filter-item';
-            item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key]}</span>`;
+            item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key].size}</span>`;
             item.onclick = (e) => { const cb = item.querySelector('input'); if (e.target !== cb) cb.checked = !cb.checked; employeeFilters[cat.key] = cb.checked; updateEmployeeVisibility(); };
             container.appendChild(item);
         });
