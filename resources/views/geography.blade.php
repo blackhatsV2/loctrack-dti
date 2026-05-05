@@ -596,6 +596,33 @@
     .ss-custom-input::placeholder {
         color: rgba(255,255,255,0.35);
     }
+
+    /* Password Peek Toggle */
+    .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+        z-index: 10;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    .password-toggle:hover {
+        color: var(--text-light);
+        background: none !important;
+    }
 </style>
 @endsection
 
@@ -655,7 +682,10 @@
                         @endif
                     </div>
                 </div>
-                <button class="btn-edit-profile" id="edit-profile-btn" onclick="toggleProfileEdit(true)">✏️ Edit Profile</button>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button class="btn-edit-profile" id="edit-profile-btn" onclick="toggleProfileEdit(true)">✏️ Edit Profile</button>
+                    <button class="btn-edit-profile" id="change-password-btn" onclick="togglePasswordEdit(true)" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.25);">🔑 Password</button>
+                </div>
             </div>
 
             <!-- Info Grid -->
@@ -721,6 +751,8 @@
             </div>
         </div>
 
+        </div>
+        
         <!-- Edit Form -->
         <div id="profile-edit" style="display: none;">
             <div style="margin-bottom: 1.75rem;">
@@ -780,6 +812,47 @@
                 <div class="profile-edit-actions">
                     <button type="submit" class="btn-save-profile">💾 Save Changes</button>
                     <button type="button" class="btn-cancel-profile" onclick="toggleProfileEdit(false)">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Password Change Form -->
+        <div id="password-edit" style="display: none;">
+            <div style="margin-bottom: 1.75rem;">
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">🔑 Change Password</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Ensure your account is using a long, random password to stay secure.</p>
+            </div>
+            <form id="password-form" onsubmit="savePassword(event)" class="profile-edit-grid">
+                <div class="profile-edit-group" style="grid-column: 1 / -1;">
+                    <label>Current Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="current_password" class="form-control" required placeholder="Enter your current password">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div class="profile-edit-group">
+                    <label>New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" class="form-control" required placeholder="Minimum 8 characters">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div class="profile-edit-group">
+                    <label>Confirm New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password_confirmation" class="form-control" required placeholder="Repeat new password">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div class="profile-edit-actions">
+                    <button type="submit" class="btn-save-profile" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">🔐 Update Password</button>
+                    <button type="button" class="btn-cancel-profile" onclick="togglePasswordEdit(false)">Cancel</button>
                 </div>
             </form>
         </div>
@@ -1086,8 +1159,85 @@
     }
 
     function toggleProfileEdit(show) {
+        if (show) togglePasswordEdit(false); // Hide password form if opening profile form
         document.getElementById('profile-display').style.display = show ? 'none' : 'block';
         document.getElementById('profile-edit').style.display = show ? 'block' : 'none';
+    }
+
+    function togglePasswordEdit(show) {
+        if (show) toggleProfileEdit(false); // Hide profile form if opening password form
+        document.getElementById('profile-display').style.display = show ? 'none' : 'block';
+        document.getElementById('password-edit').style.display = show ? 'block' : 'none';
+        if (!show) {
+            document.getElementById('password-form').reset();
+            // Reset all password fields to type="password"
+            document.querySelectorAll('#password-form input').forEach(input => {
+                input.type = 'password';
+            });
+            document.querySelectorAll('.password-toggle').forEach(btn => {
+                btn.textContent = '👁️';
+            });
+        }
+    }
+
+    function togglePasswordVisibility(button) {
+        const input = button.parentElement.querySelector('input');
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = '🔒';
+        } else {
+            input.type = 'password';
+            button.textContent = '👁️';
+        }
+    }
+
+    async function savePassword(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = 'Updating...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch("{{ route('profile.password') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                if (typeof showToast === 'function') {
+                    showToast('Success', 'Password updated successfully', 'success');
+                }
+                togglePasswordEdit(false);
+            } else {
+                let errorMsg = result.message || 'Failed to update password';
+                if (result.errors) {
+                    errorMsg = Object.values(result.errors).flat().join(' ');
+                }
+                if (typeof showToast === 'function') {
+                    showToast('Error', errorMsg, 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error updating password:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error', 'An unexpected error occurred', 'error');
+            }
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 
     async function saveProfile(event) {

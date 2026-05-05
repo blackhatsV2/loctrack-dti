@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/location/reuse/{id}', [LocationController::class, 'reuse'])
         ->name('location.reuse');
     Route::post('/profile/update', [LocationController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [LocationController::class, 'updatePassword'])->name('profile.password');
 
     // Disaster Tracker Routes
     Route::get('/disasters', [DisasterController::class, 'index'])->name('disasters.index');
