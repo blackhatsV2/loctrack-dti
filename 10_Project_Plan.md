@@ -46,10 +46,8 @@ The Preparedness, Safety & Continuity Portal: Workforce Locator is a premium wor
 - [x] Active Fault and Volcano map layers.
 - [x] KML/KMZ file support and rendering.
 
-### Phase 3: Performance & Scale (In Progress)
-- [x] Skeleton loaders and optimized page transitions.
+### Phase 3: Performance & Scale 
 - [x] Advanced database indexing for time-series location data.
-- [ ] Automated exportable PDF/Excel compliance reports.
 
 ### Phase 4: Intelligence & Automation (Future)
 - [ ] **Predictive Alerts**: Automated warnings based on disaster trajectory.
