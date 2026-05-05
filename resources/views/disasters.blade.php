@@ -144,15 +144,66 @@
     @media (max-width: 768px) {
         .sidebar-left { display: none; }
     }
+
+    /* Profile & Stats Highlights */
+    .dashboard-highlights {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        padding: 1.5rem;
+        text-align: center;
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .profile-mini-card {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .profile-avatar {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; font-weight: 700; color: white;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+    .profile-info h4 { margin: 0; font-size: 1.1rem; }
+    .profile-info p { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted); }
+    .profile-role-badge {
+        display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem;
+        background: rgba(99, 102, 241, 0.1); color: #a5b4fc;
+        font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-top: 0.5rem;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-highlights { grid-template-columns: 1fr; }
+    }
 </style>
 @endsection
 
 @section('content')
 <div class="animate-fade-in">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
         <div>
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Unified Disaster & Workforce Map</h1>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Integrated monitoring of personnel safety and global hazards</p>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Disaster Tracker Dashboard</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time monitoring of global hazards and personnel safety.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
             <button onclick="syncData()" class="btn btn-ghost" style="font-size: 0.8rem;">
@@ -161,6 +212,31 @@
             <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.8rem;">
                 📍 Recenter PH
             </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Highlights -->
+    <div class="dashboard-highlights">
+        <div class="stat-card">
+            <div class="stat-value">{{ number_format($totalCheckins) }}</div>
+            <div class="stat-label">Total Location Logs</div>
+        </div>
+        <div class="profile-mini-card">
+            <div class="profile-avatar">
+                {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $user->name)[1] ?? '', 0, 1)) }}
+            </div>
+            <div class="profile-info">
+                <h4>{{ $user->name }}</h4>
+                <p>{{ $user->email }}</p>
+                <div class="profile-role-badge">
+                    ⚡ {{ $user->employee_type ?? 'Staff Member' }}
+                </div>
+            </div>
+            <div style="margin-left: auto;">
+                <a href="{{ route('location.geography') }}" class="btn btn-ghost" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
+                    ⚙️ Manage Profile
+                </a>
+            </div>
         </div>
     </div>
 

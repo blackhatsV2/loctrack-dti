@@ -605,10 +605,10 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem;">
         <div>
             <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem;">
-                My Dashboard
+                My Geography
             </h1>
             <p style="color: var(--text-muted); font-size: 1rem;">
-                Welcome back, <span style="color: var(--text-light); font-weight: 600;">{{ $user->name }}</span>. Here is your tracking geography.
+                Manage your profile and focal point locations, <span style="color: var(--text-light); font-weight: 600;">{{ $user->name }}</span>.
             </p>
         </div>
     </div>

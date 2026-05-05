@@ -64,9 +64,9 @@ class LocationController extends Controller
     }
 
     /**
-     * Show the employee dashboard.
+     * Show the employee geography management page.
      */
-    public function dashboard()
+    public function geography()
     {
         $user = Auth::user();
         
@@ -112,7 +112,7 @@ class LocationController extends Controller
                 ->orderBy('employee_type')->pluck('employee_type');
         });
 
-        return view('dashboard', compact(
+        return view('geography', compact(
             'user', 
             'homeLocation', 
             'officeLocation', 

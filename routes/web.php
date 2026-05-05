@@ -17,7 +17,8 @@ Route::get('/', function () {
 
 // Employee routes (authenticated)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [LocationController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [DisasterController::class, 'index'])->name('dashboard');
+    Route::get('/geography', [LocationController::class, 'geography'])->name('location.geography');
 
     Route::post('/api/address', [LocationController::class, 'updateAddress'])
         ->name('location.updateAddress');
