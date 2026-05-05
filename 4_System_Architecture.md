@@ -1,15 +1,15 @@
 [← Back to README](README.md) | [← Previous: Functional Requirements](3_Functional_Requirements.md) | [Next: Database Documentation →](5_Database_Documentation.md)
 
-# System Architecture: Loctrack DTI
+# System Architecture: Preparedness, Safety & Continuity Portal: Workforce Locator
 
-This document describes the high-level architecture and technology stack of the Employee Location Tracking System.
+This document describes the high-level architecture and technology stack of the Preparedness, Safety & Continuity Portal: Workforce Locator system.
 
 ## Architecture Pattern
 The application follows the **Model-View-Controller (MVC)** architectural pattern.
 
 - **Model**: Eloquent ORM (e.g., `User.php`, `EmployeeLocation.php`) manages data logic and MySQL interactions.
-- **View**: Responsive Blade templates enhanced with **Tailwind CSS** and **Alpine.js**.
-- **Controller**: Logic handlers (e.g., `LocationController`, `AdminController`) managing input validation and response routing.
+- **View**: Responsive Blade templates enhanced with **Tailwind CSS v4** and **Alpine.js**.
+- **Controller**: Logic handlers (e.g., `LocationController`, `AdminController`, `DisasterController`) managing input validation, API orchestration, and response routing.
 
 ## Technology Stack
 
@@ -19,10 +19,13 @@ The application follows the **Model-View-Controller (MVC)** architectural patter
 - **Database**: MySQL (optimized with indexed time-series data)
 
 ### Specialized Integrations
-- **Maps**: Leaflet.js for interactive geographical plotting.
-- **Charts**: Chart.js for dashboard visualizations.
-- **API**: HTML5 Geolocation API for coordinate capture.
-- **Build System**: Vite for modern asset bundling.
+- **Maps**: Leaflet.js for interactive geographical plotting of personnel and hazards.
+- **Charts**: Chart.js for dashboard visualizations (distribution, density).
+- **API**: 
+    - HTML5 Geolocation API for coordinate capture.
+    - **USGS API**: For live earthquake data.
+    - **NASA EONET API**: For global natural events tracking.
+- **Build System**: Vite 7 for modern asset bundling.
 
 ## Infrastructure & Ops
 - **Containerization**: Docker-ready (via Sail/Dockerfile).
@@ -31,12 +34,14 @@ The application follows the **Model-View-Controller (MVC)** architectural patter
 
 ## Key System Components
 
-### 1. Geolocation Terminal
-A RESTful interface (`/api/location`) that validates and persists GPS data. Includes built-in throttling for stability.
+### 1. Telemetry API Terminal
+A RESTful interface (`/api/location`) that validates and persists GPS data. Includes built-in throttling for stability and reverse-geocoding for human-readable addresses.
 
-### 2. Admin Command Center
-Protected by `AdminMiddleware`, this layer provides the visualization engine for map plotting and record auditing.
+### 2. Disaster Orchestration Layer
+The `DisasterController` manages the fetching, normalization, and caching of live disaster data from external providers (USGS, NASA), making it available for the Command Center.
 
-### 3. Logic & Data Flow
-Employee Dashboard -> Browser Geolocation -> POST /api/location -> Laravel Controller -> MySQL Storage -> Admin Map View (Leaflet)
+### 3. Unified Command Center
+Protected by `AdminMiddleware`, this layer provides the visualization engine that synchronizes employee positions with disaster markers, fault lines, and volcano layers.
 
+### 4. Logic & Data Flow
+Employee Dashboard -> Browser Geolocation -> POST /api/location -> Laravel Controller -> MySQL Storage -> Admin Map View (Leaflet) <- Disaster Data Sync (USGS/NASA)

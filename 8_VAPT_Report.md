@@ -1,14 +1,14 @@
 [← Back to README](README.md) | [← Previous: User Manual](7_User_Manual.md) | [Next: Presentation →](9_Presentation.md)
 
-# VAPT Summary Report: Loctrack DTI
+# VAPT Summary Report: Preparedness, Safety & Continuity Portal: Workforce Locator
 
 ## 1. Executive Summary
-This report summarizes the security posture of the **Employee Location Tracking System**. The platform is designed with security-first principles, focusing on personnel data privacy, RBAC integrity, and API stability.
+This report summarizes the security posture of the **Preparedness, Safety & Continuity Portal: Workforce Locator**. The platform is designed with security-first principles, focusing on personnel data privacy, RBAC integrity, and API stability.
 
 ## 2. Security Assessment Scope
 - **Infrastructure**: Containerized Docker (Sail/Dockerfile) environment.
-- **Application Logic**: Laravel 11/12 framework core.
-- **API Endpoints**: `/api/location` (Geolocation submission) and administrative controllers.
+- **Application Logic**: Laravel 12 framework core.
+- **API Endpoints**: `/api/location` (Telemetry submission) and administrative controllers.
 - **Database**: Persistence layer integrity and access control.
 
 ## 3. Implemented Security Controls
@@ -19,7 +19,7 @@ This report summarizes the security posture of the **Employee Location Tracking 
 - **SecurityHeaders Middleware**: Additional HTTP security headers applied globally.
 - **CSRF & XSS Protection**: Native Laravel shields against web-based injection and forgery.
 
-### B. Geolocation API Security
+### B. Telemetry API Security
 - **Rate Limiting**: Throttling (30 requests/min) to mitigate DoS and coordinate injection attacks.
 - **Input Sanitization**: Strict validation of Latitude and Longitude coordinate precision.
 
@@ -40,4 +40,3 @@ This report summarizes the security posture of the **Employee Location Tracking 
 - Ensure `APP_ENV=production` enforces `FORCE_HTTPS=true`.
 - Implement automated dependency scanning in the CI/CD pipeline.
 - Periodic rotation of `APP_KEY` and database credentials.
-

@@ -1,8 +1,8 @@
 [← Back to README](README.md) | [← Previous: Database Documentation](5_Database_Documentation.md) | [Next: User Manual →](7_User_Manual.md)
 
-# Deployment Guide: Loctrack DTI
+# Deployment Guide: Preparedness, Safety & Continuity Portal: Workforce Locator
 
-This document provides instructions for deploying the Employee Location Tracking System.
+This document provides instructions for deploying the Preparedness, Safety & Continuity Portal: Workforce Locator system.
 
 ## Prerequisites
 - **Local Environment**: PHP 8.2+, Composer, Node.js & NPM, MySQL.
@@ -23,7 +23,7 @@ This document provides instructions for deploying the Employee Location Tracking
 ### 2. Cloud-Native / PaaS (e.g., Northflank)
 The system is optimized for **Nixpacks** detection.
 
-1.  Connect the `loctrack-dti` repository.
+1.  Connect the repository.
 2.  Define **Environment Variables**:
     *   `APP_KEY`, `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
 3.  The build process will automatically handle `composer install` and `npm install`.
@@ -42,4 +42,3 @@ php artisan view:cache
 - **SSL**: Force HTTPS in production `APP_URL`.
 - **Backups**: Regular dumps of the `employee_locations` table.
 - **Logs**: Monitor `storage/logs/laravel.log` for geolocation failures.
-

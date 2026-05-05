@@ -1,58 +1,57 @@
 [← Back to README](README.md) | [← Previous: VAPT Report](8_VAPT_Report.md) | [Next: Project Plan →](10_Project_Plan.md)
 
-# Project Presentation: Loctrack DTI
+# Project Presentation: Preparedness, Safety & Continuity Portal: Workforce Locator
 
 ## Slide 1: Welcome
-**Employee Location Tracking System**
-*Next-Gen Workforce Visibility and Real-time Monitoring*
+**Preparedness, Safety & Continuity Portal: Workforce Locator**
+*Synchronizing Workforce Visibility with Real-time Hazard Monitoring*
 
 ---
 
 ## Slide 2: The Challenge
-- Difficulty managing field personnel across multiple geographical zones.
-- Error-prone manual check-ins and delayed reporting.
-- Lack of centralized, real-time data for logistical planning.
-- High risk of data inconsistency in historical logs.
+- Managing field personnel across volatile geographical zones.
+- Lack of real-time correlation between staff locations and environmental hazards.
+- Fragmented reporting systems leading to delayed emergency response.
+- Need for high-accuracy, geocoded, and immutable tracking logs.
 
 ---
 
-## Slide 3: Our Solution: Loctrack DTI
-- **Real-time Snapshots**: Effortless mobile check-ins with high-accuracy GPS.
-- **Interactive Command Center**: Instant visualization of field distribution.
-- **Immutable History**: Comprehensive audit logs for compliance and safety.
-- **Modern Tech**: Built for scale using the Laravel 12 ecosystem.
+## Slide 3: Our Solution
+- **Unified Command Center**: A single-pane-of-glass view for personnel and hazards.
+- **Live Hazard Sync**: Real-time integration with USGS (Earthquakes) and NASA (Events).
+- **Geospatial Intelligence**: Active fault lines, volcano mapping, and KML/KMZ support.
+- **Modern Architecture**: Built on Laravel 12 for speed, security, and scalability.
 
 ---
 
 ## Slide 4: Personnel Features
-- **One-Click Reporting**: Simplified mobile UI for rapid submits.
-- **Automatic Addressing**: Instant reverse-geocoding of GPS data.
-- **Privacy First**: Secure authentication and session management.
+- **Rapid Reporting**: Simplified mobile UI for one-click location submits.
+- **Contextual Tracking**: Distinguish between Home and Office check-ins.
+- **Privacy First**: Secure RBAC and encrypted telemetry transmission.
 
 ---
 
-## Slide 5: Administrative Control
-- **Live Fleet Map**: Plotting workforce locations on a dynamic canvas.
+## Slide 5: Administrative Intelligence
+- **Interactive Fleet Map**: Plotting workforce distribution against live disaster data.
+- **Workforce Geography**: Specialized spatial analysis of home vs. office density.
 - **Audit Terminal**: Drill-down into personnel movement and reporting patterns.
-- **CRM Integration**: Manage employee profiles, offices, and contact data.
 
 ---
 
-## Slide 6: Security Highlights
-- **RBAC**: Multi-tier access control (Admin vs. Employee).
-- **API Guard**: Rate limiting and strict input validation.
-- **Containerization**: Standardized Docker-ready environment for rapid scaling.
+## Slide 6: Security & Resilience
+- **VAPT Verified**: Mitigated risks for SQLi, CSRF, and Access Control.
+- **API Guard**: Strict rate limiting and sanitized coordinate validation.
+- **Performant UI**: Skeleton loaders and optimized queries for zero-latency transitions.
 
 ---
 
 ## Slide 7: Future Vision
-- **Geofencing**: Automated zone-based alerts.
-- **Analytical Intelligence**: Workforce density heatmaps and route optimization.
-- **Native Experience**: Dedicated mobile applications for background tracking.
+- **Predictive Risk Assessment**: Automated alerts based on hazard trajectory.
+- **Geofencing**: Virtual perimeters for automated site check-ins/outs.
+- **Native Experience**: Background tracking via dedicated mobile apps.
 
 ---
 
 ## Slide 8: Closing
 **Thank you!**
-*Efficiency through Visibility.*
-
+*Safety through Visibility, Efficiency through Integration.*
