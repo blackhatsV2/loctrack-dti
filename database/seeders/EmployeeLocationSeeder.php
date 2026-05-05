@@ -178,7 +178,19 @@ class EmployeeLocationSeeder extends Seeder
                 ['email' => $email],
                 [
                     'name' => $name,
-                    'password' => Hash::make('dti6-' . Str::random(8)),
+                    'password' => (function() use ($name) {
+                        $parseName = trim($name);
+                        if (str_contains($parseName, ',')) {
+                            $parts = explode(',', $parseName);
+                            $lastName = trim($parts[0]);
+                            $firstName = trim($parts[1] ?? '');
+                        } else {
+                            $parts = explode(' ', $parseName);
+                            $lastName = trim(array_pop($parts));
+                            $firstName = trim(implode('', $parts));
+                        }
+                        return Hash::make(strtolower(str_replace(' ', '', $lastName . $firstName)) . '06');
+                    })(),
                 ]
             );
 

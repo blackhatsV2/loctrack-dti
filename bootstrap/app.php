@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         
+        $middleware->trimStrings(except: []);
+        
         $middleware->throttleApi('60,1'); // Generic API rate limit
     })
     ->withExceptions(function (Exceptions $exceptions): void {

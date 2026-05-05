@@ -98,12 +98,16 @@ class AdminController extends Controller
         $address = $request->address ? trim($request->address) : null;
 
         if (str_contains($name, ',')) {
-            $lastName = trim(explode(',', $name)[0]);
+            $parts = explode(',', $name);
+            $lastName = trim($parts[0]);
+            $firstName = trim($parts[1] ?? '');
         } else {
             $parts = explode(' ', $name);
-            $lastName = trim(end($parts));
+            $lastName = trim(array_pop($parts));
+            $firstName = trim(implode('', $parts));
         }
-        $password = $lastName . '@dti06';
+        
+        $password = strtolower(str_replace(' ', '', $lastName . $firstName)) . '06';
 
         // Create user
         $user = User::create([
