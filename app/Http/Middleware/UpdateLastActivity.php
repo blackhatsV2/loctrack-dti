@@ -17,8 +17,13 @@ class UpdateLastActivity
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {
-            $user = auth()->user();
-            $user->update(['last_activity_at' => now()]);
+            // Only update last_activity_at once per 60 seconds to avoid
+            // hammering the (remote) database on every single request.
+            $lastUpdate = session('_last_activity_updated_at', 0);
+            if (now()->timestamp - $lastUpdate > 60) {
+                auth()->user()->update(['last_activity_at' => now()]);
+                session(['_last_activity_updated_at' => now()->timestamp]);
+            }
         }
         return $next($request);
     }

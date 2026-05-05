@@ -429,6 +429,17 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => close(), 150);
         });
     }
+
+    // Standardize all form inputs (trim whitespace) before submission
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form.method.toLowerCase() === 'post') {
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea');
+            inputs.forEach(input => {
+                input.value = input.value.trim();
+            });
+        }
+    });
 });
 </script>
 @endsection

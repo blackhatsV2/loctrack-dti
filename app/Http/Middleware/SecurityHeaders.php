@@ -26,9 +26,20 @@ class SecurityHeaders
         if (app()->isProduction()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
-        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-        $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Expires', '0');
+
+        // Smart cache control: only disable caching for HTML/API responses,
+        // allow browser to cache static assets (CSS, JS, images, fonts).
+        $contentType = $response->headers->get('Content-Type', '');
+        $isHtmlOrApi = str_contains($contentType, 'text/html')
+                    || str_contains($contentType, 'application/json')
+                    || empty($contentType);
+
+        if ($isHtmlOrApi) {
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
+        // Static assets (CSS/JS/images/fonts) keep their default caching behavior
 
         return $response;
     }

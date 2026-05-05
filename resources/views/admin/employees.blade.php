@@ -92,19 +92,28 @@
     .modal {
         display: none;
         position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 23, 42, 0.82);
-        backdrop-filter: blur(8px);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         z-index: 9999;
         align-items: center;
         justify-content: center;
+        padding: 1.5rem;
     }
     .modal.active { display: flex; }
     .modal-content {
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
+        width: 100%;
+        max-width: 550px;
+        max-height: 85vh;
         overflow-y: auto;
+        position: relative;
+        margin: auto;
     }
     .input-group {
         margin-bottom: 1.25rem;
@@ -227,6 +236,7 @@
         @endif
     </div>
     @endif
+</div>
 
     <!-- Add Employee Modal -->
     <div id="add-employee-modal" class="modal">
@@ -248,9 +258,30 @@
                     <input type="email" name="email" class="form-input" placeholder="e.g. juan@dti6.gov.ph" required>
                 </div>
 
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">ID No. (Optional)</label>
+                        <input type="text" name="employee_id_no" class="form-input" placeholder="e.g. 12345">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Office</label>
+                        <select name="office" class="form-input" required>
+                            <option value="">Select Office</option>
+                            @foreach($offices as $o)
+                                <option value="{{ $o }}">{{ $o }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
                 <div class="input-group">
-                    <label class="input-label">Mobile Number</label>
-                    <input type="text" name="mobile_no" class="form-input" placeholder="e.g. 09123456789" required>
+                    <label class="input-label">Mobile Number (Optional)</label>
+                    <input type="text" name="mobile_no" class="form-input" placeholder="e.g. 09123456789">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Address (Optional)</label>
+                    <textarea name="address" class="form-input" placeholder="e.g. Iloilo City" rows="2" style="resize: vertical;"></textarea>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
@@ -281,7 +312,6 @@
             </form>
         </div>
     </div>
-</div>
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -291,11 +321,27 @@
     });
 
     function openAddModal() {
-        document.getElementById('add-employee-modal').classList.add('active');
+        const modal = document.getElementById('add-employee-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Disable background scroll
+        
+        // Reset modal scroll position to top
+        if (modalContent) modalContent.scrollTop = 0;
+        
+        // Scroll window to top for a clean backdrop
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Focus the first input
+        setTimeout(() => {
+            modal.querySelector('input[name="name"]')?.focus();
+        }, 300);
     }
 
     function closeAddModal() {
         document.getElementById('add-employee-modal').classList.remove('active');
+        document.body.style.overflow = ''; // Re-enable background scroll
     }
 
     function confirmDelete(id, name) {
@@ -306,10 +352,12 @@
         nameSpan.innerText = name;
         form.action = `/admin/employees/${id}`;
         modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 
     function closeDeleteModal() {
         document.getElementById('delete-modal').classList.remove('active');
+        document.body.style.overflow = '';
     }
 
     // Close modals on escape key
@@ -327,6 +375,17 @@
         if (event.target == addModal) closeAddModal();
         if (event.target == deleteModal) closeDeleteModal();
     }
+
+    // Standardize all form inputs (trim whitespace) before submission
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form.method.toLowerCase() === 'post') {
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea');
+            inputs.forEach(input => {
+                input.value = input.value.trim();
+            });
+        }
+    });
 </script>
 @endsection
 @endsection

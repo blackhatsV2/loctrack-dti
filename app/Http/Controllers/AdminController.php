@@ -5,18 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\EmployeeLocation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
+    /**
+     * Get admin user IDs (cached for 10 minutes to avoid redundant remote DB queries).
+     */
+    private function getAdminIds()
+    {
+        return Cache::remember('admin_user_ids', 600, function () {
+            $adminEmail = 'admin@dti6.gov.ph';
+            return User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id')->toArray();
+        });
+    }
     /**
      * List all employees (non-admin users).
      */
     public function index(Request $request)
     {
         // Only show non-admin users (KML entries only)
-        $adminEmail = 'admin@dti6.gov.ph';
-        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+        $adminIds = $this->getAdminIds();
         $query = User::whereNotIn('id', $adminIds)->where('is_admin', false);
 
         if ($search = $request->input('search')) {
@@ -43,8 +53,24 @@ class AdminController extends Controller
             ->select('office')
             ->distinct()
             ->whereNotNull('office')
+            ->where('office', '!=', '')
             ->orderBy('office')
-            ->pluck('office');
+            ->pluck('office')
+            ->toArray();
+
+        // Default DTI Region 6 offices if none or few found
+        $defaultOffices = [
+            'DTI Regional Office VI',
+            'DTI Aklan',
+            'DTI Antique',
+            'DTI Capiz',
+            'DTI Guimaras',
+            'DTI Iloilo',
+            'DTI Negros Occidental'
+        ];
+
+        $offices = array_unique(array_merge($offices, $defaultOffices));
+        sort($offices);
 
         return view('admin.employees', compact('employees', 'offices'));
     }
@@ -57,10 +83,20 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'mobile_no' => 'required|string|max:20',
+            'office' => 'required|string|max:255',
+            'employee_id_no' => 'nullable|string|max:50',
+            'mobile_no' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
         ]);
 
-        $name = trim($request->name);
+        // Standardize inputs
+        $name = \Illuminate\Support\Str::title(trim($request->name));
+        $email = strtolower(trim($request->email));
+        $office = trim($request->office);
+        $employeeIdNo = $request->employee_id_no ? strtoupper(trim($request->employee_id_no)) : null;
+        $mobileNo = $request->mobile_no ? trim($request->mobile_no) : null;
+        $address = $request->address ? trim($request->address) : null;
+
         if (str_contains($name, ',')) {
             $lastName = trim(explode(',', $name)[0]);
         } else {
@@ -69,21 +105,26 @@ class AdminController extends Controller
         }
         $password = $lastName . '@dti06';
 
-        // Create user with the new default password
+        // Create user
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name' => $name,
+            'email' => $email,
             'password' => Hash::make($password),
-            'mobile_no' => $request->mobile_no,
+            'employee_id_no' => $employeeIdNo,
+            'mobile_no' => $mobileNo,
+            'office' => $office,
             'is_admin' => false,
         ]);
 
-        // Create initial location record with mobile number
+        // Create initial location record
         EmployeeLocation::create([
             'user_id' => $user->id,
-            'mobile_no' => $request->mobile_no,
-            'latitude' => 0, // Default or placeholder
-            'longitude' => 0, // Default or placeholder
+            'employee_id_no' => $employeeIdNo,
+            'office' => $office,
+            'mobile_no' => $mobileNo,
+            'address' => $address,
+            'latitude' => 0,
+            'longitude' => 0,
             'recorded_at' => now(),
         ]);
 
@@ -125,14 +166,23 @@ class AdminController extends Controller
             'longitude' => 'nullable|numeric',
         ]);
 
+        // Standardize inputs
+        $name = \Illuminate\Support\Str::title(trim($request->name));
+        $email = strtolower(trim($request->email));
+        $office = $request->office ? trim($request->office) : null;
+        $employeeIdNo = $request->employee_id_no ? strtoupper(trim($request->employee_id_no)) : null;
+        $mobileNo = $request->mobile_no ? trim($request->mobile_no) : null;
+        $address = $request->address ? trim($request->address) : null;
+        $employeeType = $request->employee_type ? trim($request->employee_type) : null;
+
         // Update user
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'employee_id_no' => $request->employee_id_no,
-            'mobile_no' => $request->mobile_no,
-            'office' => $request->office,
-            'employee_type' => $request->employee_type,
+            'name' => $name,
+            'email' => $email,
+            'employee_id_no' => $employeeIdNo,
+            'mobile_no' => $mobileNo,
+            'office' => $office,
+            'employee_type' => $employeeType,
         ]);
 
         // Update or create location record
@@ -140,11 +190,11 @@ class AdminController extends Controller
 
         if ($location) {
             $location->update([
-                'address' => $request->address,
-                'mobile_no' => $request->mobile_no,
-                'office' => $request->office,
-                'employee_id_no' => $request->employee_id_no,
-                'employee_type' => $request->employee_type,
+                'address' => $address,
+                'mobile_no' => $mobileNo,
+                'office' => $office,
+                'employee_id_no' => $employeeIdNo,
+                'employee_type' => $employeeType,
                 'latitude' => $request->latitude ?? $location->latitude,
                 'longitude' => $request->longitude ?? $location->longitude,
             ]);
@@ -185,12 +235,10 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        // Define admin email to exclude
-        $adminEmail = 'admin@dti6.gov.ph';
-        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+        $adminIds = $this->getAdminIds();
 
         // Cache statistics for 5 minutes to ensure snappy dashboard loads
-        $stats = \Illuminate\Support\Facades\Cache::remember('admin_dashboard_stats', 300, function() use ($adminIds) {
+        $stats = Cache::remember('admin_dashboard_stats', 300, function() use ($adminIds) {
             return [
                 'totalEmployees' => User::whereNotIn('id', $adminIds)->count(),
                 'totalOffices' => EmployeeLocation::whereIn('id', function($query) {
@@ -214,6 +262,7 @@ class AdminController extends Controller
         $activeThreshold = now()->subHours(24);
         $onlineUsers = User::where('is_admin', false)
             ->where('last_activity_at', '>=', $activeThreshold)
+            ->select(['id', 'name', 'email', 'office', 'last_activity_at'])
             ->get();
 
         return view('admin.dashboard', compact(
@@ -229,8 +278,7 @@ class AdminController extends Controller
      */
     public function workforce()
     {
-        $adminEmail = 'admin@dti6.gov.ph';
-        $adminIds = User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+        $adminIds = $this->getAdminIds();
 
         $latestLocations = EmployeeLocation::whereIn('id', function($query) {
                 $query->selectRaw('MAX(id)')
@@ -238,7 +286,7 @@ class AdminController extends Controller
                     ->groupBy('user_id');
             })
             ->whereNotIn('user_id', $adminIds)
-            ->with('user')
+            ->with('user:id,name,email,office')
             ->get();
 
         $allOffices = $latestLocations->pluck('office')->unique()->filter()->values();
@@ -253,12 +301,8 @@ class AdminController extends Controller
             ->map(fn($group) => $group->count())
             ->filter(fn($count, $type) => !empty($type));
 
-        // Records Data
-        $recentLocations = EmployeeLocation::whereNotIn('user_id', $adminIds)
-            ->with('user')
-            ->latest('id')
-            ->limit(300)
-            ->get();
+        // Reuse latestLocations as recentLocations instead of a separate 300-row query
+        $recentLocations = $latestLocations;
 
         $offices = $allOffices;
 

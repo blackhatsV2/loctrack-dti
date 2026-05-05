@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EmployeeLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class LocationController extends Controller
 {
@@ -35,9 +36,11 @@ class LocationController extends Controller
 
     public function index()
     {
-        // Define admin email to include/exclude
-        $adminEmail = 'admin@dti6.gov.ph';
-        $adminIds = \App\Models\User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id');
+        // Use cached admin IDs
+        $adminIds = Cache::remember('admin_user_ids', 600, function () {
+            $adminEmail = 'admin@dti6.gov.ph';
+            return \App\Models\User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id')->toArray();
+        });
 
         // Get latest location for each non-admin user using a more efficient join
         $locations = EmployeeLocation::select('employee_locations.*')
@@ -47,7 +50,7 @@ class LocationController extends Controller
                     ->groupBy('user_id');
             }, 'latest', 'employee_locations.id', '=', 'latest.max_id')
             ->whereNotIn('user_id', $adminIds)
-            ->with('user')
+            ->with('user:id,name,email,office')
             ->get();
 
         return response()->json($locations);
@@ -59,55 +62,48 @@ class LocationController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $homeLocation = EmployeeLocation::where('user_id', $user->id)
-            ->where(function ($query) {
-                $query->where('type', 'home')
-                      ->orWhere(function ($q) {
-                          $q->whereNull('type')->whereNotNull('address');
-                      });
-            })
-            ->latest('recorded_at')
-            ->first();
-            
-        $officeLocation = EmployeeLocation::where('user_id', $user->id)
-            ->where(function ($query) {
-                $query->where('type', 'office')
-                      ->orWhere(function ($q) {
-                          $q->whereNull('type')->whereNotNull('office');
-                      });
-            })
-            ->latest('recorded_at')
-            ->first();
-
-        // Latest overall record for profile info (ID, Mobile, Type, etc.)
-        $latestLocation = EmployeeLocation::where('user_id', $user->id)
-            ->latest('recorded_at')
-            ->first();
         
-        // Stats & History for the new "Workforce Geography" style dashboard
-        $totalCheckins = EmployeeLocation::where('user_id', $user->id)->count();
-        $recentHistory = EmployeeLocation::where('user_id', $user->id)
+        // Single query to get all user locations needed, ordered by most recent
+        $userLocations = EmployeeLocation::where('user_id', $user->id)
             ->latest('recorded_at')
-            ->take(8)
+            ->limit(50)
             ->get();
 
-        // Activity Data (last 7 days)
-        $activityData = EmployeeLocation::where('user_id', $user->id)
-            ->where('recorded_at', '>=', now()->subDays(7))
-            ->selectRaw('DATE_FORMAT(recorded_at, "%b %d") as date, count(*) as count')
-            ->groupBy('date')
-            ->orderBy('recorded_at')
-            ->get()
-            ->pluck('count', 'date');
+        $homeLocation = $userLocations->first(function ($loc) {
+            return $loc->type === 'home' || (is_null($loc->type) && !is_null($loc->address));
+        });
 
-        // Distinct offices and employee types for searchable dropdowns
-        $offices = EmployeeLocation::select('office')->distinct()
-            ->whereNotNull('office')->where('office', '!=', '')
-            ->orderBy('office')->pluck('office');
+        $officeLocation = $userLocations->first(function ($loc) {
+            return $loc->type === 'office' || (is_null($loc->type) && !is_null($loc->office));
+        });
 
-        $employeeTypes = EmployeeLocation::select('employee_type')->distinct()
-            ->whereNotNull('employee_type')->where('employee_type', '!=', '')
-            ->orderBy('employee_type')->pluck('employee_type');
+        // Latest overall record for profile info
+        $latestLocation = $userLocations->first();
+        
+        // Stats & History
+        $totalCheckins = $userLocations->count(); // approximate from loaded records
+        $recentHistory = $userLocations->take(8);
+
+        // Activity Data (last 7 days) - filter from loaded collection
+        $sevenDaysAgo = now()->subDays(7);
+        $activityData = $userLocations->filter(function ($loc) use ($sevenDaysAgo) {
+            return $loc->recorded_at && $loc->recorded_at->gte($sevenDaysAgo);
+        })->groupBy(function ($loc) {
+            return $loc->recorded_at->format('M d');
+        })->map->count();
+
+        // Cache dropdown options for 10 minutes (rarely change, expensive queries)
+        $offices = Cache::remember('dropdown_offices', 600, function () {
+            return EmployeeLocation::select('office')->distinct()
+                ->whereNotNull('office')->where('office', '!=', '')
+                ->orderBy('office')->pluck('office');
+        });
+
+        $employeeTypes = Cache::remember('dropdown_employee_types', 600, function () {
+            return EmployeeLocation::select('employee_type')->distinct()
+                ->whereNotNull('employee_type')->where('employee_type', '!=', '')
+                ->orderBy('employee_type')->pluck('employee_type');
+        });
 
         return view('dashboard', compact(
             'user', 
