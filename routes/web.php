@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->where('filename', '.*\.kmz$');
 
+    Route::get('/api/locations', [LocationController::class, 'index'])->name('location.index');
 });
 
 
@@ -66,7 +67,6 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::delete('/employees/{user}', [AdminController::class, 'destroy'])->name('admin.employees.destroy');
     Route::get('/employees/{user}/history', [AdminController::class, 'locationHistory'])->name('admin.employees.history');
 
-    Route::get('/api/locations', [LocationController::class, 'index'])->name('location.index');
     Route::put('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 });
 

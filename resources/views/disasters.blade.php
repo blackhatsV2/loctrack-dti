@@ -171,16 +171,20 @@
                 <h3>👥 Personnel Layers</h3>
                 <small>Showing <span id="emp-visible-count">0</span> employees</small>
             </div>
+            @if(Auth::user()->is_admin)
             <div class="search-box">
                 <input type="text" id="emp-search" class="search-input" placeholder="Search name or office...">
             </div>
+            @endif
             <div class="scroll-content" id="employee-layers">
                 <!-- Dynamic categories -->
             </div>
+            @if(Auth::user()->is_admin)
             <div style="padding: 1.25rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem;">
                 <button class="btn btn-ghost" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;" onclick="setAllEmployees(false)">Hide All</button>
                 <button class="btn btn-primary" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;" onclick="setAllEmployees(true)">Show All</button>
             </div>
+            @endif
         </aside>
 
         <!-- Central Map -->
@@ -236,6 +240,9 @@
     let staticLayersLoaded = false;
     let activeHazardType = 'all';
     let employeeFilters = {};
+
+    const isAdmin = {{ Auth::user()->is_admin ? 'true' : 'false' }};
+    const currentUserName = "{{ Auth::user()->name }}";
 
     const empCategories = [
         { key: 'NC Negros Occidental',  label: 'NC Negros Occidental', color: '#3b82f6' },
@@ -296,7 +303,14 @@
         else check.checked ? map.addLayer(volcanoesLayer) : map.removeLayer(volcanoesLayer);
     }
 
-    function recenterPH() { map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); }
+    function recenterPH() { 
+        if (!isAdmin && empMarkers.length > 0) {
+            const first = empMarkers[0].marker.getLatLng();
+            map.flyTo(first, 12, { duration: 1.5 });
+        } else {
+            map.flyTo([12.8797, 121.7740], 6, { duration: 1.5 }); 
+        }
+    }
 
     // Personnel Logic
     async function loadPersonnel() {
@@ -311,7 +325,9 @@
                 if (isNaN(lat) || isNaN(lon)) return;
 
                 const cat = getEmpCat(loc);
-                const marker = L.marker([lat, lon], { icon: getEmpIcon(cat) });
+                // If not admin, use a distinct "Self" icon color
+                const icon = isAdmin ? getEmpIcon(cat) : getEmpIcon('self');
+                const marker = L.marker([lat, lon], { icon: icon });
                 marker.bindPopup(buildEmpPopup(loc), { maxWidth: 300 });
                 empMarkers.push({ marker, cat, data: loc });
                 marker.addTo(map);
@@ -338,7 +354,13 @@
     }
 
     function getEmpIcon(cat) {
-        const color = empCategories.find(c => c.key === cat)?.color || '#94a3b8';
+        let color = '#94a3b8';
+        if (cat === 'self') {
+            color = '#6366f1'; // Match the sidebar "Self" color
+        } else {
+            color = empCategories.find(c => c.key === cat)?.color || '#94a3b8';
+        }
+        
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="28" height="32">
             <polygon points="16,2 2,16 7,16 7,30 25,30 25,16 30,16" fill="${color}" stroke="#fff" stroke-width="1.5"/>
             <rect x="12" y="20" width="8" height="10" rx="1" fill="#fff" opacity="0.85"/>
@@ -347,17 +369,54 @@
     }
 
     function buildEmpPopup(loc) {
-        return `<div style="padding: 10px; min-width: 200px;">
-            <div style="font-weight: 600; font-size: 1rem;">${loc.user?.name}</div>
-            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div>
-            <div style="font-size: 0.85rem;"><b>Office:</b> ${loc.office || 'N/A'}</div>
-            <div style="font-size: 0.85rem;"><b>Mobile:</b> ${loc.mobile_no || '—'}</div>
+        const color = isAdmin ? (empCategories.find(c => c.key === getEmpCat(loc))?.color || '#94a3b8') : '#6366f1';
+        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;">
+            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 2px;">${loc.user?.name}</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                <div><span style="color:#64748b;">Home:</span> ${loc.address || 'N/A'}</div>
+                <div><span style="color:#64748b;">Office:</span> ${loc.office || 'N/A'}</div>
+                <div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div>
+                <div style="margin-top:6px;">
+                    <span style="font-size: 0.7rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">
+                        ${loc.employee_type || 'Unknown'}
+                    </span>
+                </div>
+            </div>
         </div>`;
     }
 
     function renderEmpLayers() {
         const container = document.getElementById('employee-layers');
         container.innerHTML = '';
+
+        if (!isAdmin) {
+            // Non-admin: Only show the current user as a single layer
+            const item = document.createElement('div');
+            item.className = 'filter-item';
+            // Use a specific color for the "Self" marker
+            const selfColor = '#6366f1'; 
+            item.innerHTML = `
+                <input type="checkbox" checked id="self-visibility-check">
+                <span style="width:10px; height:10px; border-radius:50%; background:${selfColor}"></span>
+                <span style="flex:1;">${currentUserName} (You)</span>
+            `;
+            
+            item.onclick = (e) => {
+                const cb = item.querySelector('input');
+                if (e.target !== cb) cb.checked = !cb.checked;
+                
+                // Toggle visibility for all (the only) employee markers
+                empMarkers.forEach(m => {
+                    cb.checked ? map.addLayer(m.marker) : map.removeLayer(m.marker);
+                });
+                updateEmpCount();
+            };
+            container.appendChild(item);
+            return;
+        }
+
+        // Admin: Show the grouped categories
         empCategories.forEach(cat => {
             employeeFilters[cat.key] = true;
             const count = empMarkers.filter(m => m.cat === cat.key).length;
@@ -488,15 +547,18 @@
     }
 
     // Search
-    document.getElementById('emp-search').addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase();
-        empMarkers.forEach(m => {
-            const s = `${m.data.user?.name} ${m.data.office}`.toLowerCase();
-            const v = s.includes(q) && employeeFilters[m.cat];
-            v ? map.addLayer(m.marker) : map.removeLayer(m.marker);
+    const empSearch = document.getElementById('emp-search');
+    if (empSearch) {
+        empSearch.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            empMarkers.forEach(m => {
+                const s = `${m.data.user?.name} ${m.data.office}`.toLowerCase();
+                const v = s.includes(q) && employeeFilters[m.cat];
+                v ? map.addLayer(m.marker) : map.removeLayer(m.marker);
+            });
+            updateEmpCount();
         });
-        updateEmpCount();
-    });
+    }
 
     function syncData() { syncHazards(); loadPersonnel(); }
 </script>

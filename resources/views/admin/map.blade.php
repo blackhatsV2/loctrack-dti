@@ -357,7 +357,20 @@
 
     function buildEmployeePopup(loc) {
         const name = loc.user?.name || 'Unknown', color = categories.find(c => c.key === getCategory(loc))?.color || '#94a3b8';
-        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;"><div style="font-weight: 600; font-size: 1rem; margin-bottom: 2px;">${name}</div><div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div><div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;"><div><span style="color:#64748b;">Office:</span> ${loc.office || 'Unassigned'}</div><div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div><div style="margin-top:4px; font-size: 0.75rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; display: inline-block;">${loc.employee_type}</div></div></div>`;
+        return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;">
+            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 2px;">${name}</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px;">${loc.employee_id_no || 'N/A'}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                <div><span style="color:#64748b;">Home:</span> ${loc.address || 'N/A'}</div>
+                <div><span style="color:#64748b;">Office:</span> ${loc.office || 'Unassigned'}</div>
+                <div><span style="color:#64748b;">Mobile:</span> ${loc.mobile_no || '—'}</div>
+                <div style="margin-top:6px;">
+                    <span style="font-size: 0.7rem; background:${color}22; color:${color}; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">
+                        ${loc.employee_type}
+                    </span>
+                </div>
+            </div>
+        </div>`;
     }
 
     function buildEmployeeFilters() {

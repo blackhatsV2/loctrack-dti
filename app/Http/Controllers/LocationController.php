@@ -36,21 +36,28 @@ class LocationController extends Controller
 
     public function index()
     {
+        $user = Auth::user();
+        
         // Use cached admin IDs
         $adminIds = Cache::remember('admin_user_ids', 600, function () {
             $adminEmail = 'admin@dti6.gov.ph';
             return \App\Models\User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id')->toArray();
         });
 
-        // Get latest location for each user and type combination
-        $locations = EmployeeLocation::select('employee_locations.*')
+        $query = EmployeeLocation::select('employee_locations.*')
             ->joinSub(function ($query) {
                 $query->selectRaw('MAX(id) as max_id')
                     ->from('employee_locations')
                     ->groupBy('user_id', 'type');
             }, 'latest', 'employee_locations.id', '=', 'latest.max_id')
-            ->whereNotIn('user_id', $adminIds)
-            ->with('user:id,name,email,office')
+            ->whereNotIn('user_id', $adminIds);
+
+        // If not admin, only show self
+        if (!$user->is_admin) {
+            $query->where('user_id', $user->id);
+        }
+
+        $locations = $query->with('user:id,name,email,office')
             ->get();
 
         return response()->json($locations);
