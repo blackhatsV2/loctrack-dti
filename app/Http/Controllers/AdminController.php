@@ -20,6 +20,24 @@ class AdminController extends Controller
             return User::where('is_admin', true)->orWhere('email', $adminEmail)->pluck('id')->toArray();
         });
     }
+
+    /**
+     * Get real coordinates for DTI Region 6 offices.
+     */
+    private function getOfficeCoordinates(string $office)
+    {
+        $coordinates = [
+            'DTI Regional Office VI' => ['lat' => 10.7202, 'lng' => 122.5621],
+            'DTI Aklan'             => ['lat' => 11.7061, 'lng' => 122.3653],
+            'DTI Antique'           => ['lat' => 10.7441, 'lng' => 121.9421],
+            'DTI Capiz'             => ['lat' => 11.5851, 'lng' => 122.7531],
+            'DTI Guimaras'          => ['lat' => 10.5931, 'lng' => 122.5881],
+            'DTI Iloilo'            => ['lat' => 10.7202, 'lng' => 122.5621],
+            'DTI Negros Occidental' => ['lat' => 10.6761, 'lng' => 122.9511],
+        ];
+
+        return $coordinates[$office] ?? ['lat' => 10.7202, 'lng' => 122.5621]; // Default to Regional Office if unknown
+    }
     /**
      * List all employees (non-admin users).
      */
@@ -120,6 +138,9 @@ class AdminController extends Controller
             'is_admin' => false,
         ]);
 
+        // Get office coordinates
+        $coords = $this->getOfficeCoordinates($office);
+
         // Create initial location record
         EmployeeLocation::create([
             'user_id' => $user->id,
@@ -127,8 +148,8 @@ class AdminController extends Controller
             'office' => $office,
             'mobile_no' => $mobileNo,
             'address' => $address,
-            'latitude' => 0,
-            'longitude' => 0,
+            'latitude' => $coords['lat'],
+            'longitude' => $coords['lng'],
             'recorded_at' => now(),
         ]);
 
@@ -193,14 +214,24 @@ class AdminController extends Controller
         $location = EmployeeLocation::where('user_id', $user->id)->latest('id')->first();
 
         if ($location) {
+            $lat = $request->latitude ?? $location->latitude;
+            $lng = $request->longitude ?? $location->longitude;
+
+            // Auto-update coordinates if they are 0 and office is set
+            if (($lat == 0 && $lng == 0) && $office) {
+                $coords = $this->getOfficeCoordinates($office);
+                $lat = $coords['lat'];
+                $lng = $coords['lng'];
+            }
+
             $location->update([
                 'address' => $address,
                 'mobile_no' => $mobileNo,
                 'office' => $office,
                 'employee_id_no' => $employeeIdNo,
                 'employee_type' => $employeeType,
-                'latitude' => $request->latitude ?? $location->latitude,
-                'longitude' => $request->longitude ?? $location->longitude,
+                'latitude' => $lat,
+                'longitude' => $lng,
             ]);
         }
 
