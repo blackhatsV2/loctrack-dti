@@ -16,10 +16,47 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $request->validate([
+            'email' => ['required', 'string'],
             'password' => ['required'],
         ]);
+
+        $loginInput = $request->input('email');
+        $password = $request->input('password');
+
+        // Determine if input is email or name
+        if (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
+            $credentials = ['email' => $loginInput, 'password' => $password];
+        } else {
+            // It's treated as a name. Must have at least one space.
+            if (!str_contains($loginInput, ' ')) {
+                return back()->withErrors([
+                    'email' => 'User not found. Please use "Firstname Lastname" format.',
+                ])->onlyInput('email');
+            }
+
+            // Attempt to find the user by name to get their email
+            // We check for exact match, like match, or reversed "Lastname, Firstname" format
+            $user = User::where('name', $loginInput)
+                ->orWhere('name', 'like', '%' . $loginInput . '%')
+                ->first();
+
+            if (!$user) {
+                // Try to match "Lastname, Firstname" format if input was "Firstname Lastname"
+                $parts = explode(' ', $loginInput);
+                $first = $parts[0];
+                $last = end($parts);
+                $user = User::where('name', 'like', "$last%, %$first%")->first();
+            }
+
+            if (!$user) {
+                return back()->withErrors([
+                    'email' => 'User not found.',
+                ])->onlyInput('email');
+            }
+
+            $credentials = ['email' => $user->email, 'password' => $password];
+        }
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
