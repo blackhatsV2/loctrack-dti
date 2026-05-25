@@ -4,37 +4,37 @@ A premium, real-time location monitoring and disaster response management system
 
 ---
 
-### 🧭 Quick Navigation
+### Quick Navigation
 
 | Section | Description |
 | :--- | :--- |
-| [📚 Documentation](#-documentation) | Project docs (Overview, Architecture, VAPT, etc.) |
-| [🚀 Getting Started](#-getting-started) | Docker & Manual setup instructions |
-| [📊 Data Management](#-data-management) | Seeders and data handling |
-| [🛠 Tech Stack](#-tech-stack) | Technologies used |
-| [📄 License](#-license) | MIT License |
+| [Documentation](#-documentation) | Project docs (Overview, Architecture, VAPT, etc.) |
+| [Getting Started](#-getting-started) | Docker & Manual setup instructions |
+| [Data Management](#-data-management) | Seeders and data handling |
+| [Tech Stack](#-tech-stack) | Technologies used |
+| [License](#-license) | MIT License |
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 Explore the project's documentation to understand the architecture, features, and deployment procedures:
 
-- 📖 [1. Project Overview](1_Project_Overview.md) - High-level goals and key features.
-- ⚙️ [2. Process Workflow](2_Process_Workflow.md) - User and system operational sequences.
-- 📋 [3. Functional Requirements](3_Functional_Requirements.md) - Detailed feature specifications.
-- 🏗️ [4. System Architecture](4_System_Architecture.md) - Tech stack and component design.
-- 🗄️ [5. Database Documentation](5_Database_Documentation.md) - Schema and index details.
-- 🚀 [6. Deployment Guide](6_Deployment_Guide.md) - Production and local setup instructions.
-- 📘 [7. User Manual](7_User_Manual.md) - Step-by-step usage guide.
-- 🛡️ [8. VAPT Report](8_VAPT_Report.md) - Security assessment and mitigations.
-- 📊 [9. Presentation Deck](9_Presentation.md) - Project summary slides.
-- 🗺️ [10. Master Project Plan / Roadmap](10_Project_Plan.md) - Strategic roadmap and status.
-- 🧩 [11. Project Modules](11_Project_Modules.md) - Detailed functional breakdown.
+- [1. Project Overview](1_Project_Overview.md) - High-level goals and key features.
+- [2. Process Workflow](2_Process_Workflow.md) - User and system operational sequences.
+- [3. Functional Requirements](3_Functional_Requirements.md) - Detailed feature specifications.
+- [4. System Architecture](4_System_Architecture.md) - Tech stack and component design.
+- [5. Database Documentation](5_Database_Documentation.md) - Schema and index details.
+- [6. Deployment Guide](6_Deployment_Guide.md) - Production and local setup instructions.
+- [7. User Manual](7_User_Manual.md) - Step-by-step usage guide.
+- [8. VAPT Report](8_VAPT_Report.md) - Security assessment and mitigations.
+- [9. Presentation Deck](9_Presentation.md) - Project summary slides.
+- [10. Master Project Plan / Roadmap](10_Project_Plan.md) - Strategic roadmap and status.
+- [11. Project Modules](11_Project_Modules.md) - Detailed functional breakdown.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Option 1: Docker Setup (Recommended)
 
@@ -73,7 +73,7 @@ Uses [Laravel Sail](https://laravel.com/docs/sail) for a containerized environme
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 - **Backend**: Laravel 12 (PHP 8.2+)
 - **Frontend**: Tailwind CSS v4, Alpine.js, Blade
 - **Maps**: Leaflet.js (Integrated with USGS Earthquakes & NASA EONET)
@@ -83,5 +83,5 @@ Uses [Laravel Sail](https://laravel.com/docs/sail) for a containerized environme
 
 ---
 
-## 📄 License
+## License
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
