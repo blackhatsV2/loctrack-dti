@@ -26,6 +26,7 @@ class User extends Authenticatable
         'office',
         'employee_type',
         'last_activity_at',
+        'is_admin',
     ];
 
     /**

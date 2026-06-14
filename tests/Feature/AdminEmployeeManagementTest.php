@@ -46,6 +46,7 @@ class AdminEmployeeManagementTest extends TestCase
             'name' => 'New Employee',
             'email' => 'new@example.com',
             'mobile_no' => '09123456789',
+            'office' => 'DTI Regional Office VI',
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.employees.store'), $employeeData);
@@ -119,5 +120,18 @@ class AdminEmployeeManagementTest extends TestCase
 
         $response->assertRedirect(route('dashboard'));
         $this->assertDatabaseHas('users', ['id' => $employee->id]);
+    }
+
+    public function test_admin_is_redirected_from_regular_dashboard()
+    {
+        $response = $this->actingAs($this->admin)->get(route('dashboard'));
+        $response->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_regular_user_can_view_regular_dashboard()
+    {
+        $response = $this->actingAs($this->user)->get(route('dashboard'));
+        $response->assertStatus(200);
+        $response->assertSee('Disaster Tracker Dashboard');
     }
 }

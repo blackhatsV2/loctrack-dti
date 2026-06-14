@@ -56,7 +56,7 @@ class LocationReuseTest extends TestCase
     public function test_user_can_reuse_own_location()
     {
         $response = $this->actingAs($this->user1)
-            ->post("/api/location/reuse/{$this->location1->id}");
+            ->postJson("/api/location/reuse/{$this->location1->id}");
 
         $response->assertStatus(200);
         $response->assertJson(['status' => 'success']);
@@ -76,7 +76,7 @@ class LocationReuseTest extends TestCase
     public function test_user_cannot_reuse_another_users_location()
     {
         $response = $this->actingAs($this->user2)
-            ->post("/api/location/reuse/{$this->location1->id}");
+            ->postJson("/api/location/reuse/{$this->location1->id}");
 
         $response->assertStatus(403);
         $this->assertEquals(0, EmployeeLocation::where('user_id', $this->user2->id)->count());
@@ -88,7 +88,7 @@ class LocationReuseTest extends TestCase
     public function test_admin_can_reuse_any_users_location()
     {
         $response = $this->actingAs($this->admin)
-            ->post("/api/location/reuse/{$this->location1->id}");
+            ->postJson("/api/location/reuse/{$this->location1->id}");
 
         $response->assertStatus(200);
         $response->assertJson(['status' => 'success']);

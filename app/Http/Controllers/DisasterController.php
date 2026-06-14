@@ -14,7 +14,11 @@ class DisasterController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
+        if ($user && $user->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // Fetch stats for the dashboard highlight
         $totalCheckins = \App\Models\EmployeeLocation::where('user_id', $user->id)->count();
         $latestLocation = \App\Models\EmployeeLocation::where('user_id', $user->id)
