@@ -68,6 +68,8 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::put('/employees/{user}', [AdminController::class, 'update'])->name('admin.employees.update');
     Route::delete('/employees/{user}', [AdminController::class, 'destroy'])->name('admin.employees.destroy');
     Route::get('/employees/{user}/history', [AdminController::class, 'locationHistory'])->name('admin.employees.history');
+    Route::delete('/history/{employeeLocation}', [AdminController::class, 'destroyLocation'])->name('admin.history.destroy');
+    Route::delete('/employees/{user}/history/bulk', [AdminController::class, 'destroyLocationsBulk'])->name('admin.employees.history.bulk');
 
     Route::put('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 });

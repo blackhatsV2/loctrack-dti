@@ -17,6 +17,7 @@
     .history-table td {
         padding: 0.75rem 1rem;
         border-bottom: 1px solid rgba(255,255,255,0.04);
+        vertical-align: middle;
     }
     .history-table tr:hover td {
         background: rgba(99, 102, 241, 0.06);
@@ -53,12 +54,32 @@
     </div>
 
     <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Location History</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Tracking history for <strong>{{ $user->name }}</strong> — {{ $locations->total() }} records</p>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <p style="color: var(--text-muted); margin-bottom: 0.25rem;">Tracking history for <strong>{{ $user->name }}</strong> — {{ $locations->total() }} records</p>
+        </div>
+        @if($locations->total() > 0)
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <button type="button" id="delete-selected-btn" class="btn animate-fade-in" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); display: none;">
+                🗑️ Delete Selected (<span id="selected-count">0</span>)
+            </button>
+            <button type="button" id="clear-all-btn" class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--glass-border);">
+                ⚠️ Clear History
+            </button>
+        </div>
+        @endif
+    </div>
 
     <div class="glass-card" style="padding: 0; overflow-x: auto; position: relative;">
         <table class="history-table">
             <thead>
                 <tr>
+                    @if($locations->total() > 0)
+                    <th style="width: 40px; text-align: center; padding: 0.75rem 1rem;">
+                        <input type="checkbox" id="select-all-checkbox" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);">
+                    </th>
+                    @endif
                     <th>#</th>
                     <th>Date & Time</th>
                     <th>Latitude</th>
@@ -71,6 +92,11 @@
             <tbody>
                 @forelse($locations as $index => $loc)
                     <tr>
+                        @if($locations->total() > 0)
+                        <td style="text-align: center; padding: 0.75rem 1rem;">
+                            <input type="checkbox" class="row-checkbox" value="{{ $loc->id }}" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);">
+                        </td>
+                        @endif
                         <td style="color: var(--text-muted);">{{ $locations->firstItem() + $index }}</td>
                         <td>{{ \Carbon\Carbon::parse($loc->recorded_at)->format('M d, Y — h:i A') }}</td>
                         <td class="coord-mono">{{ $loc->latitude }}</td>
@@ -78,14 +104,19 @@
                         <td>{{ $loc->address ?? '—' }}</td>
                         <td>{{ $loc->office ?? '—' }}</td>
                         <td>
-                            <button type="button" class="btn btn-small reuse-btn" data-url="{{ route('location.reuse', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
-                                🔄 Reuse
-                            </button>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button type="button" class="btn btn-small reuse-btn" data-url="{{ route('location.reuse', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                                    🔄 Reuse
+                                </button>
+                                <button type="button" class="btn btn-small delete-btn" data-url="{{ route('admin.history.destroy', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3);">
+                                    🗑️ Delete
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No location history found.</td>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No location history found.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -116,10 +147,203 @@
     </div>
     @endif
 </div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="modal-overlay" onclick="if(event.target === this) hideConfirmModal()">
+    <div class="modal-content">
+        <h2 id="confirm-modal-title" style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: 600;">Confirm Deletion</h2>
+        <p id="confirm-modal-message" style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.5; font-size: 0.95rem;"></p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn" id="confirm-modal-cancel" style="flex: 1; background: rgba(255,255,255,0.05); color: var(--text-muted);" onclick="hideConfirmModal()">Cancel</button>
+            <button type="button" class="btn" id="confirm-modal-submit" style="flex: 1; background: #f43f5e; color: white;">Yes, Delete</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
+    // Global Confirmation Modal Logic
+    let confirmAction = null;
+
+    function showConfirmModal(title, message, callback) {
+        document.getElementById('confirm-modal-title').textContent = title;
+        document.getElementById('confirm-modal-message').textContent = message;
+        confirmAction = callback;
+        document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function hideConfirmModal() {
+        document.getElementById('confirm-modal').classList.remove('active');
+        confirmAction = null;
+    }
+
+    document.getElementById('confirm-modal-submit').addEventListener('click', function() {
+        if (confirmAction) {
+            confirmAction();
+        }
+        hideConfirmModal();
+    });
+
+    // Checkbox Selection Logic
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    function updateDeleteSelectedVisibility() {
+        const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+        const checkedCount = checkedBoxes.length;
+
+        if (checkedCount > 0) {
+            deleteSelectedBtn.style.display = 'inline-block';
+            selectedCountSpan.textContent = checkedCount;
+        } else {
+            deleteSelectedBtn.style.display = 'none';
+        }
+    }
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(cb => cb.checked = this.checked);
+            updateDeleteSelectedVisibility();
+        });
+    }
+
+    rowCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            if (!this.checked && selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            } else if (selectAllCheckbox && document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length) {
+                selectAllCheckbox.checked = true;
+            }
+            updateDeleteSelectedVisibility();
+        });
+    });
+
+    // Individual Delete Logic
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            showConfirmModal(
+                'Delete Location Log',
+                'Are you sure you want to permanently delete this location log from history? This action cannot be undone.',
+                function() {
+                    if (typeof showGlobalLoader === 'function') showGlobalLoader();
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to delete location.');
+                            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                        }
+                    })
+                    .catch(err => {
+                        alert('Error: ' + err.message);
+                        if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                    });
+                }
+            );
+        });
+    });
+
+    // Delete Selected Logic
+    if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const url = "{{ route('admin.employees.history.bulk', $user->id) }}";
+
+            showConfirmModal(
+                'Delete Selected Logs',
+                `Are you sure you want to permanently delete the ${selectedIds.length} selected location log(s)? This action cannot be undone.`,
+                function() {
+                    if (typeof showGlobalLoader === 'function') showGlobalLoader();
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: 'selected',
+                            ids: selectedIds
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to delete selected locations.');
+                            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                        }
+                    })
+                    .catch(err => {
+                        alert('Error: ' + err.message);
+                        if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                    });
+                }
+            );
+        });
+    }
+
+    // Clear All History Logic
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function() {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const url = "{{ route('admin.employees.history.bulk', $user->id) }}";
+
+            showConfirmModal(
+                'Clear All History',
+                "Are you sure you want to permanently clear ALL location history for {{ $user->name }}? This action is irreversible.",
+                function() {
+                    if (typeof showGlobalLoader === 'function') showGlobalLoader();
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: 'all'
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to clear history.');
+                            if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                        }
+                    })
+                    .catch(err => {
+                        alert('Error: ' + err.message);
+                        if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
+                    });
+                }
+            );
+        });
+    }
+
+    // Existing Reuse Button Handler
     document.querySelectorAll('.reuse-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var url = this.getAttribute('data-url');
@@ -159,3 +383,4 @@
     });
 </script>
 @endsection
+

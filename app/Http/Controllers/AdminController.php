@@ -378,4 +378,64 @@ class AdminController extends Controller
 
         return back()->with('success', 'Profile updated successfully.');
     }
+
+    /**
+     * Delete an individual location record.
+     */
+    public function destroyLocation(EmployeeLocation $employeeLocation)
+    {
+        if ($employeeLocation->user && $employeeLocation->user->is_admin) {
+            return back()->with('error', 'Cannot delete history records of an admin.');
+        }
+
+        $employeeLocation->delete();
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Location log deleted successfully.'
+            ]);
+        }
+
+        return back()->with('success', 'Location log deleted successfully.');
+    }
+
+    /**
+     * Bulk/batch delete location records for a user.
+     */
+    public function destroyLocationsBulk(Request $request, User $user)
+    {
+        if ($user->is_admin) {
+            return back()->with('error', 'Cannot delete history records of an admin.');
+        }
+
+        $action = $request->input('action');
+
+        if ($action === 'all') {
+            EmployeeLocation::where('user_id', $user->id)->delete();
+            $message = "All location history for '{$user->name}' cleared successfully.";
+        } elseif ($action === 'selected') {
+            $ids = $request->input('ids', []);
+            if (empty($ids)) {
+                return back()->with('error', 'No locations were selected for deletion.');
+            }
+
+            EmployeeLocation::where('user_id', $user->id)
+                ->whereIn('id', $ids)
+                ->delete();
+            $message = 'Selected location logs deleted successfully.';
+        } else {
+            return back()->with('error', 'Invalid action specified.');
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => $message
+            ]);
+        }
+
+        return back()->with('success', $message);
+    }
 }
+

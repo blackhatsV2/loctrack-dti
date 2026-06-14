@@ -134,4 +134,121 @@ class AdminEmployeeManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Disaster Tracker Dashboard');
     }
+
+    public function test_admin_can_delete_individual_location_history_log()
+    {
+        $location = EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.1,
+            'longitude' => 120.2,
+            'recorded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.history.destroy', $location));
+
+        $response->assertStatus(302); // redirect back
+        $this->assertDatabaseMissing('employee_locations', ['id' => $location->id]);
+    }
+
+    public function test_admin_can_delete_selected_location_history_logs()
+    {
+        $loc1 = EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.1,
+            'longitude' => 120.2,
+            'recorded_at' => now(),
+        ]);
+        $loc2 = EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.2,
+            'longitude' => 120.3,
+            'recorded_at' => now(),
+        ]);
+        $loc3 = EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.3,
+            'longitude' => 120.4,
+            'recorded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.employees.history.bulk', $this->user), [
+            'action' => 'selected',
+            'ids' => [$loc1->id, $loc3->id],
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseMissing('employee_locations', ['id' => $loc1->id]);
+        $this->assertDatabaseMissing('employee_locations', ['id' => $loc3->id]);
+        $this->assertDatabaseHas('employee_locations', ['id' => $loc2->id]);
+    }
+
+    public function test_admin_can_clear_all_location_history_logs_for_employee()
+    {
+        EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.1,
+            'longitude' => 120.2,
+            'recorded_at' => now(),
+        ]);
+        EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.2,
+            'longitude' => 120.3,
+            'recorded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.employees.history.bulk', $this->user), [
+            'action' => 'all',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals(0, EmployeeLocation::where('user_id', $this->user->id)->count());
+    }
+
+    public function test_non_admin_cannot_delete_location_history_logs()
+    {
+        $location = EmployeeLocation::create([
+            'user_id' => $this->user->id,
+            'latitude' => 10.1,
+            'longitude' => 120.2,
+            'recorded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->user)->delete(route('admin.history.destroy', $location));
+        $response->assertRedirect(route('dashboard'));
+        $this->assertDatabaseHas('employee_locations', ['id' => $location->id]);
+
+        $response2 = $this->actingAs($this->user)->delete(route('admin.employees.history.bulk', $this->user), [
+            'action' => 'all',
+        ]);
+        $response2->assertRedirect(route('dashboard'));
+        $this->assertDatabaseHas('employee_locations', ['id' => $location->id]);
+    }
+
+    public function test_admin_cannot_delete_history_of_another_admin()
+    {
+        $anotherAdmin = User::create([
+            'name' => 'Another Admin',
+            'email' => 'anotheradmin@dti6.gov.ph',
+            'password' => bcrypt('password'),
+            'is_admin' => true,
+        ]);
+
+        $location = EmployeeLocation::create([
+            'user_id' => $anotherAdmin->id,
+            'latitude' => 10.1,
+            'longitude' => 120.2,
+            'recorded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete(route('admin.history.destroy', $location));
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('employee_locations', ['id' => $location->id]);
+
+        $response2 = $this->actingAs($this->admin)->delete(route('admin.employees.history.bulk', $anotherAdmin), [
+            'action' => 'all',
+        ]);
+        $response2->assertSessionHas('error');
+        $this->assertDatabaseHas('employee_locations', ['id' => $location->id]);
+    }
 }
