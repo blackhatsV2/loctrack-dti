@@ -140,6 +140,68 @@
     .btn-danger:hover {
         background: #dc2626;
     }
+
+    /* Override global button styles for clear filter button */
+    #clear-search-btn {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: var(--text-muted) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    #clear-search-btn:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: none !important;
+    }
+
+    /* Override global button styles for action links (like Delete button) */
+    button.action-link {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 1rem 0 0 !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        display: inline !important;
+        font-family: inherit !important;
+        color: #ef4444 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        transition: color 0.2s ease !important;
+    }
+    button.action-link:hover {
+        color: #f87171 !important;
+        text-decoration: underline !important;
+        background: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    /* Reset button styles for modal close buttons */
+    .close-btn {
+        background: transparent !important;
+        border: none !important;
+        padding: 0.5rem !important;
+        font-size: 1.5rem !important;
+        cursor: pointer !important;
+        color: var(--text-muted) !important;
+        box-shadow: none !important;
+        transform: none !important;
+        transition: color 0.2s ease !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .close-btn:hover {
+        color: white !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
 </style>
 @endsection
 
@@ -156,7 +218,7 @@
     </div>
 
     <div class="search-bar">
-        <input type="text" id="employee-search-input" placeholder="Search by name or email..." autocomplete="off" onkeyup="filterEmployees()" oninput="filterEmployees()">
+        <input type="text" id="employee-search-input" placeholder="Search by name, email, ID, or mobile..." autocomplete="off" onkeyup="filterEmployees()" oninput="filterEmployees()">
         <select id="employee-office-select" onchange="filterEmployees()">
             <option value="">All Offices</option>
             @foreach($offices as $o)
@@ -183,11 +245,13 @@
                 </tr>
             </thead>
             <tbody id="employee-table-body">
-                @forelse($employees as $emp)
+                @foreach($employees as $emp)
                     @php $loc = $emp->locations->first(); @endphp
                     <tr class="emp-row"
                         data-name="{{ strtolower($emp->name) }}"
                         data-email="{{ strtolower($emp->email) }}"
+                        data-id-no="{{ strtolower($loc->employee_id_no ?? $emp->employee_id_no ?? '') }}"
+                        data-mobile="{{ strtolower($loc->mobile_no ?? $emp->mobile_no ?? '') }}"
                         data-office="{{ strtolower($loc->office ?? $emp->office ?? '') }}">
                         <td>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -201,14 +265,13 @@
                         <td style="white-space: nowrap;">
                             <a href="{{ route('admin.employees.edit', $emp) }}" class="action-link">Edit</a>
                             <a href="{{ route('admin.employees.history', $emp) }}" class="action-link">History</a>
-                            <button onclick="confirmDelete('{{ $emp->id }}', '{{ $emp->name }}')" class="action-link" style="background: none; border: none; cursor: pointer; color: #ef4444;">Delete</button>
+                            <button onclick="confirmDelete('{{ $emp->id }}', '{{ $emp->name }}')" class="action-link">Delete</button>
                         </td>
                     </tr>
-                @empty
-                    <tr id="no-employees-row">
-                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No employees found.</td>
-                    </tr>
-                @endforelse
+                @endforeach
+                <tr id="no-employees-row" style="display: {{ $employees->isEmpty() ? '' : 'none' }};">
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No employees found.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -219,7 +282,7 @@
         <div class="glass-card modal-content animate-fade-in">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 style="margin: 0;">Add New Employee</h2>
-                <button onclick="closeAddModal()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                <button onclick="closeAddModal()" class="close-btn">&times;</button>
             </div>
 
             <form action="{{ route('admin.employees.store') }}" method="POST">
@@ -300,7 +363,7 @@
 
     // --- Instant Client-Side Filtering (like Workforce page) ---
     function filterEmployees() {
-        const search = document.getElementById('employee-search-input').value.toLowerCase();
+        const search = document.getElementById('employee-search-input').value.toLowerCase().trim();
         const officeFilter = document.getElementById('employee-office-select').value.toLowerCase();
         const rows = document.querySelectorAll('.emp-row');
         const clearBtn = document.getElementById('clear-search-btn');
@@ -310,8 +373,14 @@
             const name = row.dataset.name;
             const email = row.dataset.email;
             const office = row.dataset.office;
+            const idNo = row.dataset.idNo;
+            const mobile = row.dataset.mobile;
 
-            const matchesSearch = !search || name.includes(search) || email.includes(search);
+            const matchesSearch = !search || 
+                                  name.includes(search) || 
+                                  email.includes(search) || 
+                                  idNo.includes(search) || 
+                                  mobile.includes(search);
             const matchesOffice = !officeFilter || office === officeFilter;
 
             if (matchesSearch && matchesOffice) {
@@ -321,6 +390,12 @@
                 row.style.display = 'none';
             }
         });
+
+        // Toggle "No employees found" row
+        const noEmployeesRow = document.getElementById('no-employees-row');
+        if (noEmployeesRow) {
+            noEmployeesRow.style.display = visibleCount === 0 ? '' : 'none';
+        }
 
         // Update count
         document.getElementById('emp-count').textContent = `Showing ${visibleCount} of ${totalEmployees} employees`;
