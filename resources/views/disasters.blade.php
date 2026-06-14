@@ -164,6 +164,12 @@
         justify-content: center;
         transition: all 0.3s ease;
     }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
+        background: rgba(30, 41, 59, 0.85);
+    }
     .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -217,10 +223,10 @@
 
     <!-- Dashboard Highlights -->
     <div class="dashboard-highlights">
-        <div class="stat-card">
+        <a href="{{ route('location.history') }}" class="stat-card" style="text-decoration: none; color: inherit; cursor: pointer;">
             <div class="stat-value">{{ number_format($totalCheckins) }}</div>
             <div class="stat-label">Total Location Logs</div>
-        </div>
+        </a>
         <div class="profile-mini-card">
             <div class="profile-avatar">
                 {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $user->name)[1] ?? '', 0, 1)) }}

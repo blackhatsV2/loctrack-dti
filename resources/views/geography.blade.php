@@ -642,10 +642,10 @@
 
     <!-- Stats Row -->
     <div class="stat-grid">
-        <div class="glass-card stat-card" style="flex: 1;">
+        <a href="{{ route('location.history') }}" class="glass-card stat-card" style="flex: 1; text-decoration: none; color: inherit; cursor: pointer; display: block;">
             <div class="stat-value">{{ $totalCheckins }}</div>
             <div class="stat-label">Total Check-ins</div>
-        </div>
+        </a>
     </div>
 
     <!-- My Professional Profile Card -->
