@@ -155,21 +155,18 @@
         </button>
     </div>
 
-    <form method="GET" action="{{ route('admin.employees') }}" class="search-bar">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or email...">
-        <select name="office">
+    <div class="search-bar">
+        <input type="text" id="employee-search-input" placeholder="Search by name or email..." autocomplete="off" onkeyup="filterEmployees()" oninput="filterEmployees()">
+        <select id="employee-office-select" onchange="filterEmployees()">
             <option value="">All Offices</option>
             @foreach($offices as $o)
-                <option value="{{ $o }}" {{ request('office') == $o ? 'selected' : '' }}>{{ $o }}</option>
+                <option value="{{ $o }}">{{ $o }}</option>
             @endforeach
         </select>
-        <button type="submit">Search</button>
-        @if(request('search') || request('office'))
-            <a href="{{ route('admin.employees') }}" style="color: var(--text-muted); text-decoration: none; padding: 0.65rem 1rem; font-size: 0.9rem;">Clear</a>
-        @endif
-    </form>
+        <button type="button" id="clear-search-btn" onclick="clearFilters()" style="display: none;">Clear</button>
+    </div>
 
-    <div class="emp-count">Showing {{ $employees->count() }} of {{ $employees->total() }} employees</div>
+    <div class="emp-count" id="emp-count">Showing {{ $employees->count() }} of {{ $employees->count() }} employees</div>
 
     <div class="glass-card" style="padding: 0; overflow-x: auto; position: relative;">
         <div class="page-loading" id="employees-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(15, 23, 42, 0.82);">
@@ -185,10 +182,13 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="employee-table-body">
                 @forelse($employees as $emp)
                     @php $loc = $emp->locations->first(); @endphp
-                    <tr>
+                    <tr class="emp-row"
+                        data-name="{{ strtolower($emp->name) }}"
+                        data-email="{{ strtolower($emp->email) }}"
+                        data-office="{{ strtolower($loc->office ?? $emp->office ?? '') }}">
                         <td>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <div style="font-weight: 500;">{{ $emp->name }}</div>
@@ -205,37 +205,13 @@
                         </td>
                     </tr>
                 @empty
-                    <tr>
+                    <tr id="no-employees-row">
                         <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No employees found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-
-    @if($employees->hasPages())
-    <div class="pagination-links">
-        @if($employees->onFirstPage())
-            <span>&laquo;</span>
-        @else
-            <a href="{{ $employees->previousPageUrl() }}">&laquo;</a>
-        @endif
-
-        @foreach($employees->getUrlRange(1, $employees->lastPage()) as $page => $url)
-            @if($page == $employees->currentPage())
-                <span class="active">{{ $page }}</span>
-            @else
-                <a href="{{ $url }}">{{ $page }}</a>
-            @endif
-        @endforeach
-
-        @if($employees->hasMorePages())
-            <a href="{{ $employees->nextPageUrl() }}">&raquo;</a>
-        @else
-            <span>&raquo;</span>
-        @endif
-    </div>
-    @endif
 </div>
 
     <!-- Add Employee Modal -->
@@ -314,11 +290,55 @@
     </div>
 @section('scripts')
 <script>
+    const totalEmployees = {{ $employees->count() }};
+
     document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             document.getElementById('employees-loading')?.classList.add('hidden');
         }, 600);
     });
+
+    // --- Instant Client-Side Filtering (like Workforce page) ---
+    function filterEmployees() {
+        const search = document.getElementById('employee-search-input').value.toLowerCase();
+        const officeFilter = document.getElementById('employee-office-select').value.toLowerCase();
+        const rows = document.querySelectorAll('.emp-row');
+        const clearBtn = document.getElementById('clear-search-btn');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const name = row.dataset.name;
+            const email = row.dataset.email;
+            const office = row.dataset.office;
+
+            const matchesSearch = !search || name.includes(search) || email.includes(search);
+            const matchesOffice = !officeFilter || office === officeFilter;
+
+            if (matchesSearch && matchesOffice) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update count
+        document.getElementById('emp-count').textContent = `Showing ${visibleCount} of ${totalEmployees} employees`;
+
+        // Show/hide clear button
+        if (search || officeFilter) {
+            clearBtn.style.display = '';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('employee-search-input').value = '';
+        document.getElementById('employee-office-select').value = '';
+        filterEmployees();
+        document.getElementById('employee-search-input').focus();
+    }
 
     function openAddModal() {
         const modal = document.getElementById('add-employee-modal');

@@ -43,28 +43,16 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
-        // Only show non-admin users (KML entries only)
+        // Load all non-admin users with their latest location for client-side filtering
         $adminIds = $this->getAdminIds();
-        $query = User::whereNotIn('id', $adminIds)->where('is_admin', false);
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        if ($office = $request->input('office')) {
-            $query->whereHas('locations', function ($q) use ($office) {
-                $q->where('office', $office);
-            });
-        }
-
-        $employees = $query->with(['locations' => function ($q) {
-            $q->latest('id')->limit(1);
-        }])
-        ->orderBy('name')
-        ->paginate(20);
+        $employees = User::whereNotIn('id', $adminIds)
+            ->where('is_admin', false)
+            ->with(['locations' => function ($q) {
+                $q->latest('id')->limit(1);
+            }])
+            ->orderBy('name')
+            ->get();
 
         // Get unique offices for filter dropdown (only from non-admin users' locations)
         $offices = EmployeeLocation::whereNotIn('user_id', $adminIds)
