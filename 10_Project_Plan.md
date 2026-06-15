@@ -2,62 +2,74 @@
 
 # Master Project Plan: Preparedness, Safety & Continuity Portal: Workforce Locator
 
-The **Master Plan** consolidates all strategic initiatives for the Preparedness, Safety & Continuity Portal: Workforce Locator system into a unified development and operations guide.
+---
+
+## 1. Project Summary
+The Workforce Locator is a web-based monitoring platform for DTI Region 6 that maps employee locations alongside live disaster data. It provides administrators with a unified command center for workforce visibility and hazard awareness.
 
 ---
 
-## 1. Strategic Project Overview
-The Preparedness, Safety & Continuity Portal: Workforce Locator is a premium workforce monitoring solution that synchronizes real-time personnel locations with live disaster telemetry.
-- **Objective**: Maximize operational efficiency and personnel safety through integrated spatial monitoring.
-- **Value Proposition**: Replaces manual check-ins with a hazard-aware, geocoded, and immutable tracking command center.
+## 2. Implemented Features
+
+### Phase 1: Core Telemetry & Employee Management
+- [x] GPS coordinate capture via browser Geolocation API (`/api/location`).
+- [x] Location broadcast endpoint (`/api/broadcast`).
+- [x] Location reuse from history (`/api/location/reuse/{id}`).
+- [x] Employee self-service profile and address management (`/geography`, `/profile/update`, `/profile/password`).
+- [x] Employee location history with pagination (`/history`).
+- [x] Authentication via email or full name with role-based redirect.
+- [x] Admin employee directory with full CRUD (add via modal, edit page, delete with confirmation).
+- [x] Real-time client-side employee search and office filtering on the directory page.
+- [x] Admin location history auditing with individual delete, bulk delete, and clear-all.
+- [x] Online personnel tracking with 30-second auto-refresh (active in last 24 hours).
+- [x] Carried-forward metadata on each location submission.
+
+### Phase 2: Disaster Integration
+- [x] USGS Earthquake API integration (past 3 days, M2.5+).
+- [x] NASA EONET v3 API integration (open events, limit 50).
+- [x] Nearest disaster calculation using Haversine formula with Philippine boundary filtering for admins.
+- [x] Philippine active fault lines overlay (GeoJSON).
+- [x] Philippine volcanoes overlay (GeoJSON).
+- [x] KMZ file serving with correct MIME type.
+
+### Phase 3: Dashboard & Visualization
+- [x] Admin Command Center: Three-panel layout with employee layers, Leaflet.js map, and hazard sidebar.
+- [x] Employee Disaster Tracker Dashboard: Three-panel layout with own location and hazard monitoring.
+- [x] Workforce Geography analytics page with office/type distribution and interactive map.
+- [x] Employee markers color-coded by DTI category.
+- [x] Separate Home/Office/Latest icons on admin Personnel Directory.
+- [x] Standard and Satellite map tile layers.
+- [x] Responsive layout (stacks vertically on ≤1200px screens).
+
+### Phase 4: Security & Performance
+- [x] SecurityHeaders middleware (CSP, X-Frame-Options, HSTS, cache control).
+- [x] AdminMiddleware for role-based access control.
+- [x] API rate limiting (30 req/min on location endpoint).
+- [x] Dashboard stats caching (5 minutes).
+- [x] Admin ID and dropdown option caching (10 minutes).
+- [x] Last activity update throttling (60-second debounce).
+- [x] Database indexes on `employee_locations` (recorded_at, office, type, user_id+recorded_at) and `users` (last_activity_at).
 
 ---
 
-## 2. Core Functional Modules
-
-### A. Unified Command Center
-- **Hazard-Aware Map**: Visual distribution of the workforce alongside live Earthquake (USGS) and Natural Event (NASA) markers.
-- **Dynamic Geospatial Layers**: Integration of active faults, volcano maps, and KMZ environmental data.
-- **Live Reporting Feed**: Instant visibility into the latest check-ins and hazard proximity.
-
-### B. Workforce Geography & Analysis
-- **Spatial Distribution**: Specialized analysis of Home vs. Office workforce density.
-- **Synchronized Data Lists**: Real-time correlation between map markers and employee data lists.
-- **Solo Marker Highlighting**: Focused visualization for specific personnel during auditing.
-
-### C. Audit & Compliance Engine
-- **Personnel History**: Comprehensive, immutable track logs for every employee.
-- **Telemetry API**: Throttled REST endpoints for secure coordinate capture and reverse-geocoding.
-- **Security Guard**: Role-based access control (RBAC) protecting sensitive PII.
+## 3. Known Limitations & Future Considerations
+- [ ] No forced password change on first login for new accounts (default password: `password123`).
+- [ ] No rate limiting on admin CRUD or disaster API proxy endpoints.
+- [ ] No push notifications or automated alerts based on disaster proximity.
+- [ ] No geofencing or virtual perimeter-based check-ins.
+- [ ] No native mobile app — browser-only.
+- [ ] No automated/scheduled disaster data syncing — currently on-demand via button click.
+- [ ] Disaster data not persisted in the database — fetched fresh each time.
 
 ---
 
-## 3. Technical Roadmap
-
-### Phase 1: Core Telemetry (Completed)
-- [x] GPS Capture via browser Geolocation API.
-- [x] Admin dashboard with live activity feed.
-- [x] Responsive mobile UI for field check-ins.
-- [x] Containerized deployment (Docker/Sail).
-
-### Phase 2: Disaster Integration (Completed)
-- [x] USGS Earthquake API synchronization.
-- [x] NASA EONET Event integration.
-- [x] Active Fault and Volcano map layers.
-- [x] KML/KMZ file support and rendering.
-
-### Phase 3: Performance & Scale 
-- [x] Advanced database indexing for time-series location data.
-
-### Phase 4: Intelligence & Automation (Future)
-- [ ] **Predictive Alerts**: Automated warnings based on disaster trajectory.
-- [ ] **Geofencing**: Virtual zone-based check-ins for office perimeters.
-- [ ] **Native Mobile**: Background tracking and push notification alerts.
-
----
-
-## 4. Security & VAPT Highlights
-The system implements high-security standards for PII and location data:
-- **RBAC**: AdminMiddleware ensures unauthorized users cannot access sensitive logs.
-- **Throttling**: 30 requests per minute limit on the tracking API.
-- **VAPT Status**: Verified mitigation for SQLi, CSRF, and Access Control vulnerabilities.
+## 4. Security Status
+| Control | Status |
+| :--- | :--- |
+| SQL Injection Mitigation | ✅ Verified (Eloquent parameter binding) |
+| CSRF Protection | ✅ Verified (Laravel CSRF middleware) |
+| XSS Protection | ✅ Verified (Blade escaping + CSP header) |
+| Access Control | ✅ Verified (AdminMiddleware + auth middleware) |
+| API Throttling | ✅ Implemented (30 req/min on `/api/location`) |
+| PII Protection | ✅ RBAC-enforced data isolation |
+| Default Passwords | ⚠️ Known risk — no forced change |
