@@ -915,71 +915,114 @@
         function fetchNearestDisaster() {
             fetch('/api/notifications/nearest-disaster')
                 .then(response => response.json())
-                .then(data => {
-                    if (data && data.nearest_disaster) {
-                        const disaster = data.nearest_disaster;
+                .then(data => { if (data) {
                         const isAdminUser = data.is_admin || false;
                         const targetPath = isAdminUser ? '/admin/dashboard' : '/dashboard';
-                        
-                        // Hazard card styling components
-                        const isEarthquake = disaster.type === 'earthquake';
-                        const typeLabel = isEarthquake ? 'Earthquake' : (disaster.category || 'NASA Alert');
-                        const badgeColor = isEarthquake ? '#fb7185' : '#60a5fa';
-                        const badgeBg = isEarthquake ? 'rgba(244, 63, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
-                        const titlePrefix = isEarthquake ? 'M ' + disaster.magnitude + ' - ' : '';
 
-                        const hazardCardHtml = `
-                            <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
-                                 style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1rem; cursor: pointer; transition: all 0.2s;"
-                                 onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)';"
-                                 onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255, 255, 255, 0.03)';">
-                                <div style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; background: ${badgeBg}; color: ${badgeColor};">${typeLabel}</div>
-                                <div style="font-weight: 600; font-size: 0.85rem; color: white;">${titlePrefix}${disaster.title}</div>
-                                <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
-                                <div style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
-                                <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #818cf8; font-weight: 600;">View on map &rarr;</div>
-                            </div>
-                        `;
-                        
-                        // Update dropdown UI
-                        const badge = document.getElementById('notif-badge');
-                        if (badge) {
-                            badge.style.display = 'block';
-                            badge.textContent = '1';
-                        }
-
-                        const notifList = document.getElementById('notification-list');
-                        if (notifList) {
-                            notifList.innerHTML = `<div style="padding: 0.5rem;">${hazardCardHtml}</div>`;
-                        }
-
-                        // Handle Popup Logic
-                        const lastAlertedId = localStorage.getItem('last_alerted_disaster_id');
-                        const hasSeenThisSession = sessionStorage.getItem('seen_disaster_popup');
-
-                        // Show popup if it's a NEW disaster altogether, OR if they haven't seen it in this login session
-                        if (lastAlertedId !== disaster.id || !hasSeenThisSession) {
+                        if (isAdminUser && data.philippine_disasters) {
+                            const badge = document.getElementById('notif-badge');
+                            if (badge) {
+                                badge.style.display = data.philippine_disasters.length > 0 ? 'block' : 'none';
+                                badge.textContent = data.philippine_disasters.length;
+                            }
                             
-                            // Inject content into popup
-                            const popupContent = document.getElementById('disaster-popup-content');
-                            if (popupContent) {
-                                popupContent.innerHTML = hazardCardHtml;
+                            const notifList = document.getElementById('notification-list');
+                            if (notifList) {
+                                let html = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.05em;">Active Philippine Disasters</div>';
+                                data.philippine_disasters.forEach(disaster => {
+                                    const isEarthquake = disaster.type === 'earthquake';
+                                    const typeLabel = isEarthquake ? 'Earthquake' : (disaster.category || 'NASA Alert');
+                                    const badgeColor = isEarthquake ? '#fb7185' : '#60a5fa';
+                                    const badgeBg = isEarthquake ? 'rgba(244, 63, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+                                    const titlePrefix = isEarthquake ? 'M ' + disaster.magnitude + ' - ' : '';
+                                    
+                                    html += `
+                                        <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
+                                             style="background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1rem; cursor: pointer; transition: all 0.2s;"
+                                             onmouseover="this.style.background='rgba(99, 102, 241, 0.05)';"
+                                             onmouseout="this.style.background='rgba(255, 255, 255, 0.03)';">
+                                            <div style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; background: ${badgeBg}; color: ${badgeColor};">${typeLabel}</div>
+                                            <div style="font-weight: 600; font-size: 0.85rem; color: white;">${titlePrefix}${disaster.title}</div>
+                                            <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
+                                            <div style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
+                                        </div>
+                                    `;
+                                });
+                                
+                                if (data.philippine_disasters.length === 0) {
+                                    html += '<div style="padding: 1.5rem; text-align: center; color: #94a3b8; font-size: 0.85rem;">No active disasters in the Philippines</div>';
+                                }
+                                
+                                notifList.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${html}</div>`;
+                            }
+                            
+                            // Close popup if any
+                            const popup = document.getElementById('disaster-popup');
+                            if (popup) popup.classList.remove('show');
+                        } else if (data.nearest_disaster) {
+                            const disaster = data.nearest_disaster;
+                            
+                            // Hazard card styling components
+                            const isEarthquake = disaster.type === 'earthquake';
+                            const typeLabel = isEarthquake ? 'Earthquake' : (disaster.category || 'NASA Alert');
+                            const badgeColor = isEarthquake ? '#fb7185' : '#60a5fa';
+                            const badgeBg = isEarthquake ? 'rgba(244, 63, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+                            const titlePrefix = isEarthquake ? 'M ' + disaster.magnitude + ' - ' : '';
+
+                            const hazardCardHtml = `
+                                <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
+                                     style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1rem; cursor: pointer; transition: all 0.2s;"
+                                     onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)';"
+                                     onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255, 255, 255, 0.03)';">
+                                    <div style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; background: ${badgeBg}; color: ${badgeColor};">${typeLabel}</div>
+                                    <div style="font-weight: 600; font-size: 0.85rem; color: white;">${titlePrefix}${disaster.title}</div>
+                                    <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
+                                    <div style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
+                                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #818cf8; font-weight: 600;">View on map &rarr;</div>
+                                </div>
+                            `;
+                            
+                            // Update dropdown UI
+                            const badge = document.getElementById('notif-badge');
+                            if (badge) {
+                                badge.style.display = 'block';
+                                badge.textContent = '1';
                             }
 
-                            // Show the popup
-                            const popup = document.getElementById('disaster-popup');
-                            if (popup) popup.classList.add('show');
-                            
-                            // Save states
-                            localStorage.setItem('last_alerted_disaster_id', disaster.id);
-                            sessionStorage.setItem('seen_disaster_popup', 'true');
-                            
-                            // Auto hide after 15 seconds
-                            setTimeout(() => {
-                                closeDisasterPopup();
-                            }, 15000);
+                            const notifList = document.getElementById('notification-list');
+                            if (notifList) {
+                                const headerHtml = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Nearest Disaster Alert</div>';
+                                notifList.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${headerHtml}<div style="padding: 0 0.5rem 0.5rem 0.5rem;">${hazardCardHtml}</div></div>`;
+                            }
+
+                            // Handle Popup Logic
+                            const lastAlertedId = localStorage.getItem('last_alerted_disaster_id');
+                            const hasSeenThisSession = sessionStorage.getItem('seen_disaster_popup');
+
+                            // Show popup if it's a NEW disaster altogether, OR if they haven't seen it in this login session
+                            if (lastAlertedId !== disaster.id || !hasSeenThisSession) {
+                                
+                                // Inject content into popup
+                                const popupContent = document.getElementById('disaster-popup-content');
+                                if (popupContent) {
+                                    popupContent.innerHTML = hazardCardHtml;
+                                }
+
+                                // Show the popup
+                                const popup = document.getElementById('disaster-popup');
+                                if (popup) popup.classList.add('show');
+                                
+                                // Save states
+                                localStorage.setItem('last_alerted_disaster_id', disaster.id);
+                                sessionStorage.setItem('seen_disaster_popup', 'true');
+                                
+                                // Auto hide after 15 seconds
+                                setTimeout(() => {
+                                    if (popup) popup.classList.remove('show');
+                                }, 15000);
+                            }
                         }
-                    }
+                    } 
                 })
                 .catch(err => console.error('Failed to fetch nearest disaster', err));
         }

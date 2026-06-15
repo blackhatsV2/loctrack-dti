@@ -152,6 +152,12 @@ class DisasterController extends Controller
                 return $earthRadius * $c;
             };
 
+            $isAdmin = $user->isAdmin();
+            $philippineDisasters = [];
+            $isInPhilippines = function($lat, $lon) {
+                return ($lat >= 4.5 && $lat <= 21.5 && $lon >= 116.0 && $lon <= 127.0);
+            };
+
             // Process USGS
             if ($usgsResponse->successful()) {
                 $features = $usgsResponse->json()['features'] ?? [];
@@ -161,18 +167,24 @@ class DisasterController extends Controller
                     if ($lat === null || $lon === null) continue;
 
                     $distance = $calculateDistance($lat, $lon);
+                    $disasterItem = [
+                        'id' => $feature['id'],
+                        'title' => $feature['properties']['title'],
+                        'type' => 'earthquake',
+                        'magnitude' => $feature['properties']['mag'],
+                        'time' => $feature['properties']['time'],
+                        'distance_km' => round($distance, 2),
+                        'latitude' => $lat,
+                        'longitude' => $lon,
+                    ];
+
                     if ($distance < $minDistance) {
                         $minDistance = $distance;
-                        $nearest = [
-                            'id' => $feature['id'],
-                            'title' => $feature['properties']['title'],
-                            'type' => 'earthquake',
-                            'magnitude' => $feature['properties']['mag'],
-                            'time' => $feature['properties']['time'],
-                            'distance_km' => round($distance, 2),
-                            'latitude' => $lat,
-                            'longitude' => $lon,
-                        ];
+                        $nearest = $disasterItem;
+                    }
+
+                    if ($isAdmin && $isInPhilippines($lat, $lon)) {
+                        $philippineDisasters[] = $disasterItem;
                     }
                 }
             }
@@ -189,31 +201,44 @@ class DisasterController extends Controller
                     if ($lat === null || $lon === null) continue;
 
                     $distance = $calculateDistance($lat, $lon);
+                    $disasterItem = [
+                        'id' => $event['id'],
+                        'title' => $event['title'],
+                        'type' => 'nasa',
+                        'category' => $event['categories'][0]['title'] ?? 'Natural Event',
+                        'time' => isset($geom['date']) ? strtotime($geom['date']) * 1000 : time() * 1000,
+                        'distance_km' => round($distance, 2),
+                        'latitude' => $lat,
+                        'longitude' => $lon,
+                    ];
+
                     if ($distance < $minDistance) {
                         $minDistance = $distance;
-                        $nearest = [
-                            'id' => $event['id'],
-                            'title' => $event['title'],
-                            'type' => 'nasa',
-                            'category' => $event['categories'][0]['title'] ?? 'Natural Event',
-                            'time' => $geom['date'] ?? null,
-                            'distance_km' => round($distance, 2),
-                            'latitude' => $lat,
-                            'longitude' => $lon,
-                        ];
+                        $nearest = $disasterItem;
+                    }
+
+                    if ($isAdmin && $isInPhilippines($lat, $lon)) {
+                        $philippineDisasters[] = $disasterItem;
                     }
                 }
             }
 
-            if ($nearest) {
+            if ($isAdmin) {
+                usort($philippineDisasters, function($a, $b) {
+                    return $b['time'] <=> $a['time']; // Descending order
+                });
+            }
+
+            if ($nearest || $isAdmin) {
                 return response()->json([
                     'nearest_disaster' => $nearest,
+                    'philippine_disasters' => $philippineDisasters,
                     'user_location' => [
                         'latitude' => $userLat,
                         'longitude' => $userLon,
                         'address' => $latestLocation->address,
                     ],
-                    'is_admin' => $user->isAdmin(),
+                    'is_admin' => $isAdmin,
                 ]);
             }
 
