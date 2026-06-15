@@ -121,43 +121,52 @@ class DisasterController extends Controller
         $userLon = $latestLocation->longitude;
 
         try {
-            // Fetch global earthquakes from the past 3 days
             $startTime = now()->subDays(3)->format('Y-m-d');
-            $response = Http::timeout(15)->get('https://earthquake.usgs.gov/fdsnws/event/1/query', [
+            
+            $usgsResponse = Http::timeout(15)->get('https://earthquake.usgs.gov/fdsnws/event/1/query', [
                 'format' => 'geojson',
                 'starttime' => $startTime,
                 'minmagnitude' => 2.5,
                 'orderby' => 'time',
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $features = $data['features'] ?? [];
-                
-                $nearest = null;
-                $minDistance = PHP_FLOAT_MAX;
+            $nasaResponse = Http::timeout(15)->get('https://eonet.gsfc.nasa.gov/api/v3/events', [
+                'status' => 'open',
+                'limit' => 50,
+            ]);
 
+            $nearest = null;
+            $minDistance = PHP_FLOAT_MAX;
+
+            $earthRadius = 6371; // km
+            $userLatRad = deg2rad($userLat);
+            $userLonRad = deg2rad($userLon);
+
+            $calculateDistance = function($lat, $lon) use ($earthRadius, $userLatRad, $userLonRad, $userLat) {
+                $dLat = deg2rad($lat - $userLat);
+                $dLon = deg2rad($lon - rad2deg($userLonRad));
+                $a = sin($dLat/2) * sin($dLat/2) +
+                     cos($userLatRad) * cos(deg2rad($lat)) *
+                     sin($dLon/2) * sin($dLon/2);
+                $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+                return $earthRadius * $c;
+            };
+
+            // Process USGS
+            if ($usgsResponse->successful()) {
+                $features = $usgsResponse->json()['features'] ?? [];
                 foreach ($features as $feature) {
-                    $lon = $feature['geometry']['coordinates'][0];
-                    $lat = $feature['geometry']['coordinates'][1];
-                    
-                    // Haversine formula
-                    $earthRadius = 6371; // km
-                    $dLat = deg2rad($lat - $userLat);
-                    $dLon = deg2rad($lon - $userLon);
-                    
-                    $a = sin($dLat/2) * sin($dLat/2) +
-                         cos(deg2rad($userLat)) * cos(deg2rad($lat)) *
-                         sin($dLon/2) * sin($dLon/2);
-                    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-                    $distance = $earthRadius * $c;
+                    $lon = $feature['geometry']['coordinates'][0] ?? null;
+                    $lat = $feature['geometry']['coordinates'][1] ?? null;
+                    if ($lat === null || $lon === null) continue;
 
+                    $distance = $calculateDistance($lat, $lon);
                     if ($distance < $minDistance) {
                         $minDistance = $distance;
                         $nearest = [
                             'id' => $feature['id'],
                             'title' => $feature['properties']['title'],
-                            'type' => 'Earthquake',
+                            'type' => 'earthquake',
                             'magnitude' => $feature['properties']['mag'],
                             'time' => $feature['properties']['time'],
                             'distance_km' => round($distance, 2),
@@ -166,7 +175,37 @@ class DisasterController extends Controller
                         ];
                     }
                 }
+            }
 
+            // Process NASA
+            if ($nasaResponse->successful()) {
+                $events = $nasaResponse->json()['events'] ?? [];
+                foreach ($events as $event) {
+                    $geom = $event['geometry'][0] ?? null;
+                    if (!$geom || $geom['type'] !== 'Point') continue;
+
+                    $lon = $geom['coordinates'][0] ?? null;
+                    $lat = $geom['coordinates'][1] ?? null;
+                    if ($lat === null || $lon === null) continue;
+
+                    $distance = $calculateDistance($lat, $lon);
+                    if ($distance < $minDistance) {
+                        $minDistance = $distance;
+                        $nearest = [
+                            'id' => $event['id'],
+                            'title' => $event['title'],
+                            'type' => 'nasa',
+                            'category' => $event['categories'][0]['title'] ?? 'Natural Event',
+                            'time' => $geom['date'] ?? null,
+                            'distance_km' => round($distance, 2),
+                            'latitude' => $lat,
+                            'longitude' => $lon,
+                        ];
+                    }
+                }
+            }
+
+            if ($nearest) {
                 return response()->json([
                     'nearest_disaster' => $nearest,
                     'user_location' => [
@@ -178,9 +217,9 @@ class DisasterController extends Controller
                 ]);
             }
 
-            return response()->json(['error' => 'Failed to fetch earthquake data'], 500);
+            return response()->json(['message' => 'No disasters found'], 200);
         } catch (\Exception $e) {
-            Log::error('USGS API Error for Nearest: ' . $e->getMessage());
+            Log::error('Disaster API Error for Nearest: ' . $e->getMessage());
             return response()->json(['error' => 'Service unavailable'], 503);
         }
     }

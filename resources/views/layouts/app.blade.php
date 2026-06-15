@@ -922,10 +922,11 @@
                         const targetPath = isAdminUser ? '/admin/dashboard' : '/dashboard';
                         
                         // Hazard card styling components
-                        const typeLabel = disaster.type === 'earthquake' ? 'Earthquake' : 'NASA Alert';
-                        const badgeColor = disaster.type === 'earthquake' ? '#fb7185' : '#60a5fa';
-                        const badgeBg = disaster.type === 'earthquake' ? 'rgba(244, 63, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
-                        const titlePrefix = disaster.type === 'earthquake' ? 'M ' + disaster.magnitude + ' - ' : '';
+                        const isEarthquake = disaster.type === 'earthquake';
+                        const typeLabel = isEarthquake ? 'Earthquake' : (disaster.category || 'NASA Alert');
+                        const badgeColor = isEarthquake ? '#fb7185' : '#60a5fa';
+                        const badgeBg = isEarthquake ? 'rgba(244, 63, 94, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+                        const titlePrefix = isEarthquake ? 'M ' + disaster.magnitude + ' - ' : '';
 
                         const hazardCardHtml = `
                             <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
