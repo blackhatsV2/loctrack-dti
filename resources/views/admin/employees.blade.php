@@ -389,13 +389,18 @@
 
     <!-- Add Employee Modal -->
     <div id="add-employee-modal" class="modal">
-        <div class="glass-card modal-content animate-fade-in">
+        <div class="glass-card modal-content animate-fade-in" style="position: relative;">
+            <!-- Loading Overlay -->
+            <div id="add-employee-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 10; align-items: center; justify-content: center; border-radius: inherit;">
+                <div class="spinner"></div>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 style="margin: 0;">Add New Employee</h2>
                 <button onclick="closeAddModal()" class="close-btn">&times;</button>
             </div>
 
-            <form action="{{ route('admin.employees.store') }}" method="POST">
+            <form id="add-employee-form" action="{{ route('admin.employees.store') }}" method="POST">
                 @csrf
                 <div class="input-group">
                     <label class="input-label">Full Name</label>
@@ -809,6 +814,19 @@
             inputs.forEach(input => {
                 input.value = input.value.trim();
             });
+        }
+
+        if (form.id === 'add-employee-form') {
+            const loadingOverlay = document.getElementById('add-employee-loading');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+                submitBtn.style.cursor = 'not-allowed';
+                submitBtn.innerText = 'Creating...';
+            }
         }
     });
 </script>
