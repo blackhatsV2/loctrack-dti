@@ -341,6 +341,17 @@
         initMap();
         loadPersonnel();
         syncHazards();
+
+        // Check for URL parameters for disaster redirection
+        const urlParams = new URLSearchParams(window.location.search);
+        const focusLat = urlParams.get('lat');
+        const focusLon = urlParams.get('lon');
+        const focusZoom = urlParams.get('zoom');
+        if (focusLat && focusLon) {
+            setTimeout(() => {
+                if (map) map.flyTo([parseFloat(focusLat), parseFloat(focusLon)], focusZoom ? parseInt(focusZoom) : 10, { duration: 1.5 });
+            }, 500);
+        }
     });
 
     function initMap() {
@@ -578,18 +589,18 @@
         if (activeHazardType === 'all' || activeHazardType === 'earthquake') {
             earthquakeData.forEach(e => {
                 if (!e.geometry || !e.geometry.coordinates) return;
-                const [lon, lat, depth] = e.geometry.coordinates;
-                const m = L.circleMarker([lat, lon], { radius: Math.max(e.properties.mag * 3, 5), fillColor: '#fb7185', color: '#f43f5e', weight: 1, fillOpacity: 0.4 }).addTo(map);
-                m.bindPopup(`<b>M ${e.properties.mag} Earthquake</b><br>${e.properties.place}<br><small>Depth: ${depth}km</small>`);
+                const [lon, lat, depth] = e.geometry.coordinates, mag = e.properties.mag, time = new Date(e.properties.time);
+                const m = L.circleMarker([lat, lon], { radius: Math.max(mag * 3, 5), fillColor: '#fb7185', color: '#f43f5e', weight: 1, opacity: 0.8, fillOpacity: 0.4 }).addTo(map);
+                m.bindPopup(`<div style="min-width: 200px;"><div style="font-weight: 600; color: #f43f5e; margin-bottom: 4px; font-size: 0.95rem;">M ${mag} Earthquake</div><div style="font-size: 0.85rem; margin-bottom: 8px;">${e.properties.place}</div><div style="display: grid; grid-template-columns: 70px 1fr; gap: 4px; font-size: 0.75rem;"><span style="color: #94a3b8;">Time</span><span>${time.toLocaleString()}</span><span style="color: #94a3b8;">Depth</span><span>${depth ? depth.toFixed(1) + ' km' : 'N/A'}</span></div></div>`);
                 eqMarkers.push(m);
             });
         }
         if (activeHazardType === 'all' || activeHazardType === 'nasa') {
             nasaData.forEach(e => {
-                const geo = e.geometry?.[0]; if (!geo) return;
+                const geo = e.geometry?.[0]; if (!geo || geo.type !== 'Point') return;
                 const [lon, lat] = geo.coordinates;
-                const m = L.circleMarker([lat, lon], { radius: 6, fillColor: '#60a5fa', color: '#3b82f6', weight: 1, fillOpacity: 0.4 }).addTo(map);
-                m.bindPopup(`<b>${e.categories[0]?.title}</b><br>${e.title}`);
+                const m = L.circleMarker([lat, lon], { radius: 6, fillColor: '#60a5fa', color: '#3b82f6', weight: 1, opacity: 0.8, fillOpacity: 0.4 }).addTo(map);
+                m.bindPopup(`<div style="min-width: 200px;"><div style="font-weight: 600; color: #3b82f6; margin-bottom: 4px; font-size: 0.95rem;">${e.categories[0]?.title}</div><div style="font-size: 0.85rem; margin-bottom: 8px;">${e.title}</div></div>`);
                 nasaMarkers.push(m);
             });
         }

@@ -894,6 +894,10 @@
                 .then(data => {
                     if (data && data.nearest_disaster) {
                         const disaster = data.nearest_disaster;
+                        const isAdminUser = data.is_admin || false;
+                        const mapUrl = isAdminUser 
+                            ? `/admin/dashboard?lat=${disaster.latitude}&lon=${disaster.longitude}&zoom=10`
+                            : `/dashboard?lat=${disaster.latitude}&lon=${disaster.longitude}&zoom=10`;
                         
                         // Update dropdown UI
                         const badge = document.getElementById('notif-badge');
@@ -905,7 +909,7 @@
                         const notifList = document.getElementById('notification-list');
                         if (notifList) {
                             notifList.innerHTML = `
-                                <a href="https://www.google.com/maps/search/?api=1&query=${disaster.latitude},${disaster.longitude}" target="_blank" class="notification-item" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.25rem;">
+                                <a href="${mapUrl}" class="notification-item" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.25rem;">
                                     <div class="notification-title">${disaster.type}: ${disaster.title}</div>
                                     <div class="notification-meta">Distance: ${disaster.distance_km} km away</div>
                                     <div class="notification-meta">Date: ${new Date(disaster.time).toLocaleString()}</div>
@@ -925,7 +929,7 @@
                             const popupContent = document.getElementById('disaster-popup-content');
                             if (popupContent) {
                                 popupContent.innerHTML = `
-                                    <a href="https://www.google.com/maps/search/?api=1&query=${disaster.latitude},${disaster.longitude}" target="_blank" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
+                                    <a href="${mapUrl}" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
                                         <strong>Nearest to your location:</strong><br>
                                         ${disaster.title}<br>
                                         <span style="color: #cbd5e1; font-size: 0.85rem;">Distance: <strong>${disaster.distance_km} km</strong></span><br>

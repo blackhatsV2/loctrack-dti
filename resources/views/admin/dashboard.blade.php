@@ -376,6 +376,17 @@
         
         // Start polling for online personnel updates every 30 seconds
         setInterval(fetchOnlinePersonnel, 30000);
+
+        // Check for URL parameters for disaster redirection
+        const urlParams = new URLSearchParams(window.location.search);
+        const focusLat = urlParams.get('lat');
+        const focusLon = urlParams.get('lon');
+        const focusZoom = urlParams.get('zoom');
+        if (focusLat && focusLon) {
+            setTimeout(() => {
+                if (map) map.flyTo([parseFloat(focusLat), parseFloat(focusLon)], focusZoom ? parseInt(focusZoom) : 10, { duration: 1.5 });
+            }, 500);
+        }
     });
 
     async function fetchOnlinePersonnel() {

@@ -173,7 +173,8 @@ class DisasterController extends Controller
                         'latitude' => $userLat,
                         'longitude' => $userLon,
                         'address' => $latestLocation->address,
-                    ]
+                    ],
+                    'is_admin' => $user->isAdmin(),
                 ]);
             }
 
