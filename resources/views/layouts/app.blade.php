@@ -300,32 +300,45 @@
             }
             .nav-links {
                 display: none;
-                width: 100%;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #0f172a;
                 flex-direction: column;
                 align-items: stretch;
-                gap: 0;
-                margin-top: 0.75rem;
-                padding-top: 0.75rem;
+                gap: 0.5rem;
+                padding: 1.5rem;
                 border-top: 1px solid var(--glass-border);
+                border-bottom: 1px solid var(--glass-border);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                z-index: 99;
             }
             .nav-links.mobile-open {
                 display: flex;
             }
             .nav-links a {
-                padding: 0.75rem 0.5rem;
+                padding: 0.75rem 1rem;
                 border-radius: 0.5rem;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.03);
             }
             .nav-links form {
                 width: 100%;
             }
             .nav-links form a {
                 display: block;
-                padding: 0.75rem 0.5rem;
+                padding: 0.75rem 1rem;
+                text-align: center;
+                background: rgba(244, 63, 94, 0.1);
+                color: #f43f5e;
             }
             .nav-badge {
-                align-self: flex-start;
+                align-self: center;
                 margin-left: 0;
                 margin-top: 0.25rem;
+                margin-bottom: 0.5rem;
+                padding: 0.25rem 0.75rem;
             }
             main {
                 padding: 1rem;
@@ -664,6 +677,17 @@
                 const loader = document.getElementById('global-loader');
                 if (loader) {
                     loader.style.display = 'none';
+                }
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const nav = document.querySelector('nav');
+            const navLinks = document.getElementById('nav-links');
+            if (nav && navLinks && navLinks.classList.contains('mobile-open')) {
+                if (!nav.contains(e.target)) {
+                    navLinks.classList.remove('mobile-open');
                 }
             }
         });

@@ -172,10 +172,28 @@
     .leaflet-popup-tip { background: #1e293b; }
 
     @media (max-width: 1200px) {
-        .sidebar-right { display: none; }
-    }
-    @media (max-width: 900px) {
-        .sidebar-left { display: none; }
+        .unified-container {
+            flex-direction: column;
+            height: auto;
+        }
+        .sidebar-left {
+            width: 100%;
+            min-width: 100%;
+            height: 350px;
+            border-right: none;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .sidebar-right {
+            width: 100%;
+            min-width: 100%;
+            height: 600px;
+            border-left: none;
+            border-top: 1px solid var(--glass-border);
+        }
+        .map-section {
+            height: 600px;
+            flex: none;
+        }
     }
 
     @media (max-width: 768px) {
@@ -192,8 +210,8 @@
             font-size: 2rem !important;
         }
         
-        .unified-container {
-            height: 500px;
+        .map-section {
+            height: 400px;
         }
     }
 
