@@ -384,7 +384,12 @@
         const focusZoom = urlParams.get('zoom');
         if (focusLat && focusLon) {
             setTimeout(() => {
-                if (map) map.flyTo([parseFloat(focusLat), parseFloat(focusLon)], focusZoom ? parseInt(focusZoom) : 10, { duration: 1.5 });
+                if (map) {
+                    map.flyTo([parseFloat(focusLat), parseFloat(focusLon)], focusZoom ? parseInt(focusZoom) : 10, { duration: 1.5 });
+                    if (urlParams.get('open_popup')) {
+                        window.pendingDisasterPopup = { lat: parseFloat(focusLat), lon: parseFloat(focusLon) };
+                    }
+                }
             }, 500);
         }
     });
@@ -468,6 +473,20 @@
             nasaData = results[1].events || [];
             renderHazardMarkers();
             renderHazardList();
+
+            if (window.pendingDisasterPopup) {
+                setTimeout(() => {
+                    map.eachLayer(function(layer) {
+                        if (layer.getLatLng && layer.openPopup) {
+                            const latlng = layer.getLatLng();
+                            if (Math.abs(latlng.lat - window.pendingDisasterPopup.lat) < 0.0001 && Math.abs(latlng.lng - window.pendingDisasterPopup.lon) < 0.0001) {
+                                layer.openPopup();
+                            }
+                        }
+                    });
+                    window.pendingDisasterPopup = null;
+                }, 1000);
+            }
         } catch (err) {
             console.error('Hazard error:', err);
             hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Sync failed.</div>';
