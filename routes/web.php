@@ -40,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/disasters', [DisasterController::class, 'index'])->name('disasters.index');
     Route::get('/api/disasters/earthquakes', [DisasterController::class, 'getEarthquakes'])->name('api.disasters.earthquakes');
     Route::get('/api/disasters/events', [DisasterController::class, 'getNaturalEvents'])->name('api.disasters.events');
+    Route::get('/api/notifications/nearest-disaster', [DisasterController::class, 'nearestDisaster'])->name('api.notifications.nearest');
     
     // Serve KMZ files with correct MIME type
     Route::get('/api/maps/{filename}', function ($filename) {

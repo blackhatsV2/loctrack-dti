@@ -446,6 +446,140 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+        /* Notification System */
+        .notification-container {
+            position: relative;
+            display: inline-block;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .notification-bell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .notification-bell:hover {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f43f5e;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 10px;
+            display: none;
+        }
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.75rem;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            width: 300px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .notification-dropdown.active {
+            display: flex;
+        }
+        .notification-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fca5a5;
+        }
+        .notification-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Nearest Disaster Popup Overlay */
+        #disaster-popup {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            border-top: 4px solid #f43f5e;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(244, 63, 94, 0.25);
+            z-index: 10000;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        #disaster-popup.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .popup-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+        }
+        .popup-close:hover {
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .notification-container {
+                margin: 0.5rem auto;
+            }
+            .notification-dropdown {
+                right: -50px;
+            }
+        }
     </style>
     @yield('styles')
 </head>
@@ -466,6 +600,21 @@
         }, 1000);
     </script>
     <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;"></div>
+
+    <div id="disaster-popup">
+        <button class="popup-close" onclick="closeDisasterPopup()">&times;</button>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h3 style="color: #f43f5e; font-size: 1.1rem; margin: 0;">Disaster Alert!</h3>
+        </div>
+        <div id="disaster-popup-content" style="font-size: 0.9rem; color: var(--text-light); line-height: 1.5;">
+            <!-- Content injected via JS -->
+        </div>
+    </div>
     <nav>
         <a href="{{ url('/') }}" class="logo-container">
             <picture>
@@ -488,6 +637,25 @@
                     <a href="{{ route('location.geography') }}" class="{{ request()->routeIs('location.geography') ? 'active' : '' }}">My Geography</a>
                     <a href="{{ route('location.history') }}" class="{{ request()->routeIs('location.history') ? 'active' : '' }}">History</a>
                 @endif
+                
+                <div class="notification-container" id="notification-container">
+                    <div class="notification-bell" onclick="toggleNotifications()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge" id="notif-badge">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-header">Alerts & Notifications</div>
+                        <div id="notification-list">
+                            <div class="notification-item" style="color: var(--text-muted); text-align: center; font-size: 0.85rem;">
+                                No recent alerts near your location.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                     @csrf
                     <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" style="opacity: 0.7;">Logout</a>
@@ -691,6 +859,96 @@
                 }
             }
         });
+
+        /* --- Notification & Disaster Alert Logic --- */
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notification-dropdown');
+            if (dropdown) dropdown.classList.toggle('active');
+        }
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('notification-container');
+            if (container && !container.contains(e.target)) {
+                const dropdown = document.getElementById('notification-dropdown');
+                if (dropdown) dropdown.classList.remove('active');
+            }
+        });
+
+        function closeDisasterPopup() {
+            const popup = document.getElementById('disaster-popup');
+            if (popup) popup.classList.remove('show');
+        }
+
+        @auth
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchNearestDisaster();
+            
+            // Poll for notifications every 5 minutes (300000 ms)
+            setInterval(fetchNearestDisaster, 300000);
+        });
+
+        function fetchNearestDisaster() {
+            fetch('/api/notifications/nearest-disaster')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.nearest_disaster) {
+                        const disaster = data.nearest_disaster;
+                        
+                        // Update dropdown UI
+                        const badge = document.getElementById('notif-badge');
+                        if (badge) {
+                            badge.style.display = 'block';
+                            badge.textContent = '1';
+                        }
+
+                        const notifList = document.getElementById('notification-list');
+                        if (notifList) {
+                            notifList.innerHTML = `
+                                <div class="notification-item">
+                                    <div class="notification-title">${disaster.type}: ${disaster.title}</div>
+                                    <div class="notification-meta">Distance: ${disaster.distance_km} km away</div>
+                                    <div class="notification-meta">Date: ${new Date(disaster.time).toLocaleString()}</div>
+                                </div>
+                            `;
+                        }
+
+                        // Handle Popup Logic
+                        const lastAlertedId = localStorage.getItem('last_alerted_disaster_id');
+                        const hasSeenThisSession = sessionStorage.getItem('seen_disaster_popup');
+
+                        // Show popup if it's a NEW disaster altogether, OR if they haven't seen it in this login session
+                        if (lastAlertedId !== disaster.id || !hasSeenThisSession) {
+                            
+                            // Inject content into popup
+                            const popupContent = document.getElementById('disaster-popup-content');
+                            if (popupContent) {
+                                popupContent.innerHTML = `
+                                    <strong>Nearest to your location:</strong><br>
+                                    ${disaster.title}<br>
+                                    <span style="color: #cbd5e1; font-size: 0.85rem;">Distance: <strong>${disaster.distance_km} km</strong></span><br>
+                                    <span style="color: #cbd5e1; font-size: 0.85rem;">Date: ${new Date(disaster.time).toLocaleString()}</span>
+                                `;
+                            }
+
+                            // Show the popup
+                            const popup = document.getElementById('disaster-popup');
+                            if (popup) popup.classList.add('show');
+                            
+                            // Save states
+                            localStorage.setItem('last_alerted_disaster_id', disaster.id);
+                            sessionStorage.setItem('seen_disaster_popup', 'true');
+                            
+                            // Auto hide after 15 seconds
+                            setTimeout(() => {
+                                closeDisasterPopup();
+                            }, 15000);
+                        }
+                    }
+                })
+                .catch(err => console.error('Failed to fetch nearest disaster', err));
+        }
+        @endauth
     </script>
     @yield('scripts')
 </body>
