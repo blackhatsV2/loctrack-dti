@@ -905,11 +905,12 @@
                         const notifList = document.getElementById('notification-list');
                         if (notifList) {
                             notifList.innerHTML = `
-                                <div class="notification-item">
+                                <a href="https://www.google.com/maps/search/?api=1&query=${disaster.latitude},${disaster.longitude}" target="_blank" class="notification-item" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.25rem;">
                                     <div class="notification-title">${disaster.type}: ${disaster.title}</div>
                                     <div class="notification-meta">Distance: ${disaster.distance_km} km away</div>
                                     <div class="notification-meta">Date: ${new Date(disaster.time).toLocaleString()}</div>
-                                </div>
+                                    <div class="notification-meta" style="color: #818cf8; font-weight: 600; margin-top: 0.25rem;">View on map &rarr;</div>
+                                </a>
                             `;
                         }
 
@@ -924,10 +925,13 @@
                             const popupContent = document.getElementById('disaster-popup-content');
                             if (popupContent) {
                                 popupContent.innerHTML = `
-                                    <strong>Nearest to your location:</strong><br>
-                                    ${disaster.title}<br>
-                                    <span style="color: #cbd5e1; font-size: 0.85rem;">Distance: <strong>${disaster.distance_km} km</strong></span><br>
-                                    <span style="color: #cbd5e1; font-size: 0.85rem;">Date: ${new Date(disaster.time).toLocaleString()}</span>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=${disaster.latitude},${disaster.longitude}" target="_blank" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
+                                        <strong>Nearest to your location:</strong><br>
+                                        ${disaster.title}<br>
+                                        <span style="color: #cbd5e1; font-size: 0.85rem;">Distance: <strong>${disaster.distance_km} km</strong></span><br>
+                                        <span style="color: #cbd5e1; font-size: 0.85rem;">Date: ${new Date(disaster.time).toLocaleString()}</span>
+                                        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #f43f5e; font-weight: 600;">Click to view on map &rarr;</div>
+                                    </a>
                                 `;
                             }
 
