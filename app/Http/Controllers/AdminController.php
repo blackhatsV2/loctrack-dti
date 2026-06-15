@@ -147,6 +147,8 @@ class AdminController extends Controller
             'recorded_at' => now(),
         ]);
 
+        Cache::forget('admin_dashboard_stats');
+
         return redirect()->route('admin.employees')->with('success', "Employee '{$user->name}' added successfully.");
     }
 
@@ -229,6 +231,8 @@ class AdminController extends Controller
             ]);
         }
 
+        Cache::forget('admin_dashboard_stats');
+
         return redirect()->route('admin.employees')->with('success', "Employee '{$user->name}' updated successfully.");
     }
 
@@ -255,6 +259,8 @@ class AdminController extends Controller
 
         $name = $user->name;
         $user->delete();
+
+        Cache::forget('admin_dashboard_stats');
 
         return redirect()->route('admin.employees')->with('success', "Employee '{$name}' deleted successfully.");
     }
