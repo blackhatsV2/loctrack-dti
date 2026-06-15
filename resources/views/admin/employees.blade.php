@@ -202,6 +202,116 @@
         box-shadow: none !important;
         transform: none !important;
     }
+    /* Searchable Select */
+    .searchable-select {
+        position: relative;
+    }
+    .searchable-select .ss-input {
+        width: 100%;
+        padding: 0.75rem 2.25rem 0.75rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        color: white;
+        font-size: 0.9rem;
+        font-family: 'Outfit', sans-serif;
+        cursor: text;
+    }
+    .searchable-select .ss-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+    }
+    .searchable-select .ss-input.has-value {
+        color: #fff;
+    }
+    .searchable-select .ss-input:not(.has-value)::placeholder {
+        color: rgba(255,255,255,0.35);
+    }
+    .searchable-select .ss-arrow {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: rgba(255,255,255,0.4);
+        font-size: 0.65rem;
+        transition: transform 0.2s;
+    }
+    .searchable-select.open .ss-arrow {
+        transform: translateY(-50%) rotate(180deg);
+    }
+    .searchable-select .ss-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        background: rgba(15, 15, 30, 0.97);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        z-index: 10000;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .searchable-select.open .ss-dropdown {
+        display: block;
+    }
+    .searchable-select .ss-option {
+        padding: 0.55rem 1rem;
+        color: rgba(255,255,255,0.8);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .searchable-select .ss-option:hover,
+    .searchable-select .ss-option.highlighted {
+        background: rgba(99,102,241,0.2);
+        color: #fff;
+    }
+    .searchable-select .ss-option.selected {
+        color: var(--primary);
+        font-weight: 500;
+    }
+    .searchable-select .ss-empty {
+        padding: 0.75rem 1rem;
+        color: rgba(255,255,255,0.35);
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    .searchable-select .ss-dropdown::-webkit-scrollbar {
+        width: 4px;
+    }
+    .searchable-select .ss-dropdown::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.15);
+        border-radius: 2px;
+    }
+    .searchable-select .ss-option.others-option {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        color: #a5b4fc;
+        font-style: italic;
+    }
+    .ss-custom-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        color: white;
+        font-size: 0.9rem;
+        font-family: 'Outfit', sans-serif;
+        margin-top: 0.5rem;
+    }
+    .ss-custom-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+    }
+    .ss-custom-input::placeholder {
+        color: rgba(255,255,255,0.35);
+    }
 </style>
 @endsection
 
@@ -303,24 +413,61 @@
                         <input type="text" name="employee_id_no" class="form-input" placeholder="e.g. 12345">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Office</label>
-                        <select name="office" class="form-input" required>
-                            <option value="">Select Office</option>
-                            @foreach($offices as $o)
-                                <option value="{{ $o }}">{{ $o }}</option>
-                            @endforeach
-                        </select>
+                        <label class="input-label">Employee Type</label>
+                        <div class="searchable-select" id="ss-employee-type">
+                            <input type="text" class="ss-input" placeholder="Search employee type..." autocomplete="off">
+                            <input type="hidden" name="employee_type" value="">
+                            <span class="ss-arrow">▼</span>
+                            <div class="ss-dropdown">
+                                @foreach($employeeTypes as $type)
+                                    <div class="ss-option" data-value="{{ $type }}">{{ $type }}</div>
+                                @endforeach
+                                @unless($employeeTypes->contains('Intern'))
+                                    <div class="ss-option" data-value="Intern">Intern</div>
+                                @endunless
+                                <div class="ss-option others-option" data-value="__others__">Others (specify manually)</div>
+                            </div>
+                            <input type="text" class="ss-custom-input" style="display:none;" placeholder="Type custom employee type...">
+                        </div>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Mobile Number (Optional)</label>
-                    <input type="text" name="mobile_no" class="form-input" placeholder="e.g. 09123456789">
+                    <label class="input-label">Address (Optional)</label>
+                    <input type="text" name="address" class="form-input" placeholder="e.g. Iloilo City">
                 </div>
 
-                <div class="input-group">
-                    <label class="input-label">Address (Optional)</label>
-                    <textarea name="address" class="form-input" placeholder="e.g. Iloilo City" rows="2" style="resize: vertical;"></textarea>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Mobile Number (Optional)</label>
+                        <input type="text" name="mobile_no" class="form-input" placeholder="e.g. 09123456789">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Office</label>
+                        <div class="searchable-select" id="ss-office">
+                            <input type="text" class="ss-input" placeholder="Search office..." autocomplete="off">
+                            <input type="hidden" name="office" value="">
+                            <span class="ss-arrow">▼</span>
+                            <div class="ss-dropdown">
+                                @foreach($offices as $o)
+                                    <div class="ss-option" data-value="{{ $o }}">{{ $o }}</div>
+                                @endforeach
+                                <div class="ss-option others-option" data-value="__others__">Others (specify manually)</div>
+                            </div>
+                            <input type="text" class="ss-custom-input" style="display:none;" placeholder="Type custom office name...">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label class="input-label">Latitude (Optional)</label>
+                        <input type="number" step="any" name="latitude" class="form-input" placeholder="e.g. 10.7202">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Longitude (Optional)</label>
+                        <input type="number" step="any" name="longitude" class="form-input" placeholder="e.g. 122.5621">
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
@@ -359,7 +506,166 @@
         setTimeout(() => {
             document.getElementById('employees-loading')?.classList.add('hidden');
         }, 600);
+
+        document.querySelectorAll('.searchable-select').forEach(initSearchableSelect);
     });
+
+    function initSearchableSelect(container) {
+        const input = container.querySelector('.ss-input');
+        const hidden = container.querySelector('input[type="hidden"]');
+        const dropdown = container.querySelector('.ss-dropdown');
+        const options = Array.from(dropdown.querySelectorAll('.ss-option'));
+        let highlightedIdx = -1;
+
+        // Set initial display value from hidden input
+        if (hidden.value) {
+            const matchingOpt = options.find(opt => opt.dataset.value === hidden.value);
+            if (matchingOpt) {
+                input.value = hidden.value;
+                input.classList.add('has-value');
+                matchingOpt.classList.add('selected');
+            } else {
+                // Value exists but not in options list — show as Others
+                input.value = 'Others';
+                input.classList.add('has-value');
+                if (container.querySelector('.ss-custom-input')) {
+                    const ci = container.querySelector('.ss-custom-input');
+                    ci.style.display = '';
+                    ci.value = hidden.value;
+                }
+            }
+        }
+
+        function open() {
+            container.classList.add('open');
+            filterOptions('');
+            highlightedIdx = -1;
+        }
+
+        function close() {
+            container.classList.remove('open');
+            const ci = container.querySelector('.ss-custom-input');
+            if (ci && ci.style.display !== 'none') {
+                input.value = 'Others';
+            } else {
+                input.value = hidden.value;
+            }
+            highlightedIdx = -1;
+        }
+
+        const customInput = container.querySelector('.ss-custom-input');
+
+        function selectOption(value, text) {
+            if (value === '__others__') {
+                // Show custom input, clear hidden for now
+                hidden.value = '';
+                input.value = 'Others';
+                input.classList.add('has-value');
+                container.classList.remove('open');
+                if (customInput) {
+                    customInput.style.display = '';
+                    customInput.value = '';
+                    customInput.focus();
+                }
+                return;
+            }
+            if (customInput) customInput.style.display = 'none';
+            hidden.value = value;
+            input.value = text;
+            input.classList.toggle('has-value', !!value);
+            options.forEach(opt => opt.classList.toggle('selected', opt.dataset.value === value));
+            close();
+        }
+
+        // Custom input writes directly to hidden field
+        if (customInput) {
+            customInput.addEventListener('input', function() {
+                hidden.value = this.value;
+            });
+        }
+
+        function filterOptions(query) {
+            const q = query.toLowerCase();
+            let visibleCount = 0;
+            options.forEach(opt => {
+                const match = opt.textContent.toLowerCase().includes(q);
+                opt.style.display = match ? '' : 'none';
+                opt.classList.remove('highlighted');
+                if (match) visibleCount++;
+            });
+
+            // Show/hide empty message
+            let emptyMsg = dropdown.querySelector('.ss-empty');
+            if (visibleCount === 0) {
+                if (!emptyMsg) {
+                    emptyMsg = document.createElement('div');
+                    emptyMsg.className = 'ss-empty';
+                    emptyMsg.textContent = 'No matches found';
+                    dropdown.appendChild(emptyMsg);
+                }
+                emptyMsg.style.display = '';
+            } else if (emptyMsg) {
+                emptyMsg.style.display = 'none';
+            }
+            highlightedIdx = -1;
+        }
+
+        function getVisibleOptions() {
+            return options.filter(opt => opt.style.display !== 'none');
+        }
+
+        function highlightOption(idx) {
+            const visible = getVisibleOptions();
+            visible.forEach(opt => opt.classList.remove('highlighted'));
+            if (idx >= 0 && idx < visible.length) {
+                highlightedIdx = idx;
+                visible[idx].classList.add('highlighted');
+                visible[idx].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        input.addEventListener('focus', function() {
+            this.select();
+            open();
+        });
+
+        input.addEventListener('input', function() {
+            if (!container.classList.contains('open')) open();
+            filterOptions(this.value);
+        });
+
+        input.addEventListener('keydown', function(e) {
+            const visible = getVisibleOptions();
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!container.classList.contains('open')) open();
+                highlightOption(Math.min(highlightedIdx + 1, visible.length - 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightOption(Math.max(highlightedIdx - 1, 0));
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightedIdx >= 0 && highlightedIdx < visible.length) {
+                    selectOption(visible[highlightedIdx].dataset.value, visible[highlightedIdx].textContent);
+                }
+            } else if (e.key === 'Escape') {
+                close();
+                input.blur();
+            }
+        });
+
+        options.forEach(opt => {
+            opt.addEventListener('mousedown', function(e) {
+                e.preventDefault(); // prevent blur before click registers
+                selectOption(this.dataset.value, this.textContent);
+            });
+        });
+
+        input.addEventListener('blur', function() {
+            // Small delay to allow mousedown on option to fire
+            setTimeout(() => close(), 150);
+        });
+    }
 
     // --- Instant Client-Side Filtering (like Workforce page) ---
     function filterEmployees() {
@@ -417,7 +723,31 @@
 
     function openAddModal() {
         const modal = document.getElementById('add-employee-modal');
+        const form = modal.querySelector('form');
         const modalContent = modal.querySelector('.modal-content');
+
+        if (form) {
+            form.reset();
+            // Reset searchable selects
+            modal.querySelectorAll('.searchable-select').forEach(container => {
+                const input = container.querySelector('.ss-input');
+                const hidden = container.querySelector('input[type="hidden"]');
+                const customInput = container.querySelector('.ss-custom-input');
+                const options = container.querySelectorAll('.ss-option');
+                if (input) {
+                    input.value = '';
+                    input.classList.remove('has-value');
+                }
+                if (hidden) {
+                    hidden.value = '';
+                }
+                if (customInput) {
+                    customInput.value = '';
+                    customInput.style.display = 'none';
+                }
+                options.forEach(opt => opt.classList.remove('selected', 'highlighted'));
+            });
+        }
         
         modal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Disable background scroll

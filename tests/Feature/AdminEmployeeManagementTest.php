@@ -47,6 +47,10 @@ class AdminEmployeeManagementTest extends TestCase
             'email' => 'new@example.com',
             'mobile_no' => '09123456789',
             'office' => 'DTI Regional Office VI',
+            'employee_type' => 'Casual',
+            'address' => '123 Test Street, Iloilo City',
+            'latitude' => 10.7255,
+            'longitude' => 122.5699,
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.employees.store'), $employeeData);
@@ -57,6 +61,7 @@ class AdminEmployeeManagementTest extends TestCase
         $this->assertDatabaseHas('users', [
             'name' => 'New Employee',
             'email' => 'new@example.com',
+            'employee_type' => 'Casual',
             'is_admin' => false,
         ]);
 
@@ -64,6 +69,42 @@ class AdminEmployeeManagementTest extends TestCase
         $this->assertDatabaseHas('employee_locations', [
             'user_id' => $newUser->id,
             'mobile_no' => '09123456789',
+            'employee_type' => 'Casual',
+            'address' => '123 Test Street, Iloilo City',
+            'latitude' => 10.7255,
+            'longitude' => 122.5699,
+        ]);
+    }
+
+    public function test_admin_can_add_employee_with_office_coords_fallback()
+    {
+        $employeeData = [
+            'name' => 'Fallback Employee',
+            'email' => 'fallback@example.com',
+            'office' => 'DTI Antique',
+            'employee_type' => 'Regular',
+        ];
+
+        $response = $this->actingAs($this->admin)->post(route('admin.employees.store'), $employeeData);
+
+        $response->assertRedirect(route('admin.employees'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Fallback Employee',
+            'email' => 'fallback@example.com',
+            'office' => 'DTI Antique',
+            'employee_type' => 'Regular',
+        ]);
+
+        $newUser = User::where('email', 'fallback@example.com')->first();
+        
+        // DTI Antique coordinates are 10.7441, 121.9421
+        $this->assertDatabaseHas('employee_locations', [
+            'user_id' => $newUser->id,
+            'office' => 'DTI Antique',
+            'latitude' => 10.7441,
+            'longitude' => 121.9421,
         ]);
     }
 

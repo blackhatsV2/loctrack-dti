@@ -78,7 +78,11 @@ class AdminController extends Controller
         $offices = array_unique(array_merge($offices, $defaultOffices));
         sort($offices);
 
-        return view('admin.employees', compact('employees', 'offices'));
+        $employeeTypes = EmployeeLocation::select('employee_type')->distinct()
+            ->whereNotNull('employee_type')->where('employee_type', '!=', '')
+            ->orderBy('employee_type')->pluck('employee_type');
+
+        return view('admin.employees', compact('employees', 'offices', 'employeeTypes'));
     }
 
     /**
@@ -91,8 +95,11 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'office' => 'required|string|max:255',
             'employee_id_no' => 'nullable|string|max:50',
-            'mobile_no' => 'nullable|string|max:20',
+            'mobile_no' => 'nullable|string|max:100',
             'address' => 'nullable|string|max:500',
+            'employee_type' => 'nullable|string|max:50',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         // Standardize inputs
@@ -102,6 +109,9 @@ class AdminController extends Controller
         $employeeIdNo = $request->employee_id_no ? strtoupper(trim($request->employee_id_no)) : null;
         $mobileNo = $request->mobile_no ? trim($request->mobile_no) : null;
         $address = $request->address ? trim($request->address) : null;
+        $employeeType = $request->employee_type ? trim($request->employee_type) : null;
+        $latitude = $request->filled('latitude') ? (float)$request->latitude : null;
+        $longitude = $request->filled('longitude') ? (float)$request->longitude : null;
 
         if (str_contains($name, ',')) {
             $parts = explode(',', $name);
@@ -123,21 +133,27 @@ class AdminController extends Controller
             'employee_id_no' => $employeeIdNo,
             'mobile_no' => $mobileNo,
             'office' => $office,
+            'employee_type' => $employeeType,
             'is_admin' => false,
         ]);
 
-        // Get office coordinates
-        $coords = $this->getOfficeCoordinates($office);
+        // Resolve coordinates
+        if ($latitude === null || $longitude === null) {
+            $coords = $this->getOfficeCoordinates($office);
+            $latitude = $latitude ?? $coords['lat'];
+            $longitude = $longitude ?? $coords['lng'];
+        }
 
         // Create initial location record
         EmployeeLocation::create([
             'user_id' => $user->id,
             'employee_id_no' => $employeeIdNo,
+            'employee_type' => $employeeType,
             'office' => $office,
             'mobile_no' => $mobileNo,
             'address' => $address,
-            'latitude' => $coords['lat'],
-            'longitude' => $coords['lng'],
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'recorded_at' => now(),
         ]);
 
