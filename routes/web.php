@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
 // Admin routes (authenticated + admin)
 Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/online-users', [AdminController::class, 'onlineUsers'])->name('admin.online-users');
     Route::get('/map', function () {
         return view('admin.map');
     })->name('admin.map');

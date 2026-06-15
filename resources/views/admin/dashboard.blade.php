@@ -308,7 +308,7 @@
             <p style="color: var(--text-muted); font-size: 0.9rem;">Employees active within the last 24 hours.</p>
         </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+        <div id="online-personnel-container" style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
             @forelse($onlineUsers as $onlineUser)
             <div class="glass-card"
                 style="padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.05);">
@@ -355,7 +355,42 @@
         try { initMap(); } catch (e) { console.error('Map init failed:', e); }
         try { loadEmployees(); } catch (e) { console.error('Employee load failed:', e); }
         try { refreshHazards(); } catch (e) { console.error('Hazards refresh failed:', e); }
+        
+        // Start polling for online personnel updates every 30 seconds
+        setInterval(fetchOnlinePersonnel, 30000);
     });
+
+    async function fetchOnlinePersonnel() {
+        try {
+            const response = await fetch('{{ route("admin.online-users") }}');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            
+            const container = document.getElementById('online-personnel-container');
+            if (!container) return;
+            
+            if (data.length === 0) {
+                container.innerHTML = `
+                <div style="padding: 2rem; text-align: center; width: 100%; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 1rem;">
+                    No employees are currently online.
+                </div>`;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(user => {
+                html += `
+                <div class="glass-card"
+                    style="padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.05);">
+                    <div class="pulse-dot" style="background: #34d399; width: 8px; height: 8px;"></div>
+                    <span style="font-weight: 600; font-size: 0.95rem;">${user.name}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Failed to fetch online personnel:', error);
+        }
+    }
 
     function initMap() {
         map = L.map('map', { zoomControl: false, attributionControl: false, preferCanvas: true }).setView([12.8797, 121.7740], 6);

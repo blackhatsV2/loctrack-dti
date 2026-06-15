@@ -303,6 +303,20 @@ class AdminController extends Controller
     }
 
     /**
+     * Get online users as JSON for real-time dashboard updates.
+     */
+    public function onlineUsers()
+    {
+        $activeThreshold = now()->subHours(24);
+        $onlineUsers = User::where('is_admin', false)
+            ->where('last_activity_at', '>=', $activeThreshold)
+            ->select(['id', 'name', 'email', 'office', 'last_activity_at'])
+            ->get();
+
+        return response()->json($onlineUsers);
+    }
+
+    /**
      * Workforce geography and analytics view.
      */
     public function workforce()
