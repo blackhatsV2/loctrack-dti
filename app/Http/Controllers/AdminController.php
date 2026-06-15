@@ -113,17 +113,7 @@ class AdminController extends Controller
         $latitude = $request->filled('latitude') ? (float)$request->latitude : null;
         $longitude = $request->filled('longitude') ? (float)$request->longitude : null;
 
-        if (str_contains($name, ',')) {
-            $parts = explode(',', $name);
-            $lastName = trim($parts[0]);
-            $firstName = trim($parts[1] ?? '');
-        } else {
-            $parts = explode(' ', $name);
-            $lastName = trim(array_pop($parts));
-            $firstName = trim(implode('', $parts));
-        }
-        
-        $password = strtolower(str_replace(' ', '', $lastName . $firstName)) . '06';
+        $password = 'password123';
 
         // Create user
         $user = User::create([
