@@ -488,7 +488,7 @@
             top: 100%;
             right: 0;
             margin-top: 0.75rem;
-            background: var(--glass);
+            background: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
             border-radius: 1rem;
