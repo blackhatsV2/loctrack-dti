@@ -228,14 +228,6 @@
             <div style="font-size: 2.5rem; font-weight: 600; color: #818cf8;">{{ $totalEmployees }}</div>
             <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Total Personnel</div>
         </a>
-        <a href="{{ route('admin.workforce') }}#records" class="glass-card stat-card">
-            <div style="font-size: 2.5rem; font-weight: 600; color: #34d399;">{{ $totalLocations }}</div>
-            <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Active Locations</div>
-        </a>
-        <a href="{{ route('admin.workforce') }}#analytics" class="glass-card stat-card">
-            <div style="font-size: 2.5rem; font-weight: 600; color: #f472b6;">{{ $totalOffices }}</div>
-            <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Active Offices</div>
-        </a>
     </div>
 
     <!-- Command Center Section -->
