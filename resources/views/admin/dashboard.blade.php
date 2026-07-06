@@ -240,7 +240,7 @@
             <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Real-time workforce distribution and analytics.</p>
         </div>
         <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <button onclick="refreshHazards(true)" class="btn btn-ghost" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <span id="sync-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span> Sync Hazards
             </button>
             <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -382,7 +382,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         try { initMap(); } catch (e) { console.error('Map init failed:', e); }
         try { loadEmployees(); } catch (e) { console.error('Employee load failed:', e); }
-        try { refreshHazards(); } catch (e) { console.error('Hazards refresh failed:', e); }
+        try { refreshHazards(false); } catch (e) { console.error('Hazards refresh failed:', e); }
         
         // Start polling for online personnel updates every 30 seconds
         setInterval(fetchOnlinePersonnel, 30000);
@@ -479,17 +479,20 @@
         } catch (err) { console.error('Static layers error:', err); }
     }
 
-    async function refreshHazards() {
+    async function refreshHazards(isSync = false) {
         const syncIcon = document.getElementById('sync-icon');
         const hazardContainer = document.getElementById('hazard-list');
-        syncIcon.style.animation = 'spin 1s linear infinite';
+        if (isSync) {
+            syncIcon.style.animation = 'spin 1s linear infinite';
+        }
         hazardContainer.innerHTML = `<div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
             <div class="loading-spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
-            <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
+            <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">${isSync ? 'Syncing' : 'Loading'} Hazards</div>${isSync ? 'Analyzing global and local risks...' : 'Retrieving current threat matrix...'}</div>`;
         try {
+            const queryParam = isSync ? '?sync=true' : '';
             const promises = [
-                fetch('{{ route("api.disasters.earthquakes") }}').then(r => r.json()),
-                fetch('{{ route("api.disasters.events") }}').then(r => r.json())
+                fetch('{{ route("api.disasters.earthquakes") }}' + queryParam).then(r => r.json()),
+                fetch('{{ route("api.disasters.events") }}' + queryParam).then(r => r.json())
             ];
             if (!staticLayersLoaded) promises.push(loadStaticLayers());
             const results = await Promise.all(promises);
@@ -497,7 +500,7 @@
             nasaData = results[1].events || [];
             renderHazardMarkers();
             renderHazardList();
-
+ 
             if (window.pendingDisasterPopup) {
                 setTimeout(() => {
                     map.eachLayer(function(layer) {
@@ -513,8 +516,12 @@
             }
         } catch (err) {
             console.error('Hazard error:', err);
-            hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Sync failed.</div>';
-        } finally { syncIcon.style.animation = 'none'; }
+            hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">' + (isSync ? 'Sync' : 'Load') + ' failed.</div>';
+        } finally {
+            if (isSync) {
+                syncIcon.style.animation = 'none';
+            }
+        }
     }
 
     async function loadEmployees() {

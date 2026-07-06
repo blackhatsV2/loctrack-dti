@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\DisasterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -60,6 +62,17 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            // Pre-warm hazard caches if not already present, to speed up map load after login
+            if (!Cache::has('usgs_earthquakes') || !Cache::has('nasa_events')) {
+                try {
+                    $disasterService = app(DisasterService::class);
+                    $disasterService->getCachedEarthquakes(true);
+                    $disasterService->getCachedNaturalEvents(true);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Pre-warming hazard caches failed: ' . $e->getMessage());
+                }
+            }
 
             // Redirect based on role
             if (Auth::user()->is_admin) {

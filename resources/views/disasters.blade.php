@@ -365,7 +365,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         initMap();
         loadPersonnel();
-        syncHazards();
+        syncHazards(false);
 
         // Check for URL parameters for disaster redirection
         const urlParams = new URLSearchParams(window.location.search);
@@ -588,23 +588,26 @@
     }
 
     // Hazard Logic
-    async function syncHazards() {
+    async function syncHazards(isSync = false) {
         const icon = document.getElementById('sync-icon');
         const hazardContainer = document.getElementById('hazard-scroll');
-        icon.style.animation = 'spin 1s linear infinite';
+        if (isSync) {
+            icon.style.animation = 'spin 1s linear infinite';
+        }
         
         hazardContainer.innerHTML = `
             <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
                 <div class="spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
-                <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">Syncing Hazards</div>
-                Analyzing global and local risks...
+                <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">${isSync ? 'Syncing' : 'Loading'} Hazards</div>
+                ${isSync ? 'Analyzing global and local risks...' : 'Retrieving current threat matrix...'}
             </div>
         `;
 
         try {
+            const queryParam = isSync ? '?sync=true' : '';
             const hazardPromises = [
-                fetch('{{ route("api.disasters.earthquakes") }}').then(r => r.json()),
-                fetch('{{ route("api.disasters.events") }}').then(r => r.json())
+                fetch('{{ route("api.disasters.earthquakes") }}' + queryParam).then(r => r.json()),
+                fetch('{{ route("api.disasters.events") }}' + queryParam).then(r => r.json())
             ];
             
             if (!staticLayersLoaded) {
@@ -634,9 +637,11 @@
             }
         } catch (err) {
             console.error('Hazard sync error:', err);
-            hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Failed to sync hazards.</div>';
+            hazardContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #f87171;">Failed to ' + (isSync ? 'sync' : 'load') + ' hazards.</div>';
         } finally { 
-            icon.style.animation = 'none'; 
+            if (isSync) {
+                icon.style.animation = 'none'; 
+            }
         }
     }
 
@@ -709,6 +714,6 @@
         });
     }
 
-    function syncData() { syncHazards(); loadPersonnel(); }
+    function syncData() { syncHazards(true); loadPersonnel(); }
 </script>
 @endsection
