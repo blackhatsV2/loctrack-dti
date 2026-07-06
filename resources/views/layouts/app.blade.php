@@ -829,31 +829,102 @@
             }
         });
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
-            const nav = document.querySelector('nav');
+        /* --- Universal Capture Phase Handler: Close Popups/Dropdowns/Modals on Outside Click without Activating Outside Elements --- */
+        window.addEventListener('click', function(e) {
+            let closedOverlay = false;
+
+            // 1. Mobile Navigation Menu
             const navLinks = document.getElementById('nav-links');
-            if (nav && navLinks && navLinks.classList.contains('mobile-open')) {
-                if (!nav.contains(e.target)) {
+            const hamburger = document.querySelector('.nav-hamburger');
+            if (navLinks && navLinks.classList.contains('mobile-open')) {
+                const inNav = navLinks.contains(e.target);
+                const inTrigger = hamburger && hamburger.contains(e.target);
+                if (!inNav && !inTrigger) {
                     navLinks.classList.remove('mobile-open');
+                    closedOverlay = true;
                 }
             }
-        });
 
-        /* --- Notification & Disaster Alert Logic --- */
+            // 2. Notification Dropdown
+            const notifDropdown = document.getElementById('notification-dropdown');
+            const notifContainer = document.getElementById('notification-container');
+            if (notifDropdown && notifDropdown.classList.contains('active')) {
+                const inDropdown = notifDropdown.contains(e.target);
+                const inContainer = notifContainer && notifContainer.contains(e.target);
+                if (!inDropdown && !inContainer) {
+                    notifDropdown.classList.remove('active');
+                    closedOverlay = true;
+                }
+            }
+
+            // 3. Profile Modal
+            const profileModal = document.getElementById('profile-modal');
+            if (profileModal && profileModal.classList.contains('active')) {
+                const profileContent = profileModal.querySelector('.modal-content');
+                const adminBadge = document.querySelector('.nav-badge');
+                const inContent = profileContent && profileContent.contains(e.target);
+                const inBadge = adminBadge && adminBadge.contains(e.target);
+                if (!inContent && !inBadge) {
+                    profileModal.classList.remove('active');
+                    closedOverlay = true;
+                }
+            }
+
+            // 4. Disaster Alert Popup
+            const disasterPopup = document.getElementById('disaster-popup');
+            if (disasterPopup && disasterPopup.classList.contains('show')) {
+                const inPopup = disasterPopup.contains(e.target);
+                if (!inPopup) {
+                    disasterPopup.classList.remove('show');
+                    closedOverlay = true;
+                }
+            }
+
+            // 5. Searchable Select Dropdowns
+            document.querySelectorAll('.searchable-select.open').forEach(ss => {
+                if (!ss.contains(e.target)) {
+                    ss.classList.remove('open');
+                    const customInput = ss.querySelector('.ss-custom-input');
+                    const selectBox = ss.querySelector('.ss-input');
+                    const hiddenInput = ss.querySelector('input[type="hidden"]');
+                    if (customInput && customInput.style.display !== 'none' && !customInput.value) {
+                        if (selectBox) selectBox.style.display = 'block';
+                        customInput.style.display = 'none';
+                    } else if (selectBox && hiddenInput) {
+                        selectBox.value = hiddenInput.value;
+                    }
+                    closedOverlay = true;
+                }
+            });
+
+            // 6. Page Modals / Overlays (e.g., Add Employee, Delete Employee confirmation)
+            document.querySelectorAll('.modal, .modal-overlay').forEach(modal => {
+                if (modal.id === 'profile-modal') return; // Handled separately
+                const style = window.getComputedStyle(modal);
+                const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && (modal.offsetWidth > 0 || modal.offsetHeight > 0);
+                if (isVisible) {
+                    const modalContent = modal.querySelector('.modal-content') || modal;
+                    const inContent = modalContent && modalContent.contains(e.target);
+                    if (!inContent) {
+                        modal.style.display = 'none';
+                        modal.classList.remove('active', 'show');
+                        closedOverlay = true;
+                    }
+                }
+            });
+
+            // If an active popup or dropdown was closed by this outside click, prevent activating the outside element!
+            if (closedOverlay) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+
         function toggleNotifications() {
             const dropdown = document.getElementById('notification-dropdown');
             if (dropdown) dropdown.classList.toggle('active');
         }
-
-        // Close notifications when clicking outside
-        document.addEventListener('click', function(e) {
-            const container = document.getElementById('notification-container');
-            if (container && !container.contains(e.target)) {
-                const dropdown = document.getElementById('notification-dropdown');
-                if (dropdown) dropdown.classList.remove('active');
-            }
-        });
 
         function closeDisasterPopup() {
             const popup = document.getElementById('disaster-popup');
