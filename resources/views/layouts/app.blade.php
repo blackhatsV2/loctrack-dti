@@ -199,12 +199,13 @@
 
         .nav-links a:hover {
             background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
+            color: var(--primary);
         }
 
         .nav-links a.active {
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            font-weight: 600;
         }
 
         .nav-badge {
@@ -345,6 +346,51 @@
             box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
         }
 
+        /* ===== Button Variants ===== */
+        .btn-primary {
+            background: var(--primary) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover) !important;
+        }
+
+        /* Ghost: subtle border button that looks good in both themes */
+        .btn-ghost {
+            background: var(--filter-count-bg) !important;
+            color: var(--text-light) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+        .btn-ghost:hover {
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+            box-shadow: none !important;
+            transform: translateY(-1px) !important;
+        }
+        .btn-ghost.active, .btn-ghost.active-hazard-filter {
+            background: rgba(99, 102, 241, 0.18) !important;
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+
+        /* Secondary/Cancel ghost: clearly distinct from primary */
+        .btn-secondary-ghost {
+            background: var(--filter-count-bg) !important;
+            color: var(--text-muted) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: none !important;
+        }
+        .btn-secondary-ghost:hover {
+            background: rgba(244, 63, 94, 0.08) !important;
+            color: #f43f5e !important;
+            border-color: rgba(244, 63, 94, 0.4) !important;
+            box-shadow: none !important;
+            transform: translateY(-1px) !important;
+        }
+
         .alert-success {
             background: rgba(74, 222, 128, 0.15);
             border: 1px solid rgba(74, 222, 128, 0.3);
@@ -407,7 +453,8 @@
                 padding: 0.75rem 1rem;
                 border-radius: 0.5rem;
                 text-align: center;
-                background: rgba(255, 255, 255, 0.03);
+                background: var(--filter-item-hover);
+                color: var(--text-light);
             }
             .nav-links form {
                 width: 100%;
@@ -538,8 +585,8 @@
             margin-left: 0.5rem;
         }
         .notification-bell {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+            background: var(--filter-count-bg);
+            border: 1px solid var(--border-color);
             border-radius: 50%;
             width: 38px;
             height: 38px;
@@ -553,7 +600,7 @@
         }
         .notification-bell:hover {
             background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
+            color: var(--primary);
         }
         .notification-badge {
             position: absolute;
@@ -608,6 +655,9 @@
         .notification-title {
             font-size: 0.85rem;
             font-weight: 600;
+            color: #f43f5e;
+        }
+        html[data-theme="dark"] .notification-title {
             color: #fca5a5;
         }
         .notification-meta {
@@ -651,7 +701,7 @@
             padding: 0;
         }
         .popup-close:hover {
-            color: white;
+            color: var(--text-light);
         }
         
         .mobile-action-notif {
@@ -784,7 +834,7 @@
     <div id="top-progress"></div>
     <div id="global-loader">
         <div class="spinner"></div>
-        <div class="spinner-text" style="color: white; font-weight: 500;">Connecting...</div>
+        <div class="spinner-text" style="font-weight: 500;">Connecting...</div>
     </div>
     <script>
         // Only show loader on initial page load if it takes longer than 1 second
@@ -896,7 +946,7 @@
                     </div>
                     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                         <button type="submit" style="flex: 2;">Update Details</button>
-                        <button type="button" class="btn btn-ghost" style="flex: 1; background: rgba(255,255,255,0.05); color: var(--text-muted);" onclick="toggleProfileModal()">Cancel</button>
+                        <button type="button" class="btn btn-secondary-ghost" style="flex: 1;" onclick="toggleProfileModal()">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -1258,7 +1308,7 @@
                             
                             const notifList = document.getElementById('notification-list');
                             if (notifList) {
-                                let html = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.05em;">Active Philippine Disasters</div>';
+                                let html = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: var(--text-light); border-bottom: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.05em;">Active Philippine Disasters</div>';
                                 data.philippine_disasters.forEach(disaster => {
                                     const isEarthquake = disaster.type === 'earthquake';
                                     const typeLabel = isEarthquake ? 'Earthquake' : (disaster.category || 'NASA Alert');
@@ -1268,19 +1318,18 @@
                                     
                                     html += `
                                         <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
-                                             style="background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1rem; cursor: pointer; transition: all 0.2s;"
-                                             onmouseover="this.style.background='rgba(99, 102, 241, 0.05)';"
-                                             onmouseout="this.style.background='rgba(255, 255, 255, 0.03)';">
+                                             class="notification-item"
+                                             style="cursor: pointer; transition: all 0.2s;">
                                             <div style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; background: ${badgeBg}; color: ${badgeColor};">${typeLabel}</div>
-                                            <div style="font-weight: 600; font-size: 0.85rem; color: white;">${titlePrefix}${disaster.title}</div>
-                                            <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
-                                            <div style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
+                                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-light);">${titlePrefix}${disaster.title}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
+                                            <div style="font-size: 0.7rem; color: var(--text-muted); opacity: 0.8; margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
                                         </div>
                                     `;
                                 });
                                 
                                 if (data.philippine_disasters.length === 0) {
-                                    html += '<div style="padding: 1.5rem; text-align: center; color: #94a3b8; font-size: 0.85rem;">No active disasters in the Philippines</div>';
+                                    html += '<div style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No active disasters in the Philippines</div>';
                                 }
                                 
                                 notifList.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${html}</div>`;
@@ -1301,13 +1350,14 @@
 
                             const hazardCardHtml = `
                                 <div onclick="handleDisasterClick(${disaster.latitude}, ${disaster.longitude}, '${targetPath}')" 
-                                     style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1rem; cursor: pointer; transition: all 0.2s;"
-                                     onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)';"
-                                     onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255, 255, 255, 0.03)';">
+                                     style="background: var(--profile-info-bg); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; cursor: pointer; transition: all 0.2s;"
+                                     onmouseover="this.style.borderColor='#6366f1'; this.style.background='var(--notif-item-hover)';"
+                                     onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='var(--profile-info-bg)';"
+                                     class="notification-item-card">
                                     <div style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; background: ${badgeBg}; color: ${badgeColor};">${typeLabel}</div>
-                                    <div style="font-weight: 600; font-size: 0.85rem; color: white;">${titlePrefix}${disaster.title}</div>
-                                    <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
-                                    <div style="font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
+                                    <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-light);">${titlePrefix}${disaster.title}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Distance: <strong>${disaster.distance_km} km</strong> away</div>
+                                    <div style="font-size: 0.7rem; color: var(--text-muted); opacity: 0.8; margin-top: 4px;">${new Date(disaster.time).toLocaleString()}</div>
                                     <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #818cf8; font-weight: 600;">View on map &rarr;</div>
                                 </div>
                             `;
@@ -1321,7 +1371,7 @@
 
                             const notifList = document.getElementById('notification-list');
                             if (notifList) {
-                                const headerHtml = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: #f8fafc; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Nearest Disaster Alert</div>';
+                                const headerHtml = '<div style="padding: 1rem 1rem 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; color: var(--text-light); border-bottom: 1px solid var(--border-color); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Nearest Disaster Alert</div>';
                                 notifList.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${headerHtml}<div style="padding: 0 0.5rem 0.5rem 0.5rem;">${hazardCardHtml}</div></div>`;
                             }
 

@@ -90,7 +90,7 @@
         padding: 0.5rem 0;
     }
     .scroll-area::-webkit-scrollbar { width: 4px; }
-    .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
 
     .filter-item {
         display: flex;
@@ -101,10 +101,10 @@
         transition: background 0.15s;
         font-size: 0.8rem;
     }
-    .filter-item:hover { background: rgba(255,255,255,0.03); }
+    .filter-item:hover { background: var(--filter-item-hover); }
     .filter-item input[type="checkbox"] { accent-color: var(--primary); width: 14px; height: 14px; }
     .filter-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .filter-count { font-size: 0.65rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 1rem; margin-left: auto; }
+    .filter-count { font-size: 0.65rem; color: var(--text-muted); background: var(--filter-count-bg); padding: 0.1rem 0.4rem; border-radius: 1rem; margin-left: auto; }
 
     .event-card {
         background: var(--event-card-bg);
@@ -231,7 +231,7 @@
         <div>
             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                 <h1 style="font-size: 2rem; margin-bottom: 0;">Admin Dashboard</h1>
-                <a href="{{ route('admin.employees') }}" title="View all employees" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; background: #1e293b; border: 1px solid #334155; padding: 0.35rem 0.85rem; border-radius: 2rem; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='#334155'; this.style.transform='none'">
+                <a href="{{ route('admin.employees') }}" title="View all employees" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; background: var(--card-bg); border: 1px solid var(--border-color); padding: 0.35rem 0.85rem; border-radius: 2rem; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor=''; this.style.transform='none'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Total Personnel:</span>
                     <span style="font-size: 0.95rem; font-weight: 700; color: #818cf8;">{{ $totalEmployees }}</span>
@@ -275,7 +275,7 @@
                 <!-- Dynamic categories -->
             </div>
 
-            <div class="sidebar-header" style="background: rgba(255,255,255,0.02); padding: 0.75rem 1.25rem;">
+            <div class="sidebar-header" style="background: var(--filter-item-hover); padding: 0.75rem 1.25rem;">
                 <h3 style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Personnel Directory</h3>
             </div>
 
@@ -283,7 +283,7 @@
                 <!-- Dynamic employee names -->
             </div>
 
-            <div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem;">
+            <div style="padding: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
                 <button class="btn btn-ghost" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(false)">Hide All</button>
                 <button class="btn btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(true)">Show All</button>
             </div>
@@ -313,7 +313,7 @@
                 <!-- Hazards list -->
             </div>
 
-            <div style="padding: 1rem; border-top: 1px solid var(--glass-border);">
+            <div style="padding: 1rem; border-top: 1px solid var(--border-color);">
                 <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted);">STATIC LAYERS</div>
                 <div class="filter-item" onclick="toggleStaticLayer('faults')">
                     <input type="checkbox" id="layer-faults" checked onclick="event.stopPropagation(); toggleStaticLayer('faults', true)">
@@ -485,7 +485,7 @@
         syncIcon.style.animation = 'spin 1s linear infinite';
         hazardContainer.innerHTML = `<div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
             <div class="loading-spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
-            <div style="font-weight: 500; color: white; margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
+            <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
         try {
             const promises = [
                 fetch('{{ route("api.disasters.earthquakes") }}').then(r => r.json()),
@@ -687,10 +687,10 @@
                 
                 if (!homeLoc && !officeLoc && otherLoc) {
                     locationHtml += `
-                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; gap: 12px;"
+                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: var(--profile-info-bg); border: 1px solid var(--profile-info-border); display: flex; align-items: center; gap: 12px;"
                              onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(otherLoc)}, this)"
-                             onmouseover="this.style.background='rgba(255, 255, 255, 0.08)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.transform='translateX(4px)'"
-                             onmouseout="this.style.background='rgba(255, 255, 255, 0.04)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='none'">
+                             onmouseover="this.style.background='var(--notif-item-hover)'; this.style.borderColor='var(--border-color)'; this.style.transform='translateX(4px)'"
+                             onmouseout="this.style.background='var(--profile-info-bg)'; this.style.borderColor='var(--profile-info-border)'; this.style.transform='none'">
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
                                 <span style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Latest Activity</span>
                                 <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${otherLoc.data.office || 'Details not set'}</span>
@@ -702,7 +702,7 @@
                 item.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 4px;">
                         <div class="filter-dot" style="background:${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}; width: 10px; height: 10px; box-shadow: 0 0 10px ${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}44;"></div>
-                        <span style="font-weight: 700; font-size: 1rem; color: white;">${group.name}</span>
+                        <span style="font-weight: 700; font-size: 1rem; color: var(--text-light);">${group.name}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 2px;">
                         ${locationHtml}

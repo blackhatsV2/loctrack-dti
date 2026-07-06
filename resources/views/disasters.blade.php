@@ -64,7 +64,7 @@
         overflow-y: auto;
     }
     .scroll-content::-webkit-scrollbar { width: 4px; }
-    .scroll-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .scroll-content::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
 
     .filter-item {
         display: flex;
@@ -75,7 +75,7 @@
         transition: background 0.2s;
         font-size: 0.85rem;
     }
-    .filter-item:hover { background: rgba(255,255,255,0.03); }
+    .filter-item:hover { background: var(--filter-item-hover); }
     .filter-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
     
     .hazard-card {
@@ -174,8 +174,8 @@
     .stat-card {
         padding: 1.5rem;
         text-align: center;
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 1.5rem;
         display: flex;
         flex-direction: column;
@@ -186,14 +186,13 @@
         transform: translateY(-3px);
         border-color: var(--primary);
         box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
-        background: #1e293b;
     }
     .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
     .profile-mini-card {
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 1.5rem;
         padding: 1.5rem;
         display: flex;
@@ -597,7 +596,7 @@
         hazardContainer.innerHTML = `
             <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
                 <div class="spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
-                <div style="font-weight: 500; color: white; margin-bottom: 0.25rem;">Syncing Hazards</div>
+                <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">Syncing Hazards</div>
                 Analyzing global and local risks...
             </div>
         `;

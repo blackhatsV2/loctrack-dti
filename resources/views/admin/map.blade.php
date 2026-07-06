@@ -324,7 +324,7 @@
         syncIcon.style.animation = 'spin 1s linear infinite';
         hazardContainer.innerHTML = `<div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
             <div class="loading-spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
-            <div style="font-weight: 500; color: white; margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
+            <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">Syncing Hazards</div>Analyzing global and local risks...</div>`;
         try {
             const promises = [
                 fetch('{{ route("api.disasters.earthquakes") }}').then(r => r.json()),

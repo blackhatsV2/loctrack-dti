@@ -38,13 +38,17 @@
         margin-top: 1.5rem;
     }
     .btn-secondary {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid var(--glass-border);
+        background: var(--filter-count-bg) !important;
+        color: var(--text-muted) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: none !important;
     }
     .btn-secondary:hover {
-        background: rgba(255,255,255,0.15);
-        box-shadow: none;
-        transform: none;
+        background: rgba(99, 102, 241, 0.12) !important;
+        color: var(--primary) !important;
+        border-color: var(--primary) !important;
+        box-shadow: none !important;
+        transform: translateY(-1px) !important;
     }
 
     /* Searchable Select */
@@ -68,10 +72,10 @@
         box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
     }
     .searchable-select .ss-input.has-value {
-        color: #fff;
+        color: var(--text-light);
     }
     .searchable-select .ss-input:not(.has-value)::placeholder {
-        color: rgba(255,255,255,0.35);
+        color: var(--search-placeholder);
     }
     .searchable-select .ss-arrow {
         position: absolute;
@@ -79,7 +83,7 @@
         top: 50%;
         transform: translateY(-50%);
         pointer-events: none;
-        color: rgba(255,255,255,0.4);
+        color: var(--text-muted);
         font-size: 0.65rem;
         transition: transform 0.2s;
     }
@@ -112,8 +116,8 @@
     }
     .searchable-select .ss-option:hover,
     .searchable-select .ss-option.highlighted {
-        background: rgba(99,102,241,0.2);
-        color: #fff;
+        background: rgba(99,102,241,0.15);
+        color: var(--primary);
     }
     .searchable-select .ss-option.selected {
         color: var(--primary);
@@ -121,7 +125,7 @@
     }
     .searchable-select .ss-empty {
         padding: 0.75rem 1rem;
-        color: rgba(255,255,255,0.35);
+        color: var(--ss-empty-color);
         font-size: 0.85rem;
         text-align: center;
     }
@@ -129,21 +133,21 @@
         width: 4px;
     }
     .searchable-select .ss-dropdown::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.15);
+        background: var(--ss-scrollbar-thumb);
         border-radius: 2px;
     }
     .searchable-select .ss-option.others-option {
-        border-top: 1px solid rgba(255,255,255,0.08);
-        color: #a5b4fc;
+        border-top: 1px solid var(--border-color);
+        color: var(--primary);
         font-style: italic;
     }
     .ss-custom-input {
         width: 100%;
         padding: 0.65rem 1rem;
         border-radius: 0.5rem;
-        background: rgba(0,0,0,0.25);
-        border: 1px solid var(--glass-border);
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
         margin-top: 0.5rem;
@@ -154,7 +158,7 @@
         box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
     }
     .ss-custom-input::placeholder {
-        color: rgba(255,255,255,0.35);
+        color: var(--search-placeholder);
     }
 
     @media (max-width: 768px) {
@@ -259,7 +263,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
                 <a href="{{ route('admin.employees') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>

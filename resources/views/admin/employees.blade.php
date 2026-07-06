@@ -128,9 +128,9 @@
         width: 100%;
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-family: 'Outfit', sans-serif;
     }
     .btn-danger {
@@ -143,16 +143,17 @@
 
     /* Override global button styles for clear filter button */
     #clear-search-btn {
-        background: rgba(255, 255, 255, 0.05) !important;
+        background: var(--filter-count-bg) !important;
         color: var(--text-muted) !important;
-        border: 1px solid var(--glass-border) !important;
+        border: 1px solid var(--border-color) !important;
         box-shadow: none !important;
         transform: none !important;
     }
     #clear-search-btn:hover {
-        background: rgba(255, 255, 255, 0.15) !important;
-        color: white !important;
-        transform: translateY(-2px) !important;
+        background: rgba(99, 102, 241, 0.12) !important;
+        color: var(--primary) !important;
+        border-color: var(--primary) !important;
+        transform: translateY(-1px) !important;
         box-shadow: none !important;
     }
 
@@ -210,9 +211,9 @@
         width: 100%;
         padding: 0.75rem 2.25rem 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--glass-border);
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
         cursor: text;
@@ -223,10 +224,10 @@
         box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
     }
     .searchable-select .ss-input.has-value {
-        color: #fff;
+        color: var(--text-light);
     }
     .searchable-select .ss-input:not(.has-value)::placeholder {
-        color: rgba(255,255,255,0.35);
+        color: var(--search-placeholder);
     }
     .searchable-select .ss-arrow {
         position: absolute;
@@ -234,7 +235,7 @@
         top: 50%;
         transform: translateY(-50%);
         pointer-events: none;
-        color: rgba(255,255,255,0.4);
+        color: var(--text-muted);
         font-size: 0.65rem;
         transition: transform 0.2s;
     }
@@ -249,26 +250,26 @@
         right: 0;
         max-height: 200px;
         overflow-y: auto;
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.75rem;
         z-index: 10000;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
     .searchable-select.open .ss-dropdown {
         display: block;
     }
     .searchable-select .ss-option {
         padding: 0.55rem 1rem;
-        color: rgba(255,255,255,0.8);
+        color: var(--ss-option-color);
         font-size: 0.85rem;
         cursor: pointer;
         transition: background 0.15s;
     }
     .searchable-select .ss-option:hover,
     .searchable-select .ss-option.highlighted {
-        background: rgba(99,102,241,0.2);
-        color: #fff;
+        background: rgba(99,102,241,0.15);
+        color: var(--primary);
     }
     .searchable-select .ss-option.selected {
         color: var(--primary);
@@ -276,7 +277,7 @@
     }
     .searchable-select .ss-empty {
         padding: 0.75rem 1rem;
-        color: rgba(255,255,255,0.35);
+        color: var(--ss-empty-color);
         font-size: 0.85rem;
         text-align: center;
     }
@@ -284,21 +285,21 @@
         width: 4px;
     }
     .searchable-select .ss-dropdown::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.15);
+        background: var(--ss-scrollbar-thumb);
         border-radius: 2px;
     }
     .searchable-select .ss-option.others-option {
-        border-top: 1px solid rgba(255,255,255,0.08);
-        color: #a5b4fc;
+        border-top: 1px solid var(--border-color);
+        color: var(--primary);
         font-style: italic;
     }
     .ss-custom-input {
         width: 100%;
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--glass-border);
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
         margin-top: 0.5rem;
@@ -309,7 +310,7 @@
         box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
     }
     .ss-custom-input::placeholder {
-        color: rgba(255,255,255,0.35);
+        color: var(--search-placeholder);
     }
 </style>
 @endsection
@@ -390,7 +391,7 @@
     <div id="add-employee-modal" class="modal">
         <div class="glass-card modal-content animate-fade-in" style="position: relative;">
             <!-- Loading Overlay -->
-            <div id="add-employee-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 10; align-items: center; justify-content: center; border-radius: inherit;">
+        <div id="add-employee-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--card-bg); z-index: 10; align-items: center; justify-content: center; border-radius: inherit;">
                 <div class="spinner"></div>
             </div>
 
@@ -475,8 +476,8 @@
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <button type="button" onclick="closeAddModal()" class="btn" style="background: rgba(255,255,255,0.1); flex: 1; border: 1px solid var(--glass-border); color: white;">Cancel</button>
-                    <button type="submit" class="btn" style="flex: 2; background: var(--primary);">Create Account</button>
+                    <button type="button" onclick="closeAddModal()" class="btn btn-secondary-ghost" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">Create Account</button>
                 </div>
             </form>
         </div>
@@ -488,7 +489,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; display: block;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <h2 style="margin-bottom: 0.5rem; border: none;">Delete Employee?</h2>
             <p style="color: var(--text-muted); margin-bottom: 2rem;">
-                Are you sure you want to delete <strong id="delete-emp-name" style="color: white;"></strong>? 
+                Are you sure you want to delete <strong id="delete-emp-name" style="color: var(--text-light);"></strong>? 
                 This action cannot be undone and all location history will be lost.
             </p>
 
@@ -496,7 +497,7 @@
                 @csrf
                 @method('DELETE')
                 <div style="display: flex; gap: 1rem;">
-                    <button type="button" onclick="closeDeleteModal()" class="btn" style="background: rgba(255,255,255,0.1); flex: 1; border: 1px solid var(--glass-border); color: white;">Cancel</button>
+                    <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary-ghost" style="flex: 1;">Cancel</button>
                     <button type="submit" class="btn btn-danger" style="flex: 1;">Delete Account</button>
                 </div>
             </form>
