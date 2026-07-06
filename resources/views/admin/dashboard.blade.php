@@ -224,10 +224,17 @@
 
 @section('content')
 <div class="animate-fade-in">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Admin Dashboard</h1>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Real-time workforce distribution and analytics.</p>
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <h1 style="font-size: 2rem; margin-bottom: 0;">Admin Dashboard</h1>
+                <a href="{{ route('admin.employees') }}" title="View all employees" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; background: #1e293b; border: 1px solid #334155; padding: 0.35rem 0.85rem; border-radius: 2rem; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='#334155'; this.style.transform='none'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Total Personnel:</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; color: #818cf8;">{{ $totalEmployees }}</span>
+                </a>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Real-time workforce distribution and analytics.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
             <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -237,13 +244,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Recenter PH
             </button>
         </div>
-    </div>
-
-    <div class="stat-grid">
-        <a href="{{ route('admin.employees') }}" class="glass-card stat-card">
-            <div style="font-size: 2.5rem; font-weight: 600; color: #818cf8;">{{ $totalEmployees }}</div>
-            <div style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Total Personnel</div>
-        </a>
     </div>
 
     <!-- Command Center Section -->
