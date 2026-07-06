@@ -98,7 +98,9 @@
         bottom: 0;
         width: 100vw;
         height: 100vh;
-        background: #0f172a;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         z-index: 9999;
         align-items: center;
         justify-content: center;

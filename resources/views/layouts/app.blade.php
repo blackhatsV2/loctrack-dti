@@ -155,6 +155,8 @@
             width: 100%;
             height: 100%;
             background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -304,6 +306,8 @@
                 border-bottom: 1px solid var(--glass-border);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
                 z-index: 99;
+                will-change: transform, opacity;
+                transform: translateZ(0);
             }
             .nav-links.mobile-open {
                 display: flex;
@@ -560,10 +564,82 @@
                 right: -50px;
             }
         }
+
+        /* ===== Mobile & Small Screen Main Page Blur System ===== */
+        #mobile-backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 98;
+            opacity: 0;
+            pointer-events: none;
+            will-change: opacity;
+            transform: translateZ(0);
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay,
+        .modal {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        @media (max-width: 1024px) {
+            body.mobile-blur-active #mobile-backdrop-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            nav {
+                z-index: 100;
+            }
+
+            .nav-links.mobile-open {
+                z-index: 101;
+            }
+
+            .notification-container {
+                position: relative;
+                z-index: 102;
+            }
+
+            .notification-dropdown {
+                z-index: 1000;
+            }
+
+            .searchable-select.open {
+                z-index: 999;
+            }
+
+            .searchable-select.open .ss-dropdown {
+                z-index: 1000;
+            }
+
+            .modal-overlay,
+            .modal {
+                z-index: 9999;
+            }
+
+            #disaster-popup {
+                z-index: 10000;
+            }
+
+            .leaflet-popup {
+                z-index: 1000;
+            }
+        }
     </style>
     @yield('styles')
 </head>
 <body>
+    <div id="mobile-backdrop-overlay" onclick="closeAllMobileOverlays()"></div>
     <div id="top-progress"></div>
     <div id="global-loader">
         <div class="spinner"></div>
@@ -603,7 +679,7 @@
             </picture>
             <span class="logo-text">PSCP Workforce Locator</span>
         </a>
-        <button class="nav-hamburger" onclick="document.getElementById('nav-links').classList.toggle('mobile-open')" aria-label="Toggle navigation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+        <button class="nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle navigation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
         <div class="nav-links" id="nav-links">
             @auth
                 @if(auth()->user()->is_admin)
@@ -1078,6 +1154,104 @@
                 .catch(err => console.error('Failed to fetch nearest disaster', err));
         }
         @endauth
+
+        // ===== Optimized Mobile View Blur & Overlay System =====
+        let isOverlayCheckPending = false;
+
+        function isMobileOrSmallScreen() {
+            return window.innerWidth <= 1024;
+        }
+
+        function toggleMobileNav() {
+            const navLinks = document.getElementById('nav-links');
+            if (!navLinks) return;
+            const isOpening = !navLinks.classList.contains('mobile-open');
+            navLinks.classList.toggle('mobile-open');
+
+            if (isOpening && isMobileOrSmallScreen()) {
+                document.body.classList.add('mobile-blur-active');
+            } else {
+                scheduleOverlayCheck();
+            }
+        }
+
+        function scheduleOverlayCheck() {
+            if (isOverlayCheckPending) return;
+            isOverlayCheckPending = true;
+            requestAnimationFrame(() => {
+                isOverlayCheckPending = false;
+                checkActiveOverlays();
+            });
+        }
+
+        function checkActiveOverlays() {
+            const mobileBackdrop = document.getElementById('mobile-backdrop-overlay');
+            if (!mobileBackdrop) return;
+
+            if (!isMobileOrSmallScreen()) {
+                document.body.classList.remove('mobile-blur-active');
+                return;
+            }
+
+            // Fast class selector checks without layout thrashing
+            const isNavOpen = !!document.querySelector('#nav-links.mobile-open');
+            const isNotifOpen = !!document.querySelector('#notification-dropdown.active');
+            const isDisasterPopupOpen = !!document.querySelector('#disaster-popup.show');
+            const isSelectOpen = !!document.querySelector('.searchable-select.open');
+            const isModalOpen = !!document.querySelector('.modal.active, .modal-overlay.active');
+            const isMapPopupOpen = !!document.querySelector('.leaflet-popup');
+
+            const hasActiveOverlay = isNavOpen || isNotifOpen || isDisasterPopupOpen || isSelectOpen || isModalOpen || isMapPopupOpen;
+
+            if (hasActiveOverlay) {
+                document.body.classList.add('mobile-blur-active');
+            } else {
+                document.body.classList.remove('mobile-blur-active');
+            }
+        }
+
+        function closeAllMobileOverlays() {
+            const navLinks = document.getElementById('nav-links');
+            if (navLinks) navLinks.classList.remove('mobile-open');
+
+            const notifDropdown = document.getElementById('notification-dropdown');
+            if (notifDropdown) notifDropdown.classList.remove('active');
+
+            const disasterPopup = document.getElementById('disaster-popup');
+            if (disasterPopup) disasterPopup.classList.remove('show');
+
+            document.querySelectorAll('.searchable-select.open').forEach(ss => ss.classList.remove('open'));
+
+            document.querySelectorAll('.modal.active, .modal-overlay.active').forEach(modal => {
+                if (modal.id === 'global-loader') return;
+                modal.classList.remove('active', 'show');
+                if (modal.style.display !== 'none' && modal.style.display !== '') {
+                    modal.style.display = 'none';
+                }
+            });
+
+            document.body.classList.remove('mobile-blur-active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkActiveOverlays();
+
+            // Targeted observer to avoid full body subtree layout thrashing
+            const overlayObserver = new MutationObserver(function() {
+                scheduleOverlayCheck();
+            });
+
+            const targetNav = document.getElementById('nav-links');
+            const targetNotif = document.getElementById('notification-dropdown');
+            const targetDisaster = document.getElementById('disaster-popup');
+
+            if (targetNav) overlayObserver.observe(targetNav, { attributes: true, attributeFilter: ['class'] });
+            if (targetNotif) overlayObserver.observe(targetNotif, { attributes: true, attributeFilter: ['class'] });
+            if (targetDisaster) overlayObserver.observe(targetDisaster, { attributes: true, attributeFilter: ['class'] });
+            overlayObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            window.addEventListener('resize', scheduleOverlayCheck, { passive: true });
+        });
     </script>
     @yield('scripts')
 </body>
