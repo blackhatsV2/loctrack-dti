@@ -837,14 +837,35 @@
         <div class="spinner-text" style="font-weight: 500;">Connecting...</div>
     </div>
     <script>
-        // Only show loader on initial page load if it takes longer than 1 second
+        // Clear session cache on authentication entry/exit points
+        const currentPath = window.location.pathname;
+        if (currentPath === '/' || currentPath.includes('/login') || currentPath.includes('/logout')) {
+            sessionStorage.clear();
+        }
+
+        // For dashboard/map/disasters pages, check if we already have the cache warm
+        const isMapOrDashboard = currentPath.includes('/dashboard') || 
+                                 currentPath.includes('/map') || 
+                                 currentPath.includes('/disasters');
+        
+        // Cache exists if we have locations, earthquakes, and events
+        const hasCache = sessionStorage.getItem('cached_locations') && 
+                         sessionStorage.getItem('cached_earthquakes') && 
+                         sessionStorage.getItem('cached_events');
+                         
+        const delay = (isMapOrDashboard && !hasCache) ? 0 : 1000;
+
         window.loaderTimeout = setTimeout(function() {
             const loader = document.getElementById('global-loader');
             if (loader && !window.pageLoaded) {
+                if (isMapOrDashboard) {
+                    const textEl = loader.querySelector('.spinner-text');
+                    if (textEl) textEl.textContent = 'Loading system resources...';
+                }
                 loader.style.display = 'flex';
                 setTimeout(() => loader.style.opacity = '1', 10);
             }
-        }, 1000);
+        }, delay);
     </script>
     <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 1rem;"></div>
 
@@ -987,6 +1008,11 @@
             window.pageLoaded = true;
             if (window.loaderTimeout) clearTimeout(window.loaderTimeout);
             
+            if (window.manualLoaderControl) return;
+            hideGlobalLoader();
+        });
+
+        function hideGlobalLoader() {
             const loader = document.getElementById('global-loader');
             if (loader) {
                 loader.classList.add('fade-out');
@@ -995,7 +1021,7 @@
                     loader.classList.remove('fade-out');
                 }, 400);
             }
-        });
+        }
 
         function showToast(title, message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -1054,6 +1080,7 @@
             // Wait a tiny bit to see if the event was cancelled by onsubmit="return confirm(...)"
             setTimeout(() => {
                 if (!e.defaultPrevented) {
+                    sessionStorage.removeItem('cached_locations');
                     showGlobalLoader();
                 }
             }, 10);

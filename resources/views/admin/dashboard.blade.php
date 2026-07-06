@@ -379,10 +379,20 @@
         { key: 'other',                 label: 'other',                 color: '#94a3b8' },
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
+    window.manualLoaderControl = true;
+
+    document.addEventListener('DOMContentLoaded', async () => {
         try { initMap(); } catch (e) { console.error('Map init failed:', e); }
-        try { loadEmployees(); } catch (e) { console.error('Employee load failed:', e); }
-        try { refreshHazards(false); } catch (e) { console.error('Hazards refresh failed:', e); }
+        try {
+            await Promise.all([
+                loadEmployees(),
+                refreshHazards(false)
+            ]);
+        } catch (e) {
+            console.error('Initial loading failed:', e);
+        } finally {
+            hideGlobalLoader();
+        }
         
         // Start polling for online personnel updates every 30 seconds
         setInterval(fetchOnlinePersonnel, 30000);
@@ -463,10 +473,22 @@
 
     async function loadStaticLayers() {
         try {
-            const [fRes, vRes] = await Promise.all([
-                fetch('/maps/ph_faults.json').then(r => r.json()),
-                fetch('/maps/ph_volcanoes.json').then(r => r.json())
-            ]);
+            let fRes, vRes;
+            const cachedF = sessionStorage.getItem('cached_faults');
+            const cachedV = sessionStorage.getItem('cached_volcanoes');
+            if (cachedF && cachedV) {
+                fRes = JSON.parse(cachedF);
+                vRes = JSON.parse(cachedV);
+            } else {
+                const results = await Promise.all([
+                    fetch('/maps/ph_faults.json').then(r => r.json()),
+                    fetch('/maps/ph_volcanoes.json').then(r => r.json())
+                ]);
+                fRes = results[0];
+                vRes = results[1];
+                sessionStorage.setItem('cached_faults', JSON.stringify(fRes));
+                sessionStorage.setItem('cached_volcanoes', JSON.stringify(vRes));
+            }
             faultLayer = L.geoJSON(fRes, {
                 style: { color: '#f87171', weight: 2, opacity: 0.8, dashArray: '5, 5' },
                 onEachFeature: (f, l) => l.bindPopup(`<b>Fault:</b> ${f.properties.name || 'Unnamed'}`)
@@ -484,20 +506,38 @@
         const hazardContainer = document.getElementById('hazard-list');
         if (isSync) {
             syncIcon.style.animation = 'spin 1s linear infinite';
+            sessionStorage.removeItem('cached_earthquakes');
+            sessionStorage.removeItem('cached_events');
         }
         hazardContainer.innerHTML = `<div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
             <div class="loading-spinner" style="margin: 0 auto 1rem; width: 24px; height: 24px; border-width: 2px;"></div>
             <div style="font-weight: 500; color: var(--text-light); margin-bottom: 0.25rem;">${isSync ? 'Syncing' : 'Loading'} Hazards</div>${isSync ? 'Analyzing global and local risks...' : 'Retrieving current threat matrix...'}</div>`;
         try {
             const queryParam = isSync ? '?sync=true' : '';
-            const promises = [
-                fetch('{{ route("api.disasters.earthquakes") }}' + queryParam).then(r => r.json()),
-                fetch('{{ route("api.disasters.events") }}' + queryParam).then(r => r.json())
-            ];
-            if (!staticLayersLoaded) promises.push(loadStaticLayers());
-            const results = await Promise.all(promises);
-            earthquakeData = results[0].features || [];
-            nasaData = results[1].events || [];
+            let eqData, evData;
+            const cachedEq = sessionStorage.getItem('cached_earthquakes');
+            const cachedEv = sessionStorage.getItem('cached_events');
+            
+            if (cachedEq && cachedEv && !isSync) {
+                eqData = JSON.parse(cachedEq);
+                evData = JSON.parse(cachedEv);
+            } else {
+                const promises = [
+                    fetch('{{ route("api.disasters.earthquakes") }}' + queryParam).then(r => r.json()),
+                    fetch('{{ route("api.disasters.events") }}' + queryParam).then(r => r.json())
+                ];
+                const results = await Promise.all(promises);
+                eqData = results[0];
+                evData = results[1];
+                sessionStorage.setItem('cached_earthquakes', JSON.stringify(eqData));
+                sessionStorage.setItem('cached_events', JSON.stringify(evData));
+            }
+            
+            earthquakeData = eqData.features || [];
+            nasaData = evData.events || [];
+            if (!staticLayersLoaded) {
+                await loadStaticLayers();
+            }
             renderHazardMarkers();
             renderHazardList();
  
@@ -527,13 +567,20 @@
     async function loadEmployees() {
         const loader = document.getElementById('map-loading');
         try {
-            const res = await fetch('{{ route("location.index") }}');
-            const data = await res.json();
+            let data;
+            const cached = sessionStorage.getItem('cached_locations');
+            if (cached) {
+                data = JSON.parse(cached);
+            } else {
+                const res = await fetch('{{ route("location.index") }}');
+                data = await res.json();
+                sessionStorage.setItem('cached_locations', JSON.stringify(data));
+            }
             
             // Clear existing markers
             employeeMarkers.forEach(m => map.removeLayer(m.marker));
             employeeMarkers = [];
-
+ 
             data.forEach(loc => {
                 const lat = parseFloat(loc.latitude), lon = parseFloat(loc.longitude);
                 if (isNaN(lat) || isNaN(lon)) return;
@@ -543,7 +590,7 @@
                 if (loc.type === 'home') icon = getHomeIcon(cat);
                 else if (loc.type === 'office') icon = getOfficeMarkerIcon(cat);
                 else icon = getEmployeeIcon(cat);
-
+ 
                 const marker = L.marker([lat, lon], { icon: icon });
                 marker.bindPopup(buildEmployeePopup(loc), { maxWidth: 300 });
                 employeeMarkers.push({ marker, cat, data: loc });
