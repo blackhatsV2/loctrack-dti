@@ -40,17 +40,17 @@
         height: 700px;
         border-radius: 1.5rem;
         overflow: hidden;
-        border: 1px solid var(--glass-border);
+        border: 1px solid var(--border-color);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        background: #0f172a;
+        background: var(--body-bg);
         margin-bottom: 2rem;
     }
 
     .sidebar-left {
         width: var(--sidebar-width-left);
         min-width: var(--sidebar-width-left);
-        background: #1e293b;
-        border-right: 1px solid #334155;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -59,8 +59,8 @@
     .sidebar-right {
         width: var(--sidebar-width-right);
         min-width: var(--sidebar-width-right);
-        background: #1e293b;
-        border-left: 1px solid #334155;
+        background: var(--sidebar-bg);
+        border-left: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -107,8 +107,8 @@
     .filter-count { font-size: 0.65rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 1rem; margin-left: auto; }
 
     .event-card {
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--event-card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.75rem;
         padding: 0.75rem;
         margin: 0.4rem 0.75rem;
@@ -139,16 +139,16 @@
         width: 100%;
         padding: 0.4rem 0.75rem;
         border-radius: 0.5rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.8rem;
     }
 
     .map-loading {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(15, 23, 42, 0.8);
+        background: var(--map-loading-bg);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -165,9 +165,12 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .leaflet-popup-content-wrapper {
-        background: #1e293b; color: #f1f5f9; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+        background: var(--leaflet-popup-bg) !important;
+        color: var(--leaflet-popup-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
     }
-    .leaflet-popup-tip { background: #1e293b; }
+    .leaflet-popup-tip { background: var(--leaflet-popup-bg) !important; }
 
     @media (max-width: 1200px) {
         .unified-container {
@@ -435,13 +438,27 @@
 
     function initMap() {
         map = L.map('map', { zoomControl: false, attributionControl: false, preferCanvas: true }).setView([12.8797, 121.7740], 6);
-        const gray = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        const lightTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        window._dashboardBaseTiles = { dark: darkTile, light: lightTile };
+        (isDark ? darkTile : lightTile).addTo(map);
         const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-        L.control.layers({ "Standard Map": gray, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
+        L.control.layers({ "Dark Map": darkTile, "Light Map": lightTile, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Swap tile layer on theme change
+        window.addEventListener('pscp-theme-changed', function(e) {
+            const newTheme = e.detail.theme;
+            const tiles = window._dashboardBaseTiles;
+            if (newTheme === 'light') {
+                if (map.hasLayer(tiles.dark)) { map.removeLayer(tiles.dark); }
+                if (!map.hasLayer(tiles.light)) { tiles.light.addTo(map); tiles.light.bringToBack(); }
+            } else {
+                if (map.hasLayer(tiles.light)) { map.removeLayer(tiles.light); }
+                if (!map.hasLayer(tiles.dark)) { tiles.dark.addTo(map); tiles.dark.bringToBack(); }
+            }
+        });
     }
 
     async function loadStaticLayers() {

@@ -12,10 +12,10 @@
         display: flex;
         height: calc(100vh - 140px);
         min-height: 700px;
-        background: #0f172a;
+        background: var(--body-bg);
         border-radius: 1.5rem;
         overflow: hidden;
-        border: 1px solid var(--glass-border);
+        border: 1px solid var(--border-color);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
@@ -23,8 +23,8 @@
     .sidebar-left {
         width: var(--sidebar-left);
         min-width: var(--sidebar-left);
-        background: #1e293b;
-        border-right: 1px solid #334155;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -34,8 +34,8 @@
     .sidebar-right {
         width: var(--sidebar-right);
         min-width: var(--sidebar-right);
-        background: #1e293b;
-        border-left: 1px solid #334155;
+        background: var(--sidebar-bg);
+        border-left: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -79,8 +79,8 @@
     .filter-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
     
     .hazard-card {
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--event-card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.75rem;
         padding: 1rem;
         margin: 0.5rem 1rem;
@@ -108,11 +108,11 @@
     }
     .search-input {
         width: 100%;
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
-        color: white;
+        color: var(--text-light);
         font-size: 0.85rem;
     }
 
@@ -389,11 +389,26 @@
         map = L.map('unified-map', { zoomControl: false, attributionControl: false, preferCanvas: true })
             .setView([12.8797, 121.7740], 6);
 
-        const gray = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        const lightTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        window._disastersBaseTiles = { dark: darkTile, light: lightTile };
+        (isDark ? darkTile : lightTile).addTo(map);
         const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}');
-        
-        L.control.layers({ "Gray Map": gray, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
+        L.control.layers({ "Dark Map": darkTile, "Light Map": lightTile, "Satellite": satellite }, {}, { position: 'topleft' }).addTo(map);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        window.addEventListener('pscp-theme-changed', function(e) {
+            const newTheme = e.detail.theme;
+            const tiles = window._disastersBaseTiles;
+            if (newTheme === 'light') {
+                if (map.hasLayer(tiles.dark)) { map.removeLayer(tiles.dark); }
+                if (!map.hasLayer(tiles.light)) { tiles.light.addTo(map); tiles.light.bringToBack(); }
+            } else {
+                if (map.hasLayer(tiles.light)) { map.removeLayer(tiles.light); }
+                if (!map.hasLayer(tiles.dark)) { tiles.dark.addTo(map); tiles.dark.bringToBack(); }
+            }
+        });
     }
 
     async function loadStaticLayers() {

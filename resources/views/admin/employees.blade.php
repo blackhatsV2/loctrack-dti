@@ -11,9 +11,9 @@
     .search-bar input, .search-bar select {
         padding: 0.65rem 1rem;
         border-radius: 0.5rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
     }
@@ -39,11 +39,11 @@
     }
     .emp-table td {
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid rgba(255,255,255,0.04);
+        border-bottom: 1px solid var(--border-color);
         vertical-align: middle;
     }
     .emp-table tr:hover td {
-        background: rgba(99, 102, 241, 0.06);
+        background: var(--table-row-hover);
     }
     .action-link {
         color: #818cf8;

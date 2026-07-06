@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,14 +17,93 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        :root {
+        /* ===== DARK THEME (default) ===== */
+        :root,
+        html[data-theme="dark"] {
             --primary: #6366f1;
             --primary-hover: #4f46e5;
+            --body-bg: #0f172a;
+            --nav-bg: #1e293b;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --table-row-hover: rgba(99, 102, 241, 0.06);
+            --modal-bg: #1e293b;
+            --sidebar-bg: #1e293b;
+            --event-card-bg: #0f172a;
+            --map-loading-bg: rgba(15, 23, 42, 0.85);
+            --mobile-menu-bg: #0f172a;
+            --loader-bg: #0f172a;
+            --toast-bg: #1e293b;
+            --table-sticky-bg: #1e293b;
+            --profile-info-bg: rgba(0, 0, 0, 0.15);
+            --profile-info-border: rgba(255, 255, 255, 0.05);
+            --minimap-bg: #111;
+            --scrollbar-thumb: rgba(255,255,255,0.1);
+            --filter-item-hover: rgba(255,255,255,0.03);
+            --filter-count-bg: rgba(255,255,255,0.06);
+            --notif-dropdown-bg: #1e293b;
+            --notif-item-hover: rgba(255, 255, 255, 0.05);
+            --notif-item-border: rgba(255,255,255,0.05);
+            --disaster-popup-bg: #0f172a;
+            --search-placeholder: rgba(255,255,255,0.35);
+            --ss-option-color: rgba(255,255,255,0.8);
+            --ss-empty-color: rgba(255,255,255,0.35);
+            --ss-scrollbar-thumb: rgba(255,255,255,0.15);
+            --leaflet-popup-bg: #1e293b;
+            --leaflet-popup-color: #f1f5f9;
+            --tile-filter: brightness(0.9) invert(0);
+
+            /* Legacy aliases */
             --bg-dark: #0f172a;
             --glass: #1e293b;
             --glass-border: #334155;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
+        }
+
+        /* ===== LIGHT THEME ===== */
+        html[data-theme="light"] {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --body-bg: #f1f5f9;
+            --nav-bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --text-light: #0f172a;
+            --text-muted: #64748b;
+            --table-row-hover: rgba(99, 102, 241, 0.07);
+            --modal-bg: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --event-card-bg: #f1f5f9;
+            --map-loading-bg: rgba(241, 245, 249, 0.9);
+            --mobile-menu-bg: #ffffff;
+            --loader-bg: #f1f5f9;
+            --toast-bg: #ffffff;
+            --table-sticky-bg: #ffffff;
+            --profile-info-bg: rgba(99, 102, 241, 0.04);
+            --profile-info-border: rgba(99, 102, 241, 0.1);
+            --minimap-bg: #e2e8f0;
+            --scrollbar-thumb: rgba(0,0,0,0.15);
+            --filter-item-hover: rgba(0,0,0,0.03);
+            --filter-count-bg: rgba(0,0,0,0.06);
+            --notif-dropdown-bg: #ffffff;
+            --notif-item-hover: rgba(0, 0, 0, 0.04);
+            --notif-item-border: rgba(0,0,0,0.05);
+            --disaster-popup-bg: #ffffff;
+            --search-placeholder: rgba(0,0,0,0.35);
+            --ss-option-color: rgba(0,0,0,0.75);
+            --ss-empty-color: rgba(0,0,0,0.4);
+            --ss-scrollbar-thumb: rgba(0,0,0,0.15);
+            --leaflet-popup-bg: #ffffff;
+            --leaflet-popup-color: #0f172a;
+            --tile-filter: brightness(1) invert(0);
+
+            /* Legacy aliases */
+            --bg-dark: #f1f5f9;
+            --glass: #ffffff;
+            --glass-border: #e2e8f0;
         }
 
         * {
@@ -35,11 +114,12 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-dark);
+            background-color: var(--body-bg);
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         nav {
@@ -47,12 +127,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
-            flex-wrap: nowrap; /* Keep it in row even if it's tight */
+            flex-wrap: nowrap;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         .nav-hamburger {
@@ -175,8 +256,8 @@
         }
 
         .modal-content {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: var(--modal-bg);
+            border: 1px solid var(--border-color);
             border-radius: 1.5rem;
             width: 100%;
             max-width: 450px;
@@ -209,11 +290,12 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: white;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
             font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
 
         .form-control:focus {
@@ -235,11 +317,12 @@
         }
 
         .glass-card {
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 1.5rem;
             padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.25s ease, border-color 0.25s ease;
         }
 
         button, .btn {
@@ -305,13 +388,13 @@
                 top: 100%;
                 left: 0;
                 right: 0;
-                background: #0f172a;
+                background: var(--mobile-menu-bg);
                 flex-direction: column;
                 align-items: stretch;
                 gap: 0.5rem;
                 padding: 1.5rem;
-                border-top: 1px solid var(--glass-border);
-                border-bottom: 1px solid var(--glass-border);
+                border-top: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border-color);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
                 z-index: 99;
                 will-change: transform, opacity;
@@ -405,7 +488,7 @@
         #global-loader {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: #0f172a;
+            background: var(--loader-bg);
             z-index: 9999;
             display: none; /* Hidden by default */
             justify-content: center;
@@ -489,11 +572,11 @@
             top: 100%;
             right: 0;
             margin-top: 0.75rem;
-            background: #1e293b;
-            border: 1px solid #334155;
+            background: var(--notif-dropdown-bg);
+            border: 1px solid var(--border-color);
             border-radius: 1rem;
             width: 300px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             display: none;
             flex-direction: column;
@@ -505,19 +588,19 @@
         }
         .notification-header {
             padding: 1rem;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--border-color);
             font-weight: 600;
             font-size: 0.95rem;
         }
         .notification-item {
             padding: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--notif-item-border);
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
         }
         .notification-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--notif-item-hover);
         }
         .notification-item:last-child {
             border-bottom: none;
@@ -539,8 +622,8 @@
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             opacity: 0;
-            background: #0f172a;
-            border: 1px solid #334155;
+            background: var(--disaster-popup-bg);
+            border: 1px solid var(--border-color);
             border-top: 4px solid #f43f5e;
             border-radius: 1rem;
             padding: 1.5rem;
@@ -587,6 +670,34 @@
                 margin: 0;
             }
         }
+
+        /* ===== Theme Toggle Button ===== */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            padding: 0;
+            font-size: 1rem;
+        }
+        .theme-toggle:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+            transform: none;
+            box-shadow: none;
+        }
+        .theme-toggle .icon-sun  { display: none; }
+        .theme-toggle .icon-moon { display: block; }
+        html[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
+        html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
         /* ===== Mobile & Small Screen Main Page Blur System ===== */
         #mobile-backdrop-overlay {
@@ -660,6 +771,13 @@
         }
     </style>
     @yield('styles')
+    <!-- Prevent FOUC: set theme before first paint -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('pscp-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 </head>
 <body>
     <div id="mobile-backdrop-overlay" onclick="closeAllMobileOverlays()"></div>
@@ -723,6 +841,10 @@
             </div>
         @endauth
 
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark theme" title="Toggle theme">
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
         <button class="nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle navigation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
         <div class="nav-links" id="nav-links">
             @auth
@@ -798,6 +920,17 @@
             @yield('content')
         </div>
     </main>
+    <script>
+        /* ===== Theme Toggle ===== */
+        function toggleTheme() {
+            var html = document.documentElement;
+            var current = html.getAttribute('data-theme') || 'dark';
+            var next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('pscp-theme', next);
+            window.dispatchEvent(new CustomEvent('pscp-theme-changed', { detail: { theme: next } }));
+        }
+    </script>
     <script>
         // Global loading feedback
         window.addEventListener('load', function() {

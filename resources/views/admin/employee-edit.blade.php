@@ -16,9 +16,9 @@
         width: 100%;
         padding: 0.65rem 1rem;
         border-radius: 0.5rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
     }
@@ -55,9 +55,9 @@
         width: 100%;
         padding: 0.65rem 2.25rem 0.65rem 1rem;
         border-radius: 0.5rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
         cursor: text;
@@ -94,8 +94,8 @@
         right: 0;
         max-height: 200px;
         overflow-y: auto;
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 0.5rem;
         z-index: 100;
         box-shadow: 0 8px 24px rgba(0,0,0,0.4);
@@ -105,7 +105,7 @@
     }
     .searchable-select .ss-option {
         padding: 0.55rem 1rem;
-        color: rgba(255,255,255,0.8);
+        color: var(--ss-option-color);
         font-size: 0.85rem;
         cursor: pointer;
         transition: background 0.15s;

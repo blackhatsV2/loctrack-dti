@@ -21,8 +21,8 @@
         max-height: 500px;
         overflow-y: auto;
         border-radius: 0.75rem;
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--event-card-bg);
+        border: 1px solid var(--border-color);
     }
 
     .address-list::-webkit-scrollbar, .table-container::-webkit-scrollbar {
@@ -91,9 +91,9 @@
         top: 15px;
         right: 15px;
         z-index: 2000;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         padding: 8px 14px;
         border-radius: 10px;
         font-size: 0.75rem;
@@ -114,9 +114,9 @@
     .filter-select, .search-input {
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: #0f172a;
-        border: 1px solid #334155;
-        color: white;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
         font-family: 'Outfit', sans-serif;
     }
 
@@ -578,7 +578,22 @@
     function initMinimap() {
         try {
             minimap = L.map('minimap', { scrollWheelZoom: false }).setView([10.7202, 122.5621], 9);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(minimap);
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+            const lightTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+            window._workforceBaseTiles = { dark: darkTile, light: lightTile };
+            (isDark ? darkTile : lightTile).addTo(minimap);
+            window.addEventListener('pscp-theme-changed', function(e) {
+                const newTheme = e.detail.theme;
+                const tiles = window._workforceBaseTiles;
+                if (newTheme === 'light') {
+                    if (minimap.hasLayer(tiles.dark)) { minimap.removeLayer(tiles.dark); }
+                    if (!minimap.hasLayer(tiles.light)) { tiles.light.addTo(minimap); tiles.light.bringToBack(); }
+                } else {
+                    if (minimap.hasLayer(tiles.light)) { minimap.removeLayer(tiles.light); }
+                    if (!minimap.hasLayer(tiles.dark)) { tiles.dark.addTo(minimap); tiles.dark.bringToBack(); }
+                }
+            });
             resetMinimap();
         } catch (e) { console.error('Map failed:', e); }
     }

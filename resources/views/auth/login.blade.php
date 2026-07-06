@@ -7,13 +7,13 @@
         @csrf
         <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Email or Full Name</label>
-            <input type="text" name="email" value="{{ old('email') }}" required autofocus style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white;" placeholder="jdoe@dti.gov.ph or John Doe">
+            <input type="text" name="email" value="{{ old('email') }}" required autofocus style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-light);" placeholder="jdoe@dti.gov.ph or John Doe">
             @error('email') <small style="color: #f43f5e; margin-top: 0.25rem; display: block;">{{ $message }}</small> @enderror
         </div>
 
         <div style="margin-bottom: 2rem; position: relative;">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Password</label>
-            <input type="password" id="password" name="password" required style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding-right: 2.5rem;">
+            <input type="password" id="password" name="password" required style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-light); padding-right: 2.5rem;">
             <button type="button" onclick="togglePassword('password')" style="position: absolute; right: 0.75rem; bottom: 0.75rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0; font-size: 0.8rem; font-weight: 600;">
                 <span id="password-toggle-icon">Show</span>
             </button>

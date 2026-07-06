@@ -17,7 +17,7 @@
     
     .stat-card:hover {
         transform: translateY(-5px);
-        background: #1e293b;
+        background: var(--card-bg);
     }
     
     .stat-value {
@@ -49,8 +49,8 @@
 
     .address-item {
         padding: 1.25rem;
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--event-card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 1rem;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -88,9 +88,9 @@
         height: 400px;
         width: 100%;
         border-radius: 1.5rem;
-        border: 1px solid var(--glass-border);
+        border: 1px solid var(--border-color);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        background: #111;
+        background: var(--minimap-bg);
         overflow: hidden;
     }
 
@@ -110,8 +110,8 @@
         max-height: 300px;
         overflow-y: auto;
         border-radius: 1rem;
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--event-card-bg);
+        border: 1px solid var(--border-color);
     }
 
     .data-table {
@@ -122,13 +122,13 @@
     .data-table th {
         text-align: left;
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--border-color);
         color: var(--text-muted);
         font-size: 0.75rem;
         text-transform: uppercase;
         position: sticky;
         top: 0;
-        background: #1e293b;
+        background: var(--table-sticky-bg);
         z-index: 5;
     }
 
@@ -184,7 +184,7 @@
         gap: 1.75rem;
         margin-bottom: 2rem;
         padding-bottom: 2rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .profile-avatar {
@@ -243,8 +243,8 @@
         align-items: flex-start;
         gap: 1rem;
         padding: 1.15rem;
-        background: rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: var(--profile-info-bg);
+        border: 1px solid var(--profile-info-border);
         border-radius: 1rem;
         transition: all 0.25s ease;
     }
@@ -997,9 +997,23 @@
         
         map = L.map('minimap', { scrollWheelZoom: false }).setView([defaultLat, defaultLng], 12);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        const lightTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 });
+        window._geoBaseTiles = { dark: darkTile, light: lightTile };
+        (isDark ? darkTile : lightTile).addTo(map);
+
+        window.addEventListener('pscp-theme-changed', function(e) {
+            const newTheme = e.detail.theme;
+            const tiles = window._geoBaseTiles;
+            if (newTheme === 'light') {
+                if (map.hasLayer(tiles.dark)) { map.removeLayer(tiles.dark); }
+                if (!map.hasLayer(tiles.light)) { tiles.light.addTo(map); tiles.light.bringToBack(); }
+            } else {
+                if (map.hasLayer(tiles.light)) { map.removeLayer(tiles.light); }
+                if (!map.hasLayer(tiles.dark)) { tiles.dark.addTo(map); tiles.dark.bringToBack(); }
+            }
+        });
 
         if (homeData.lat) {
             homeMarker = L.marker([homeData.lat, homeData.lng], {
