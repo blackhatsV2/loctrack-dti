@@ -556,12 +556,20 @@
             color: white;
         }
         
+        .mobile-action-notif {
+            display: none;
+            margin: 0;
+        }
         @media (max-width: 768px) {
-            .notification-container {
-                margin: 0.5rem auto;
+            #notification-container > .notification-bell {
+                display: none !important;
             }
-            .notification-dropdown {
-                right: -50px;
+            .notification-container {
+                margin: 0;
+            }
+            .mobile-action-notif {
+                display: inline-block;
+                margin: 0;
             }
         }
 
@@ -679,6 +687,27 @@
             </picture>
             <span class="logo-text">PSCP Workforce Locator</span>
         </a>
+        
+        @auth
+            <div class="notification-container" id="notification-container">
+                <div class="notification-bell" onclick="toggleNotifications(event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="notification-badge notif-badge" id="notif-badge">0</span>
+                </div>
+                <div class="notification-dropdown" id="notification-dropdown">
+                    <div class="notification-header">Alerts & Notifications</div>
+                    <div id="notification-list">
+                        <div class="notification-item" style="color: var(--text-muted); text-align: center; font-size: 0.85rem;">
+                            No recent alerts near your location.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endauth
+
         <button class="nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle navigation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
         <div class="nav-links" id="nav-links">
             @auth
@@ -694,24 +723,6 @@
                     <a href="{{ route('location.history') }}" class="{{ request()->routeIs('location.history') ? 'active' : '' }}">History</a>
                 @endif
                 
-                <div class="notification-container" id="notification-container">
-                    <div class="notification-bell" onclick="toggleNotifications()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                        <span class="notification-badge" id="notif-badge">0</span>
-                    </div>
-                    <div class="notification-dropdown" id="notification-dropdown">
-                        <div class="notification-header">Alerts & Notifications</div>
-                        <div id="notification-list">
-                            <div class="notification-item" style="color: var(--text-muted); text-align: center; font-size: 0.85rem;">
-                                No recent alerts near your location.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                     @csrf
                     <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" style="opacity: 0.7;">Logout</a>
@@ -923,10 +934,9 @@
 
             // 2. Notification Dropdown
             const notifDropdown = document.getElementById('notification-dropdown');
-            const notifContainer = document.getElementById('notification-container');
             if (notifDropdown && notifDropdown.classList.contains('active')) {
                 const inDropdown = notifDropdown.contains(e.target);
-                const inContainer = notifContainer && notifContainer.contains(e.target);
+                const inContainer = !!e.target.closest('.notification-container');
                 if (!inDropdown && !inContainer) {
                     notifDropdown.classList.remove('active');
                     closedOverlay = true;
@@ -997,9 +1007,54 @@
             }
         }, true);
 
-        function toggleNotifications() {
+        function toggleNotifications(event) {
             const dropdown = document.getElementById('notification-dropdown');
-            if (dropdown) dropdown.classList.toggle('active');
+            if (!dropdown) return;
+
+            // If opening from inside mobile nav drawer, close mobile nav for a clean view
+            const navLinks = document.getElementById('nav-links');
+            if (navLinks && navLinks.classList.contains('mobile-open')) {
+                navLinks.classList.remove('mobile-open');
+            }
+
+            const willBeActive = !dropdown.classList.contains('active');
+
+            if (willBeActive && window.innerWidth <= 768) {
+                let bell = null;
+                if (event && event.currentTarget) {
+                    bell = event.currentTarget;
+                } else {
+                    bell = document.querySelector('.mobile-action-notif .notification-bell') || document.querySelector('.notification-bell');
+                }
+
+                if (bell) {
+                    const rect = bell.getBoundingClientRect();
+                    const topPos = rect.bottom + 8;
+                    const rightOffset = Math.max(10, Math.min(window.innerWidth - rect.right, window.innerWidth - 340));
+                    
+                    dropdown.style.setProperty('position', 'fixed', 'important');
+                    dropdown.style.setProperty('top', topPos + 'px', 'important');
+                    dropdown.style.setProperty('right', rightOffset + 'px', 'important');
+                    dropdown.style.setProperty('left', 'auto', 'important');
+                    dropdown.style.setProperty('transform', 'none', 'important');
+                    dropdown.style.setProperty('width', 'calc(100vw - 2rem)', 'important');
+                    dropdown.style.setProperty('max-width', '340px', 'important');
+                    dropdown.style.setProperty('margin-top', '0', 'important');
+                    dropdown.style.setProperty('z-index', '10000', 'important');
+                }
+            } else if (!willBeActive) {
+                dropdown.style.top = '';
+                dropdown.style.right = '';
+                dropdown.style.left = '';
+                dropdown.style.transform = '';
+                dropdown.style.position = '';
+                dropdown.style.width = '';
+                dropdown.style.maxWidth = '';
+                dropdown.style.marginTop = '';
+                dropdown.style.zIndex = '';
+            }
+
+            dropdown.classList.toggle('active');
         }
 
         function closeDisasterPopup() {
@@ -1047,11 +1102,11 @@
                         const targetPath = isAdminUser ? '/admin/dashboard' : '/dashboard';
 
                         if (isAdminUser && data.philippine_disasters) {
-                            const badge = document.getElementById('notif-badge');
-                            if (badge) {
+                            const badges = document.querySelectorAll('.notif-badge, .notification-badge');
+                            badges.forEach(badge => {
                                 badge.style.display = data.philippine_disasters.length > 0 ? 'block' : 'none';
                                 badge.textContent = data.philippine_disasters.length;
-                            }
+                            });
                             
                             const notifList = document.getElementById('notification-list');
                             if (notifList) {
@@ -1110,11 +1165,11 @@
                             `;
                             
                             // Update dropdown UI
-                            const badge = document.getElementById('notif-badge');
-                            if (badge) {
+                            const badges = document.querySelectorAll('.notif-badge, .notification-badge');
+                            badges.forEach(badge => {
                                 badge.style.display = 'block';
                                 badge.textContent = '1';
-                            }
+                            });
 
                             const notifList = document.getElementById('notification-list');
                             if (notifList) {
