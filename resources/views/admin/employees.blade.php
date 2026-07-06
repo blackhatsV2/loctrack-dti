@@ -11,8 +11,8 @@
     .search-bar input, .search-bar select {
         padding: 0.65rem 1rem;
         border-radius: 0.5rem;
-        background: rgba(0,0,0,0.25);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         color: white;
         font-size: 0.9rem;
         font-family: 'Outfit', sans-serif;
@@ -98,9 +98,7 @@
         bottom: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(15, 23, 42, 0.85);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: #0f172a;
         z-index: 9999;
         align-items: center;
         justify-content: center;
@@ -128,8 +126,8 @@
         width: 100%;
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         color: white;
         font-family: 'Outfit', sans-serif;
     }
@@ -249,11 +247,10 @@
         right: 0;
         max-height: 200px;
         overflow-y: auto;
-        background: rgba(15, 15, 30, 0.97);
-        border: 1px solid var(--glass-border);
+        background: #1e293b;
+        border: 1px solid #334155;
         border-radius: 0.75rem;
         z-index: 10000;
-        backdrop-filter: blur(12px);
         box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .searchable-select.open .ss-dropdown {
@@ -391,7 +388,7 @@
     <div id="add-employee-modal" class="modal">
         <div class="glass-card modal-content animate-fade-in" style="position: relative;">
             <!-- Loading Overlay -->
-            <div id="add-employee-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 10; align-items: center; justify-content: center; border-radius: inherit;">
+            <div id="add-employee-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 10; align-items: center; justify-content: center; border-radius: inherit;">
                 <div class="spinner"></div>
             </div>
 

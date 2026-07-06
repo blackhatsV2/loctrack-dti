@@ -22,7 +22,7 @@
     </div>
 
     <div style="margin-top: 6rem; position: relative;">
-        <div style="background: var(--glass); padding: 1rem; border-radius: 2rem; border: 1px solid var(--glass-border); opacity: 0.5;">
+        <div style="background: #1e293b; padding: 1rem; border-radius: 2rem; border: 1px solid #334155;">
             <picture>
                 <source srcset="{{ asset('images/world_map_preview.webp') }}" type="image/webp">
                 <img src="{{ asset('images/world_map_preview.png') }}" alt="Map Preview" style="width: 100%; height: 300px; object-fit: cover; border-radius: 1.5rem; display: block;" loading="lazy" decoding="async">

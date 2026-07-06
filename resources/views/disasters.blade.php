@@ -23,9 +23,8 @@
     .sidebar-left {
         width: var(--sidebar-left);
         min-width: var(--sidebar-left);
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border-right: 1px solid var(--glass-border);
+        background: #1e293b;
+        border-right: 1px solid #334155;
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -35,9 +34,8 @@
     .sidebar-right {
         width: var(--sidebar-right);
         min-width: var(--sidebar-right);
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border-left: 1px solid var(--glass-border);
+        background: #1e293b;
+        border-left: 1px solid #334155;
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -81,8 +79,8 @@
     .filter-item input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px; }
     
     .hazard-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         border-radius: 0.75rem;
         padding: 1rem;
         margin: 0.5rem 1rem;
@@ -110,8 +108,8 @@
     }
     .search-input {
         width: 100%;
-        background: rgba(0,0,0,0.2);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
         color: white;
@@ -176,9 +174,8 @@
     .stat-card {
         padding: 1.5rem;
         text-align: center;
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
+        background: #1e293b;
+        border: 1px solid #334155;
         border-radius: 1.5rem;
         display: flex;
         flex-direction: column;
@@ -189,15 +186,14 @@
         transform: translateY(-3px);
         border-color: var(--primary);
         box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
-        background: rgba(30, 41, 59, 0.85);
+        background: #1e293b;
     }
     .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
     .profile-mini-card {
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
+        background: #1e293b;
+        border: 1px solid #334155;
         border-radius: 1.5rem;
         padding: 1.5rem;
         display: flex;

@@ -21,8 +21,8 @@
         max-height: 500px;
         overflow-y: auto;
         border-radius: 0.75rem;
-        background: rgba(0, 0, 0, 0.15);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
     }
 
     .address-list::-webkit-scrollbar, .table-container::-webkit-scrollbar {
@@ -91,15 +91,14 @@
         top: 15px;
         right: 15px;
         z-index: 2000;
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: #0f172a;
+        border: 1px solid #334155;
         color: white;
         padding: 8px 14px;
         border-radius: 10px;
         font-size: 0.75rem;
         font-weight: 600;
         cursor: pointer;
-        backdrop-filter: blur(12px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
@@ -115,8 +114,8 @@
     .filter-select, .search-input {
         padding: 0.75rem 1rem;
         border-radius: 0.75rem;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         color: white;
         font-family: 'Outfit', sans-serif;
     }
@@ -214,10 +213,9 @@
 
     /* Leaflet Popup Styling */
     .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-        background: rgba(15, 23, 42, 0.95) !important;
-        backdrop-filter: blur(12px);
+        background: #1e293b !important;
         color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #334155;
         box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
     }
 
@@ -698,7 +696,7 @@
             hint = document.createElement('div');
             hint.id = 'map-scroll-hint';
             hint.innerHTML = `
-                <div style="background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);" 
+                <div style="background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);" 
                      onclick="document.getElementById('minimap').scrollIntoView({behavior: 'smooth', block: 'center'}); this.parentElement.remove();">
                     <span style="font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.2); padding: 0.2rem 0.5rem; border-radius: 0.4rem;">MAP</span>
                     <div>

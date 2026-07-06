@@ -21,8 +21,8 @@
             --primary: #6366f1;
             --primary-hover: #4f46e5;
             --bg-dark: #0f172a;
-            --glass: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass: #1e293b;
+            --glass-border: #334155;
             --text-light: #f8fafc;
             --text-muted: #94a3b8;
         }
@@ -47,9 +47,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -155,8 +154,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
@@ -171,9 +169,8 @@
         }
 
         .modal-content {
-            background: var(--glass);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 1.5rem;
             width: 100%;
             max-width: 450px;
@@ -202,8 +199,8 @@
             width: 100%;
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
+            background: #0f172a;
+            border: 1px solid #334155;
             color: white;
             font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
@@ -228,9 +225,8 @@
         }
 
         .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 1.5rem;
             padding: 2.5rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -390,8 +386,7 @@
         #global-loader {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
+            background: #0f172a;
             z-index: 9999;
             display: none; /* Hidden by default */
             justify-content: center;
@@ -475,9 +470,8 @@
             top: 100%;
             right: 0;
             margin-top: 0.75rem;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 1rem;
             width: 300px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
@@ -526,9 +520,8 @@
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             opacity: 0;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(244, 63, 94, 0.4);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-top: 4px solid #f43f5e;
             border-radius: 1rem;
             padding: 1.5rem;

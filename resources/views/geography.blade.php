@@ -17,7 +17,7 @@
     
     .stat-card:hover {
         transform: translateY(-5px);
-        background: rgba(30, 41, 59, 0.85);
+        background: #1e293b;
     }
     
     .stat-value {
@@ -49,8 +49,8 @@
 
     .address-item {
         padding: 1.25rem;
-        background: rgba(0, 0, 0, 0.15);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         border-radius: 1rem;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -110,8 +110,8 @@
         max-height: 300px;
         overflow-y: auto;
         border-radius: 1rem;
-        background: rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
     }
 
     .data-table {
@@ -532,11 +532,10 @@
         right: 0;
         max-height: 200px;
         overflow-y: auto;
-        background: rgba(15,15,30,0.97);
-        border: 1px solid var(--glass-border);
+        background: #1e293b;
+        border: 1px solid #334155;
         border-radius: 0.5rem;
         z-index: 100;
-        backdrop-filter: blur(12px);
         box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .searchable-select.open .ss-dropdown {
@@ -913,7 +912,7 @@
             <div id="pin-instruction" class="instruction-overlay">
                 Click on the map to pin your <span id="pin-type-text"></span>
             </div>
-            <button onclick="resetMap()" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; cursor: pointer; backdrop-filter: blur(10px);">
+            <button onclick="resetMap()" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: #0f172a; border: 1px solid #334155; color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; cursor: pointer;">
                 Show All
             </button>
         </div>

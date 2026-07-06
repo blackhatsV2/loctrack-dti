@@ -23,9 +23,8 @@
     .sidebar-left {
         width: var(--sidebar-width-left);
         min-width: var(--sidebar-width-left);
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border-right: 1px solid var(--glass-border);
+        background: #1e293b;
+        border-right: 1px solid #334155;
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -34,9 +33,8 @@
     .sidebar-right {
         width: var(--sidebar-width-right);
         min-width: var(--sidebar-width-right);
-        background: var(--glass);
-        backdrop-filter: blur(12px);
-        border-left: 1px solid var(--glass-border);
+        background: #1e293b;
+        border-left: 1px solid #334155;
         display: flex;
         flex-direction: column;
         z-index: 10;
@@ -83,8 +81,8 @@
     .filter-count { font-size: 0.7rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 1rem; margin-left: auto; }
 
     .event-card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         border-radius: 0.75rem;
         padding: 0.85rem;
         margin: 0.5rem 1rem;
@@ -115,8 +113,8 @@
         width: 100%;
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
-        background: rgba(0,0,0,0.2);
-        border: 1px solid var(--glass-border);
+        background: #0f172a;
+        border: 1px solid #334155;
         color: white;
         font-size: 0.85rem;
     }
