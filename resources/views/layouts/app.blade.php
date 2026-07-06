@@ -152,6 +152,8 @@
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
             height: 100%;
             background: rgba(15, 23, 42, 0.85);
@@ -163,6 +165,8 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease;
+            padding: 1rem;
+            box-sizing: border-box;
         }
 
         .modal-overlay.active {
@@ -180,6 +184,10 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin: auto;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
 
         .modal-overlay.active .modal-content {
@@ -343,9 +351,10 @@
                 border-radius: 1rem;
             }
             .modal-content {
-                margin: 1rem;
+                margin: auto;
                 padding: 1.5rem;
                 border-radius: 1rem;
+                max-width: 100%;
             }
             h1 {
                 font-size: 1.5rem !important;
@@ -358,6 +367,12 @@
             }
             .glass-card {
                 padding: 1rem;
+            }
+            .modal-overlay {
+                padding: 0.75rem;
+            }
+            .modal-content {
+                padding: 1.25rem;
             }
         }
 
