@@ -206,7 +206,7 @@
                     <div class="searchable-select" id="ss-employee-type">
                         <input type="text" class="ss-input" placeholder="Search employee type..." autocomplete="off">
                         <input type="hidden" name="employee_type" value="{{ old('employee_type', $location->employee_type ?? $user->employee_type ?? '') }}">
-                        <span class="ss-arrow">▼</span>
+                        <span class="ss-arrow"></span>
                         <div class="ss-dropdown">
                             @foreach($employeeTypes as $type)
                                 <div class="ss-option" data-value="{{ $type }}">{{ $type }}</div>
@@ -237,7 +237,7 @@
                     <div class="searchable-select" id="ss-office">
                         <input type="text" class="ss-input" placeholder="Search office..." autocomplete="off">
                         <input type="hidden" name="office" value="{{ old('office', $location->office ?? $user->office ?? '') }}">
-                        <span class="ss-arrow">▼</span>
+                        <span class="ss-arrow"></span>
                         <div class="ss-dropdown">
                             @foreach($offices as $office)
                                 <div class="ss-option" data-value="{{ $office }}">{{ $office }}</div>

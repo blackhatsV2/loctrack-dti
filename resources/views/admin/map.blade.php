@@ -163,10 +163,10 @@
         </div>
         <div style="display: flex; gap: 0.5rem;">
             <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                <span id="sync-icon">🔄</span> Sync Hazards
+                <span id="sync-icon"></span>Sync Hazards
             </button>
             <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
-                📍 Recenter PH
+                Recenter PH
             </button>
         </div>
     </div>
@@ -175,7 +175,7 @@
         <!-- Left Sidebar: Employees -->
         <div class="sidebar-left">
             <div class="sidebar-header">
-                <h3>👥 Employee Layers</h3>
+                <h3>Employee Layers</h3>
                 <small>Filter by office/category</small>
             </div>
             
@@ -205,7 +205,7 @@
         <!-- Right Sidebar: Hazards -->
         <div class="sidebar-right">
             <div class="sidebar-header">
-                <h3>⚠️ Global Hazards</h3>
+                <h3>Global Hazards</h3>
                 <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
                     <button onclick="setHazardFilter('all')" class="btn btn-ghost active-hazard-filter" id="h-filter-all" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">All</button>
                     <button onclick="setHazardFilter('earthquake')" class="btn btn-ghost" id="h-filter-earthquake" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">USGS</button>

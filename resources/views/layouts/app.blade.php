@@ -36,9 +36,6 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0, transparent 50%);
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
@@ -96,9 +93,7 @@
             font-size: 1.5rem;
             font-weight: 600;
             letter-spacing: -0.025em;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #818cf8;
             white-space: nowrap;
         }
 
@@ -416,10 +411,10 @@
             position: fixed;
             top: 0; left: 0;
             width: 0; height: 3px;
-            background: linear-gradient(to right, #818cf8, #c084fc);
+            background: #6366f1;
             z-index: 10001;
             transition: width 0.4s ease;
-            box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
             display: none;
             pointer-events: none;
         }
@@ -430,15 +425,7 @@
 
         /* Skeleton Shimmer Utility */
         .skeleton {
-            background: rgba(255, 255, 255, 0.05);
-            background: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.05) 25%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(255, 255, 255, 0.05) 75%
-            );
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite linear;
+            background: rgba(255, 255, 255, 0.07);
             border-radius: 0.75rem;
         }
 
@@ -623,7 +610,7 @@
             </picture>
             <span class="logo-text">PSCP Workforce Locator</span>
         </a>
-        <button class="nav-hamburger" onclick="document.getElementById('nav-links').classList.toggle('mobile-open')" aria-label="Toggle navigation">☰</button>
+        <button class="nav-hamburger" onclick="document.getElementById('nav-links').classList.toggle('mobile-open')" aria-label="Toggle navigation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
         <div class="nav-links" id="nav-links">
             @auth
                 @if(auth()->user()->is_admin)

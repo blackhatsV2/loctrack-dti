@@ -323,7 +323,7 @@
             <p style="color: var(--text-muted); margin-bottom: 0;">Manage and track all employees.</p>
         </div>
         <button onclick="openAddModal()" class="btn" style="background: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span>➕</span> Add Employee
+            Add Employee
         </button>
     </div>
 
@@ -422,7 +422,7 @@
                         <div class="searchable-select" id="ss-employee-type">
                             <input type="text" class="ss-input" placeholder="Search employee type..." autocomplete="off">
                             <input type="hidden" name="employee_type" value="">
-                            <span class="ss-arrow">▼</span>
+                            <span class="ss-arrow"></span>
                             <div class="ss-dropdown">
                                 @foreach($employeeTypes as $type)
                                     <div class="ss-option" data-value="{{ $type }}">{{ $type }}</div>
@@ -452,7 +452,7 @@
                         <div class="searchable-select" id="ss-office">
                             <input type="text" class="ss-input" placeholder="Search office..." autocomplete="off">
                             <input type="hidden" name="office" value="">
-                            <span class="ss-arrow">▼</span>
+                            <span class="ss-arrow"></span>
                             <div class="ss-dropdown">
                                 @foreach($offices as $o)
                                     <div class="ss-option" data-value="{{ $o }}">{{ $o }}</div>
@@ -486,7 +486,6 @@
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="modal">
         <div class="glass-card modal-content animate-fade-in" style="max-width: 400px; text-align: center; padding: 2rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
             <h2 style="margin-bottom: 0.5rem; border: none;">Delete Employee?</h2>
             <p style="color: var(--text-muted); margin-bottom: 2rem;">
                 Are you sure you want to delete <strong id="delete-emp-name" style="color: white;"></strong>? 

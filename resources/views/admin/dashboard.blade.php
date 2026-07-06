@@ -233,10 +233,10 @@
         </div>
         <div style="display: flex; gap: 0.75rem;">
             <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.85rem;">
-                <span id="sync-icon">🔄</span> Sync Hazards
+                <span id="sync-icon"></span>Sync Hazards
             </button>
             <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.85rem;">
-                📍 Recenter PH
+                Recenter PH
             </button>
         </div>
     </div>
@@ -253,7 +253,7 @@
         <!-- Left Sidebar: Employees -->
         <div class="sidebar-left">
             <div class="sidebar-header">
-                <h3>👥 Employee Layers</h3>
+                <h3>Employee Layers</h3>
                 <small>Filter by office/category</small>
             </div>
             
@@ -291,7 +291,7 @@
         <!-- Right Sidebar: Hazards -->
         <div class="sidebar-right">
             <div class="sidebar-header">
-                <h3>⚠️ Global Hazards</h3>
+                <h3>Global Hazards</h3>
                 <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
                     <button onclick="setHazardFilter('all')" class="btn btn-ghost active-hazard-filter" id="h-filter-all" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">All</button>
                     <button onclick="setHazardFilter('earthquake')" class="btn btn-ghost" id="h-filter-earthquake" style="padding: 0.2rem 0.5rem; font-size: 0.65rem;">USGS</button>
@@ -322,7 +322,7 @@
     <!-- Online Presence Section -->
     <div class="glass-card animate-fade-in" style="margin-bottom: 2rem;">
         <div style="margin-bottom: 1.5rem;">
-            <h2 style="margin-bottom: 0.25rem;">📡 Online Personnel</h2>
+            <h2 style="margin-bottom: 0.25rem;">Online Personnel</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Employees active within the last 24 hours.</p>
         </div>
 
@@ -554,7 +554,7 @@
 
     function buildEmployeePopup(loc) {
         const name = loc.user?.name || 'Unknown', color = categories.find(c => c.key === getCategory(loc))?.color || '#94a3b8';
-        const typeLabel = loc.type === 'home' ? '🏠 Home Address' : (loc.type === 'office' ? '🏢 Office Location' : '📍 Personnel Location');
+        const typeLabel = loc.type === 'home' ? 'Home Address' : (loc.type === 'office' ? 'Office Location' : 'Personnel Location');
         const address = loc.type === 'office' ? loc.office : (loc.address || 'Not set');
         
         return `<div style="padding: 10px; min-width: 220px; font-family: 'Outfit', sans-serif;">
@@ -637,7 +637,7 @@
                              onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(homeLoc)}, this)"
                              onmouseover="this.style.background='rgba(244, 63, 94, 0.08)'; this.style.borderColor='rgba(244, 63, 94, 0.3)'; this.style.transform='translateX(4px)'"
                              onmouseout="this.style.background='rgba(244, 63, 94, 0.04)'; this.style.borderColor='rgba(244, 63, 94, 0.1)'; this.style.transform='none'">
-                            <span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🏠</span>
+                            <span style="font-size: 0.7rem; font-weight: 800; color: #fb7185;">H</span>
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
                                 <span style="font-size: 0.65rem; font-weight: 800; color: #fb7185; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Home Address</span>
                                 <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${homeLoc.data.address || 'Address not set'}</span>
@@ -652,7 +652,7 @@
                              onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(officeLoc)}, this)"
                              onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'; this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.transform='translateX(4px)'"
                              onmouseout="this.style.background='rgba(99, 102, 241, 0.04)'; this.style.borderColor='rgba(99, 102, 241, 0.1)'; this.style.transform='none'">
-                            <span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🏢</span>
+                            <span style="font-size: 0.7rem; font-weight: 800; color: #818cf8;">O</span>
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
                                 <span style="font-size: 0.65rem; font-weight: 800; color: #818cf8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Office Location</span>
                                 <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${officeLoc.data.office || 'Office not set'}</span>
@@ -667,7 +667,6 @@
                              onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(otherLoc)}, this)"
                              onmouseover="this.style.background='rgba(255, 255, 255, 0.08)'; this.style.borderColor='rgba(255, 255, 255, 0.3)'; this.style.transform='translateX(4px)'"
                              onmouseout="this.style.background='rgba(255, 255, 255, 0.04)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='none'">
-                            <span style="font-size: 1.25rem;">📍</span>
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
                                 <span style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Latest Activity</span>
                                 <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${otherLoc.data.office || 'Details not set'}</span>

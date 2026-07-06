@@ -62,10 +62,10 @@
         @if($locations->total() > 0)
         <div style="display: flex; gap: 0.75rem; align-items: center;">
             <button type="button" id="delete-selected-btn" class="btn animate-fade-in" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); display: none;">
-                🗑️ Delete Selected (<span id="selected-count">0</span>)
+                Delete Selected (<span id="selected-count">0</span>)
             </button>
             <button type="button" id="clear-all-btn" class="btn" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--glass-border);">
-                ⚠️ Clear History
+                Clear History
             </button>
         </div>
         @endif
@@ -106,10 +106,10 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <button type="button" class="btn btn-small reuse-btn" data-url="{{ route('location.reuse', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
-                                    🔄 Reuse
+                                    Reuse
                                 </button>
                                 <button type="button" class="btn btn-small delete-btn" data-url="{{ route('admin.history.destroy', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3);">
-                                    🗑️ Delete
+                                    Delete
                                 </button>
                             </div>
                         </td>
@@ -350,7 +350,7 @@
             var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             btn.disabled = true;
-            btn.textContent = '⏳ Reusing...';
+            btn.textContent = 'Reusing...';
             if (typeof showGlobalLoader === 'function') showGlobalLoader();
 
             fetch(url, {
@@ -369,14 +369,14 @@
                 } else {
                     alert(data.message || 'Failed to reuse location.');
                     btn.disabled = false;
-                    btn.textContent = '🔄 Reuse';
+                    btn.textContent = 'Reuse';
                     if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
                 }
             })
             .catch(function(err) {
                 alert('Error: ' + err.message);
                 btn.disabled = false;
-                btn.textContent = '🔄 Reuse';
+                btn.textContent = 'Reuse';
                 if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
             });
         });

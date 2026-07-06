@@ -14,8 +14,8 @@
         <div style="margin-bottom: 2rem; position: relative;">
             <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Password</label>
             <input type="password" id="password" name="password" required style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding-right: 2.5rem;">
-            <button type="button" onclick="togglePassword('password')" style="position: absolute; right: 0.75rem; bottom: 0.75rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0;">
-                <span id="password-toggle-icon">👁️</span>
+            <button type="button" onclick="togglePassword('password')" style="position: absolute; right: 0.75rem; bottom: 0.75rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0; font-size: 0.8rem; font-weight: 600;">
+                <span id="password-toggle-icon">Show</span>
             </button>
         </div>
 
@@ -33,10 +33,10 @@
         const icon = document.getElementById(id + '-toggle-icon');
         if (input.type === 'password') {
             input.type = 'text';
-            icon.innerText = '🙈';
+            icon.innerText = 'Hide';
         } else {
             input.type = 'password';
-            icon.innerText = '👁️';
+            icon.innerText = 'Show';
         }
     }
 

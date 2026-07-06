@@ -248,7 +248,7 @@
 <div class="animate-fade-in">
     <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🌍 Workforce Geography & Analytics</h1>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Workforce Geography & Analytics</h1>
             <p style="color: var(--text-muted);">Real-time distribution, analytics, and historical records.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
@@ -283,7 +283,7 @@
             <div class="address-card-grid">
                 <!-- Left: Home Addresses -->
                 <div class="address-column">
-                    <h4 style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏠 Home Addresses</h4>
+                    <h4 style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Home Addresses</h4>
                     <div class="address-list" id="home-list">
                         @foreach($latestLocations->whereNotNull('address') as $loc)
                         <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
@@ -299,7 +299,7 @@
 
                 <!-- Right: Office Addresses -->
                 <div class="address-column">
-                    <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Office Assignments</h4>
+                    <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Office Assignments</h4>
                     <div class="address-list" id="office-list">
                         @foreach($latestLocations->whereNotNull('office') as $loc)
                         <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
@@ -318,7 +318,7 @@
             @php $unmapped = $latestLocations->whereNull('address')->whereNull('office'); @endphp
             @if($unmapped->count() > 0)
             <div class="no-address-section">
-                <h4 style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">⚠️ Unmapped Personnel</h4>
+                <h4 style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Unmapped Personnel</h4>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     @foreach($unmapped as $loc)
                     <div class="glass-card geo-item" data-user-id="{{ $loc->user_id }}"
@@ -335,7 +335,7 @@
             <div class="minimap-wrapper" style="position: relative; margin-top: 1.5rem;">
                 <div id="minimap" class="minimap-container" style="margin-top: 0;"></div>
                 <button onclick="resetMinimap()" class="map-reset-btn">
-                    <span>🔄</span> Show All
+                    Show All
                 </button>
             </div>
         </div>
@@ -374,7 +374,7 @@
         
         <!-- Office Table -->
         <div class="glass-card">
-            <h2 style="margin-bottom: 1.5rem;">🏢 Office Locations Details</h2>
+            <h2 style="margin-bottom: 1.5rem;">Office Locations Details</h2>
             <input type="text" id="office-search" class="search-input" placeholder="Search offices..."
                 onkeyup="powerSearch('office-table', 'office-search')">
             <div class="table-container">
@@ -406,7 +406,7 @@
     <!-- Records Section -->
     <div id="section-records" class="workforce-section animate-fade-in">
         <div class="glass-card">
-            <h2 style="margin-bottom: 1.5rem;">📍 Recent Location Records</h2>
+            <h2 style="margin-bottom: 1.5rem;">Recent Location Records</h2>
             <input type="text" id="power-search" class="search-input"
                 placeholder="Power Search: Find by name, address, or office..."
                 onkeyup="powerSearch('location-table', 'power-search')">
@@ -509,9 +509,6 @@
 
             if (Object.keys(typeData).length > 0) {
                 const ctx = document.getElementById('typeChart').getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
-                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
 
                 new Chart(ctx, {
                     type: 'bar',
@@ -520,7 +517,7 @@
                         datasets: [{
                             label: 'Personnel Count',
                             data: Object.values(typeData),
-                            backgroundColor: gradient,
+                            backgroundColor: 'rgba(99, 102, 241, 0.6)',
                             borderColor: '#818cf8',
                             borderWidth: 2, borderRadius: 8
                         }]
@@ -602,7 +599,7 @@
             const label = isHome ? 'Home Address' : 'Office Assignment';
             const addressText = isHome ? loc.address : loc.office;
             
-            const marker = L.marker(coords, { icon: createCustomIcon(isHome ? '🏠' : '🏢') });
+            const marker = L.marker(coords, { icon: createCustomIcon(isHome ? 'H' : 'O') });
             
             marker.bindPopup(`
                 <div style="font-family: 'Outfit', sans-serif; min-width: 150px;">
@@ -653,7 +650,7 @@
             if (markerCluster) minimap.removeLayer(markerCluster);
 
             const coords = type === 'home' ? [lat, lng] : getOfficeCoords(officeName);
-            const iconEmoji = type === 'home' ? '🏠' : '🏢';
+            const iconEmoji = type === 'home' ? 'H' : 'O';
             const label = type === 'home' ? 'Home Address' : 'Office Assignment';
             const addressText = type === 'home' ? (clickedEl.querySelector('.emp-addr').title) : officeName;
             
@@ -703,7 +700,7 @@
             hint.innerHTML = `
                 <div style="background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);" 
                      onclick="document.getElementById('minimap').scrollIntoView({behavior: 'smooth', block: 'center'}); this.parentElement.remove();">
-                    <span style="font-size: 1.2rem;">📍</span>
+                    <span style="font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.2); padding: 0.2rem 0.5rem; border-radius: 0.4rem;">MAP</span>
                     <div>
                         <div style="font-weight: 600; font-size: 0.95rem;">Map Updated Below</div>
                         <div style="font-size: 0.75rem; opacity: 0.9;">Click to scroll to location</div>

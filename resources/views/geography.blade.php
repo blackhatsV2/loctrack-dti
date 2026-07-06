@@ -191,7 +191,7 @@
         width: 90px;
         height: 90px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+        background: #6366f1;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -355,7 +355,7 @@
     .btn-save-profile {
         flex: 1;
         padding: 0.8rem;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: #6366f1;
         border: none;
         color: white;
         font-weight: 600;
@@ -365,7 +365,7 @@
     }
 
     .btn-save-profile:hover {
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        background: #4f46e5;
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
     }
@@ -468,7 +468,7 @@
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
 
     .privilege-badge {
-        background: linear-gradient(to right, #f43f5e, #fb7185);
+        background: #f43f5e;
         color: white;
         padding: 0.2rem 0.6rem;
         border-radius: 0.4rem;
@@ -667,31 +667,31 @@
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
                         @if($user->employee_type)
                             <span class="profile-role-badge">
-                                <span>⚡</span> {{ $user->employee_type }}
+                                {{ $user->employee_type }}
                             </span>
                         @else
                             <span class="profile-role-badge">
-                                <span>👤</span> Employee
+                                Employee
                             </span>
                         @endif
 
                         @if($user->email_verified_at)
-                            <span class="status-pill status-verified">✓ Verified Account</span>
+                            <span class="status-pill status-verified">Verified Account</span>
                         @else
-                            <span class="status-pill status-pending">⚠ Pending Verification</span>
+                            <span class="status-pill status-pending">Pending Verification</span>
                         @endif
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <button class="btn-edit-profile" id="edit-profile-btn" onclick="toggleProfileEdit(true)">✏️ Edit Profile</button>
-                    <button class="btn-edit-profile" id="change-password-btn" onclick="togglePasswordEdit(true)" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.25);">🔑 Password</button>
+                    <button class="btn-edit-profile" id="edit-profile-btn" onclick="toggleProfileEdit(true)">Edit Profile</button>
+                    <button class="btn-edit-profile" id="change-password-btn" onclick="togglePasswordEdit(true)" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.25);">Password</button>
                 </div>
             </div>
 
             <!-- Info Grid -->
             <div class="profile-info-grid">
                 <div class="profile-info-item">
-                    <div class="profile-info-icon icon-id">🪪</div>
+                    <div class="profile-info-icon icon-id" style="font-size: 0.75rem; font-weight: 700;">ID</div>
                     <div class="profile-info-details">
                         <span class="profile-info-label">Employee ID</span>
                         <span class="profile-info-value {{ !($latestLocation->employee_id_no ?? $user->employee_id_no) ? 'empty' : '' }}" id="disp-employee_id_no">{{ $latestLocation->employee_id_no ?? $user->employee_id_no ?? 'Not set' }}</span>
@@ -699,7 +699,7 @@
                 </div>
 
                 <div class="profile-info-item">
-                    <div class="profile-info-icon icon-phone">📱</div>
+                    <div class="profile-info-icon icon-phone" style="font-size: 0.75rem; font-weight: 700;">TEL</div>
                     <div class="profile-info-details">
                         <span class="profile-info-label">Mobile Number</span>
                         <span class="profile-info-value {{ !($latestLocation->mobile_no ?? $user->mobile_no) ? 'empty' : '' }}" id="disp-mobile_no">{{ $latestLocation->mobile_no ?? $user->mobile_no ?? 'Not set' }}</span>
@@ -707,7 +707,7 @@
                 </div>
 
                 <div class="profile-info-item">
-                    <div class="profile-info-icon icon-office">🏢</div>
+                    <div class="profile-info-icon icon-office" style="font-size: 0.75rem; font-weight: 700;">OFF</div>
                     <div class="profile-info-details">
                         <span class="profile-info-label">Office Assignment</span>
                         <span class="profile-info-value {{ !($latestLocation->office ?? $user->office) ? 'empty' : '' }}" id="disp-office">{{ $latestLocation->office ?? $user->office ?? 'Not set' }}</span>
@@ -715,7 +715,7 @@
                 </div>
 
                 <div class="profile-info-item">
-                    <div class="profile-info-icon icon-type">💼</div>
+                    <div class="profile-info-icon icon-type" style="font-size: 0.75rem; font-weight: 700;">ROLE</div>
                     <div class="profile-info-details">
                         <span class="profile-info-label">Employee Category</span>
                         <span class="profile-info-value {{ !($latestLocation->employee_type ?? $user->employee_type) ? 'empty' : '' }}" id="disp-employee_type">{{ $latestLocation->employee_type ?? $user->employee_type ?? 'Not set' }}</span>
@@ -725,7 +725,7 @@
 
             <!-- Metadata Section (Everything in Database) -->
             <div class="profile-meta-section">
-                <h3 class="meta-title">⚙️ Account System Metadata</h3>
+                <h3 class="meta-title">Account System Metadata</h3>
                 <div class="profile-meta-grid">
                     <div class="meta-item">
                         <span class="meta-label">System User ID</span>
@@ -751,12 +751,10 @@
             </div>
         </div>
 
-        </div>
-        
         <!-- Edit Form -->
         <div id="profile-edit" style="display: none;">
             <div style="margin-bottom: 1.75rem;">
-                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">✏️ Edit Profile</h2>
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">Edit Profile</h2>
                 <p style="color: var(--text-muted); font-size: 0.85rem;">Update your official identity and contact details.</p>
             </div>
             <form id="profile-form" onsubmit="saveProfile(event)" class="profile-edit-grid">
@@ -781,7 +779,7 @@
                     <div class="searchable-select" id="ss-office-profile">
                         <input type="text" class="ss-input" placeholder="Search office..." autocomplete="off">
                         <input type="hidden" name="office" value="{{ $user->office ?? $latestLocation?->office }}">
-                        <span class="ss-arrow">▼</span>
+                        <span class="ss-arrow"></span>
                         <div class="ss-dropdown">
                             @foreach($offices as $office)
                                 <div class="ss-option" data-value="{{ $office }}">{{ $office }}</div>
@@ -796,7 +794,7 @@
                     <div class="searchable-select" id="ss-type-profile">
                         <input type="text" class="ss-input" placeholder="Search employee type..." autocomplete="off">
                         <input type="hidden" name="employee_type" value="{{ $user->employee_type ?? $latestLocation?->employee_type }}">
-                        <span class="ss-arrow">▼</span>
+                        <span class="ss-arrow"></span>
                         <div class="ss-dropdown">
                             @foreach($employeeTypes as $type)
                                 <div class="ss-option" data-value="{{ $type }}">{{ $type }}</div>
@@ -810,7 +808,7 @@
                     </div>
                 </div>
                 <div class="profile-edit-actions">
-                    <button type="submit" class="btn-save-profile">💾 Save Changes</button>
+                    <button type="submit" class="btn-save-profile">Save Changes</button>
                     <button type="button" class="btn-cancel-profile" onclick="toggleProfileEdit(false)">Cancel</button>
                 </div>
             </form>
@@ -819,7 +817,7 @@
         <!-- Password Change Form -->
         <div id="password-edit" style="display: none;">
             <div style="margin-bottom: 1.75rem;">
-                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">🔑 Change Password</h2>
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.25rem;">Change Password</h2>
                 <p style="color: var(--text-muted); font-size: 0.85rem;">Ensure your account is using a long, random password to stay secure.</p>
             </div>
             <form id="password-form" onsubmit="savePassword(event)" class="profile-edit-grid">
@@ -827,8 +825,8 @@
                     <label>Current Password</label>
                     <div class="password-wrapper">
                         <input type="password" name="current_password" class="form-control" required placeholder="Enter your current password">
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
-                            👁️
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" style="font-size: 0.75rem; font-weight: 600;">
+                            Show
                         </button>
                     </div>
                 </div>
@@ -836,8 +834,8 @@
                     <label>New Password</label>
                     <div class="password-wrapper">
                         <input type="password" name="password" class="form-control" required placeholder="Minimum 8 characters">
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
-                            👁️
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" style="font-size: 0.75rem; font-weight: 600;">
+                            Show
                         </button>
                     </div>
                 </div>
@@ -845,13 +843,13 @@
                     <label>Confirm New Password</label>
                     <div class="password-wrapper">
                         <input type="password" name="password_confirmation" class="form-control" required placeholder="Repeat new password">
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)">
-                            👁️
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" style="font-size: 0.75rem; font-weight: 600;">
+                            Show
                         </button>
                     </div>
                 </div>
                 <div class="profile-edit-actions">
-                    <button type="submit" class="btn-save-profile" style="background: linear-gradient(135deg, #f43f5e, #fb7185);">🔐 Update Password</button>
+                    <button type="submit" class="btn-save-profile" style="background: #f43f5e;">Update Password</button>
                     <button type="button" class="btn-cancel-profile" onclick="togglePasswordEdit(false)">Cancel</button>
                 </div>
             </form>
@@ -861,7 +859,7 @@
     <!-- My Geography Section -->
     <div class="glass-card" style="margin-bottom: 2rem; padding: 2rem;">
         <div style="margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">🌍 My Geography</h2>
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">My Geography</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your permanent locations and focal points.</p>
         </div>
 
@@ -869,7 +867,7 @@
             <!-- Home Column -->
             <div class="address-column">
                 <div class="address-item" id="home-item" onclick="focusOnMap('home')">
-                    <span class="address-label">🏠 Home Base</span>
+                    <span class="address-label">Home Base</span>
                     
                     <div id="home-display">
                         <div class="address-text">{{ $homeLocation?->address ?? 'No home address setup yet.' }}</div>
@@ -879,7 +877,7 @@
                     <div id="home-edit" style="display: none;">
                         <input type="text" id="home-address-input" class="form-control" style="margin-bottom: 1rem;" placeholder="Enter address..." value="{{ $homeLocation?->address ?? '' }}">
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-small" style="background: var(--primary);" onclick="togglePinMode('home', event)">📍 Pin</button>
+                            <button class="btn-small" style="background: var(--primary);" onclick="togglePinMode('home', event)">Pin</button>
                             <button class="btn-small" style="flex:1;" onclick="saveAddress('home', event)">Save</button>
                             <button class="btn-small btn-secondary" onclick="toggleEdit('home', false, event)">Cancel</button>
                         </div>
@@ -890,7 +888,7 @@
             <!-- Office Column -->
             <div class="address-column">
                 <div class="address-item" id="office-item" onclick="focusOnMap('office')">
-                    <span class="address-label">🏢 Office Assignment</span>
+                    <span class="address-label">Office Assignment</span>
                     
                     <div id="office-display">
                         <div class="address-text">{{ $officeLocation?->office ?? 'No office assigned yet.' }}</div>
@@ -900,7 +898,7 @@
                     <div id="office-edit" style="display: none;">
                         <input type="text" id="office-address-input" class="form-control" style="margin-bottom: 1rem;" placeholder="Enter office name/address..." value="{{ $officeLocation?->office ?? '' }}">
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-small" style="background: #c084fc;" onclick="togglePinMode('office', event)">📍 Pin</button>
+                            <button class="btn-small" style="background: #c084fc;" onclick="togglePinMode('office', event)">Pin</button>
                             <button class="btn-small" style="flex:1;" onclick="saveAddress('office', event)">Save</button>
                             <button class="btn-small btn-secondary" onclick="toggleEdit('office', false, event)">Cancel</button>
                         </div>
@@ -916,7 +914,7 @@
                 Click on the map to pin your <span id="pin-type-text"></span>
             </div>
             <button onclick="resetMap()" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; cursor: pointer; backdrop-filter: blur(10px);">
-                🔄 Show All
+                Show All
             </button>
         </div>
     </div>
@@ -925,7 +923,7 @@
     <div class="analytics-grid">
         <!-- History Table -->
         <div class="glass-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">📍 Recent Check-ins</h3>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Recent Check-ins</h3>
             <div class="history-table-container">
                 <table class="data-table">
                     <thead>
@@ -958,7 +956,7 @@
 
         <!-- Activity Chart -->
         <div class="glass-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">📊 Activity (Last 7 Days)</h3>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Activity (Last 7 Days)</h3>
             <div class="chart-container">
                 <canvas id="activityChart"></canvas>
             </div>
@@ -1006,22 +1004,22 @@
 
         if (homeData.lat) {
             homeMarker = L.marker([homeData.lat, homeData.lng], {
-                icon: createCustomIcon('🏠', '#6366f1')
+                icon: createCustomIcon('H', '#6366f1')
             }).addTo(map).bindPopup('<strong>Home Base</strong>');
         }
 
         if (officeData.lat) {
             officeMarker = L.marker([officeData.lat, officeData.lng], {
-                icon: createCustomIcon('🏢', '#c084fc')
+                icon: createCustomIcon('O', '#c084fc')
             }).addTo(map).bindPopup('<strong>Office Assignment</strong>');
         }
 
         map.on('click', onMapClick);
     }
 
-    function createCustomIcon(emoji, color) {
+    function createCustomIcon(label, color) {
         return L.divIcon({
-            html: `<div style="background:white; width:34px; height:34px; border-radius:50%; border:3px solid ${color}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 10px rgba(0,0,0,0.3)">${emoji}</div>`,
+            html: `<div style="background:white; width:34px; height:34px; border-radius:50%; border:3px solid ${color}; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:${color}; box-shadow:0 4px 10px rgba(0,0,0,0.3)">${label}</div>`,
             className: '',
             iconSize: [34, 34],
             iconAnchor: [17, 17],
@@ -1083,7 +1081,8 @@
 
     function focusOnMap(type) {
         document.querySelectorAll('.address-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(type + '-item').classList.add('active');
+        const el = document.getElementById(type + '-item');
+        if (el) el.classList.add('active');
         
         const data = type === 'home' ? homeData : officeData;
         const marker = type === 'home' ? homeMarker : officeMarker;
@@ -1128,11 +1127,11 @@
         if (pinMode === 'home') {
             homeData.lat = lat; homeData.lng = lng;
             if (homeMarker) homeMarker.setLatLng(e.latlng);
-            else homeMarker = L.marker(e.latlng, { icon: createCustomIcon('🏠', '#6366f1') }).addTo(map);
+            else homeMarker = L.marker(e.latlng, { icon: createCustomIcon('H', '#6366f1') }).addTo(map);
         } else {
             officeData.lat = lat; officeData.lng = lng;
             if (officeMarker) officeMarker.setLatLng(e.latlng);
-            else officeMarker = L.marker(e.latlng, { icon: createCustomIcon('🏢', '#c084fc') }).addTo(map);
+            else officeMarker = L.marker(e.latlng, { icon: createCustomIcon('O', '#c084fc') }).addTo(map);
         }
 
         pinMode = null;
@@ -1159,23 +1158,22 @@
     }
 
     function toggleProfileEdit(show) {
-        if (show) togglePasswordEdit(false); // Hide password form if opening profile form
+        if (show) togglePasswordEdit(false);
         document.getElementById('profile-display').style.display = show ? 'none' : 'block';
         document.getElementById('profile-edit').style.display = show ? 'block' : 'none';
     }
 
     function togglePasswordEdit(show) {
-        if (show) toggleProfileEdit(false); // Hide profile form if opening password form
+        if (show) toggleProfileEdit(false);
         document.getElementById('profile-display').style.display = show ? 'none' : 'block';
         document.getElementById('password-edit').style.display = show ? 'block' : 'none';
         if (!show) {
             document.getElementById('password-form').reset();
-            // Reset all password fields to type="password"
             document.querySelectorAll('#password-form input').forEach(input => {
                 input.type = 'password';
             });
             document.querySelectorAll('.password-toggle').forEach(btn => {
-                btn.textContent = '👁️';
+                btn.textContent = 'Show';
             });
         }
     }
@@ -1184,10 +1182,10 @@
         const input = button.parentElement.querySelector('input');
         if (input.type === 'password') {
             input.type = 'text';
-            button.textContent = '🔒';
+            button.textContent = 'Hide';
         } else {
             input.type = 'password';
-            button.textContent = '👁️';
+            button.textContent = 'Show';
         }
     }
 

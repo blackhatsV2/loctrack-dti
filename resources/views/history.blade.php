@@ -79,7 +79,7 @@
                         <td>{{ $loc->office ?? '—' }}</td>
                         <td>
                             <button type="button" class="btn btn-small reuse-btn" data-url="{{ route('location.reuse', $loc->id) }}" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
-                                🔄 Reuse
+                                Reuse
                             </button>
                         </td>
                     </tr>
@@ -132,7 +132,7 @@
             var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             btn.disabled = true;
-            btn.textContent = '⏳ Reusing...';
+            btn.textContent = 'Reusing...';
             if (typeof showGlobalLoader === 'function') showGlobalLoader();
 
             fetch(url, {
@@ -151,14 +151,14 @@
                 } else {
                     alert(data.message || 'Failed to reuse location.');
                     btn.disabled = false;
-                    btn.textContent = '🔄 Reuse';
+                    btn.textContent = 'Reuse';
                     if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
                 }
             })
             .catch(function(err) {
                 alert('Error: ' + err.message);
                 btn.disabled = false;
-                btn.textContent = '🔄 Reuse';
+                btn.textContent = 'Reuse';
                 if (typeof hideGlobalLoader === 'function') hideGlobalLoader();
             });
         });

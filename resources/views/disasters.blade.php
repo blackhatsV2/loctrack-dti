@@ -206,7 +206,7 @@
     }
     .profile-avatar {
         width: 64px; height: 64px; border-radius: 50%;
-        background: linear-gradient(135deg, #6366f1, #a855f7);
+        background: #6366f1;
         display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem; font-weight: 700; color: white;
         box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
@@ -234,10 +234,10 @@
         </div>
         <div style="display: flex; gap: 0.75rem;">
             <button onclick="syncData()" class="btn btn-ghost" style="font-size: 0.8rem;">
-                <span id="sync-icon">🔄</span> Sync Data
+                <span id="sync-icon"></span>Sync Data
             </button>
             <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.8rem;">
-                📍 Recenter PH
+                Recenter PH
             </button>
         </div>
     </div>
@@ -256,12 +256,12 @@
                 <h4>{{ $user->name }}</h4>
                 <p>{{ $user->email }}</p>
                 <div class="profile-role-badge">
-                    ⚡ {{ $user->employee_type ?? 'Staff Member' }}
+                    {{ $user->employee_type ?? 'Staff Member' }}
                 </div>
             </div>
             <div style="margin-left: auto;">
                 <a href="{{ route('location.geography') }}" class="btn btn-ghost" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
-                    ⚙️ Manage Profile
+                    Manage Profile
                 </a>
             </div>
         </div>
@@ -271,7 +271,7 @@
         <!-- Personnel Side -->
         <aside class="sidebar-left">
             <div class="sidebar-header">
-                <h3>👥 Personnel Layers</h3>
+                <h3>Personnel Layers</h3>
                 <small>Showing <span id="emp-visible-count">0</span> employees</small>
             </div>
             @if(Auth::user()->is_admin)
@@ -302,7 +302,7 @@
         <!-- Hazard Side -->
         <aside class="sidebar-right">
             <div class="sidebar-header">
-                <h3>⚠️ Hazard Monitoring</h3>
+                <h3>Hazard Monitoring</h3>
                 <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
                     <button onclick="setHazardType('all')" class="btn btn-ghost hazard-pill active" id="hp-all" style="padding: 0.25rem 0.6rem; font-size: 0.7rem;">All</button>
                     <button onclick="setHazardType('earthquake')" class="btn btn-ghost hazard-pill" id="hp-earthquake" style="padding: 0.25rem 0.6rem; font-size: 0.7rem;">USGS</button>

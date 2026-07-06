@@ -11,9 +11,6 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #0f172a;
-            background-image:
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0, transparent 50%);
             color: #f8fafc;
             min-height: 100vh;
             display: flex;
@@ -37,9 +34,7 @@
         h1 {
             font-size: 2rem;
             margin-bottom: 1rem;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #818cf8;
         }
         p {
             color: #94a3b8;
@@ -68,7 +63,9 @@
 </head>
 <body>
     <div class="container">
-        <div class="offline-icon">📡</div>
+        <div class="offline-icon" style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"/><path d="M8.5 8.5a5 5 0 0 1 7 0"/><path d="M5 5a10 10 0 0 1 14 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
         <h1>You're Offline</h1>
         <p>It looks like you've lost your internet connection. Please check your network and try again.</p>
         <button onclick="window.location.reload()">Try Again</button>

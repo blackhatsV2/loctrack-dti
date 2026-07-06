@@ -10,7 +10,7 @@
     </div>
     <h1 class="hero-title" style="font-size: 3.5rem; margin-bottom: 1.5rem; font-weight: 600; line-height: 1.1;">
         Preparedness, Safety & <br> Continuity Portal: <br>
-        <span style="background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Workforce Locator</span>
+        <span style="color: #818cf8;">Workforce Locator</span>
     </h1>
     <p class="hero-subtitle" style="color: var(--text-muted); font-size: 1.25rem; margin-bottom: 3rem;">
         Empowering MSMEs across Western Visayas — <br>
