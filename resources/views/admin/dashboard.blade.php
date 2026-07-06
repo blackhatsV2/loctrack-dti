@@ -230,11 +230,11 @@
             <p style="color: var(--text-muted); font-size: 0.95rem;">Real-time workforce distribution and analytics.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
-            <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.85rem;">
-                <span id="sync-icon"></span>Sync Hazards
+            <button onclick="refreshHazards()" class="btn btn-ghost" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <span id="sync-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span> Sync Hazards
             </button>
-            <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.85rem;">
-                Recenter PH
+            <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Recenter PH
             </button>
         </div>
     </div>
@@ -251,7 +251,7 @@
         <!-- Left Sidebar: Employees -->
         <div class="sidebar-left">
             <div class="sidebar-header">
-                <h3>Employee Layers</h3>
+                <h3 style="display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Employee Layers</h3>
                 <small>Filter by office/category</small>
             </div>
             

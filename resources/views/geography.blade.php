@@ -858,7 +858,7 @@
     <!-- My Geography Section -->
     <div class="glass-card" style="margin-bottom: 2rem; padding: 2rem;">
         <div style="margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">My Geography</h2>
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>My Geography</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your permanent locations and focal points.</p>
         </div>
 
@@ -866,7 +866,7 @@
             <!-- Home Column -->
             <div class="address-column">
                 <div class="address-item" id="home-item" onclick="focusOnMap('home')">
-                    <span class="address-label">Home Base</span>
+                    <span class="address-label" style="display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home Base</span>
                     
                     <div id="home-display">
                         <div class="address-text">{{ $homeLocation?->address ?? 'No home address setup yet.' }}</div>
@@ -876,7 +876,7 @@
                     <div id="home-edit" style="display: none;">
                         <input type="text" id="home-address-input" class="form-control" style="margin-bottom: 1rem;" placeholder="Enter address..." value="{{ $homeLocation?->address ?? '' }}">
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-small" style="background: var(--primary);" onclick="togglePinMode('home', event)">Pin</button>
+                            <button class="btn-small" style="background: var(--primary); display: inline-flex; align-items: center; gap: 0.25rem;" onclick="togglePinMode('home', event)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Pin</button>
                             <button class="btn-small" style="flex:1;" onclick="saveAddress('home', event)">Save</button>
                             <button class="btn-small btn-secondary" onclick="toggleEdit('home', false, event)">Cancel</button>
                         </div>
@@ -887,7 +887,7 @@
             <!-- Office Column -->
             <div class="address-column">
                 <div class="address-item" id="office-item" onclick="focusOnMap('office')">
-                    <span class="address-label">Office Assignment</span>
+                    <span class="address-label" style="display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>Office Assignment</span>
                     
                     <div id="office-display">
                         <div class="address-text">{{ $officeLocation?->office ?? 'No office assigned yet.' }}</div>
@@ -897,7 +897,7 @@
                     <div id="office-edit" style="display: none;">
                         <input type="text" id="office-address-input" class="form-control" style="margin-bottom: 1rem;" placeholder="Enter office name/address..." value="{{ $officeLocation?->office ?? '' }}">
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-small" style="background: #c084fc;" onclick="togglePinMode('office', event)">Pin</button>
+                            <button class="btn-small" style="background: #c084fc; display: inline-flex; align-items: center; gap: 0.25rem;" onclick="togglePinMode('office', event)"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Pin</button>
                             <button class="btn-small" style="flex:1;" onclick="saveAddress('office', event)">Save</button>
                             <button class="btn-small btn-secondary" onclick="toggleEdit('office', false, event)">Cancel</button>
                         </div>
@@ -912,8 +912,8 @@
             <div id="pin-instruction" class="instruction-overlay">
                 Click on the map to pin your <span id="pin-type-text"></span>
             </div>
-            <button onclick="resetMap()" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: #0f172a; border: 1px solid #334155; color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; cursor: pointer;">
-                Show All
+            <button onclick="resetMap()" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: #0f172a; border: 1px solid #334155; color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Show All
             </button>
         </div>
     </div>
@@ -922,7 +922,7 @@
     <div class="analytics-grid">
         <!-- History Table -->
         <div class="glass-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Recent Check-ins</h3>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Recent Check-ins</h3>
             <div class="history-table-container">
                 <table class="data-table">
                     <thead>
@@ -955,7 +955,7 @@
 
         <!-- Activity Chart -->
         <div class="glass-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Activity (Last 7 Days)</h3>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Activity (Last 7 Days)</h3>
             <div class="chart-container">
                 <canvas id="activityChart"></canvas>
             </div>
@@ -1017,8 +1017,13 @@
     }
 
     function createCustomIcon(label, color) {
+        const isHome = label === 'H' || label === 'home' || label === '🏠';
+        const iconColor = color || (isHome ? '#6366f1' : '#c084fc');
+        const svg = isHome
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>`;
         return L.divIcon({
-            html: `<div style="background:white; width:34px; height:34px; border-radius:50%; border:3px solid ${color}; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; color:${color}; box-shadow:0 4px 10px rgba(0,0,0,0.3)">${label}</div>`,
+            html: `<div style="background:white; width:34px; height:34px; border-radius:50%; border:3px solid ${iconColor}; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.3)">${svg}</div>`,
             className: '',
             iconSize: [34, 34],
             iconAnchor: [17, 17],

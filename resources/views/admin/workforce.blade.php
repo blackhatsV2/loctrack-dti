@@ -246,7 +246,7 @@
 <div class="animate-fade-in">
     <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Workforce Geography & Analytics</h1>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>Workforce Geography & Analytics</h1>
             <p style="color: var(--text-muted);">Real-time distribution, analytics, and historical records.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
@@ -281,7 +281,7 @@
             <div class="address-card-grid">
                 <!-- Left: Home Addresses -->
                 <div class="address-column">
-                    <h4 style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Home Addresses</h4>
+                    <h4 style="color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home Addresses</h4>
                     <div class="address-list" id="home-list">
                         @foreach($latestLocations->whereNotNull('address') as $loc)
                         <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
@@ -297,7 +297,7 @@
 
                 <!-- Right: Office Addresses -->
                 <div class="address-column">
-                    <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">Office Assignments</h4>
+                    <h4 style="color: #f472b6; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>Office Assignments</h4>
                     <div class="address-list" id="office-list">
                         @foreach($latestLocations->whereNotNull('office') as $loc)
                         <div class="address-item geo-item" data-user-id="{{ $loc->user_id }}"
@@ -316,7 +316,7 @@
             @php $unmapped = $latestLocations->whereNull('address')->whereNull('office'); @endphp
             @if($unmapped->count() > 0)
             <div class="no-address-section">
-                <h4 style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Unmapped Personnel</h4>
+                <h4 style="color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Unmapped Personnel</h4>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     @foreach($unmapped as $loc)
                     <div class="glass-card geo-item" data-user-id="{{ $loc->user_id }}"
@@ -332,8 +332,8 @@
             <!-- Minimap -->
             <div class="minimap-wrapper" style="position: relative; margin-top: 1.5rem;">
                 <div id="minimap" class="minimap-container" style="margin-top: 0;"></div>
-                <button onclick="resetMinimap()" class="map-reset-btn">
-                    Show All
+                <button onclick="resetMinimap()" class="map-reset-btn" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Show All
                 </button>
             </div>
         </div>
@@ -372,7 +372,7 @@
         
         <!-- Office Table -->
         <div class="glass-card">
-            <h2 style="margin-bottom: 1.5rem;">Office Locations Details</h2>
+            <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>Office Locations Details</h2>
             <input type="text" id="office-search" class="search-input" placeholder="Search offices..."
                 onkeyup="powerSearch('office-table', 'office-search')">
             <div class="table-container">
@@ -404,7 +404,7 @@
     <!-- Records Section -->
     <div id="section-records" class="workforce-section animate-fade-in">
         <div class="glass-card">
-            <h2 style="margin-bottom: 1.5rem;">Recent Location Records</h2>
+            <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>Recent Location Records</h2>
             <input type="text" id="power-search" class="search-input"
                 placeholder="Power Search: Find by name, address, or office..."
                 onkeyup="powerSearch('location-table', 'power-search')">
@@ -560,13 +560,18 @@
         return [10.7202, 122.5621];
     }
 
-    function createCustomIcon(emoji) {
+    function createCustomIcon(type) {
+        const isHome = type === 'H' || type === 'home' || type === '🏠';
+        const color = isHome ? '#6366f1' : '#c084fc';
+        const svg = isHome
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>`;
         return L.divIcon({
-            html: `<div style="font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${emoji}</div>`,
-            className: 'custom-leaflet-icon',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15],
-            popupAnchor: [0, -15]
+            html: `<div style="background:white; width:34px; height:34px; border-radius:50%; border:3px solid ${color}; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.3)">${svg}</div>`,
+            className: '',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor: [0, -17]
         });
     }
 
@@ -698,7 +703,7 @@
             hint.innerHTML = `
                 <div style="background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2);" 
                      onclick="document.getElementById('minimap').scrollIntoView({behavior: 'smooth', block: 'center'}); this.parentElement.remove();">
-                    <span style="font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.2); padding: 0.2rem 0.5rem; border-radius: 0.4rem;">MAP</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     <div>
                         <div style="font-weight: 600; font-size: 0.95rem;">Map Updated Below</div>
                         <div style="font-size: 0.75rem; opacity: 0.9;">Click to scroll to location</div>

@@ -320,7 +320,7 @@
             <p style="color: var(--text-muted); margin-bottom: 0;">Manage and track all employees.</p>
         </div>
         <button onclick="openAddModal()" class="btn" style="background: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
-            Add Employee
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Employee
         </button>
     </div>
 
@@ -419,7 +419,7 @@
                         <div class="searchable-select" id="ss-employee-type">
                             <input type="text" class="ss-input" placeholder="Search employee type..." autocomplete="off">
                             <input type="hidden" name="employee_type" value="">
-                            <span class="ss-arrow"></span>
+                            <span class="ss-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
                             <div class="ss-dropdown">
                                 @foreach($employeeTypes as $type)
                                     <div class="ss-option" data-value="{{ $type }}">{{ $type }}</div>
@@ -449,7 +449,7 @@
                         <div class="searchable-select" id="ss-office">
                             <input type="text" class="ss-input" placeholder="Search office..." autocomplete="off">
                             <input type="hidden" name="office" value="">
-                            <span class="ss-arrow"></span>
+                            <span class="ss-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
                             <div class="ss-dropdown">
                                 @foreach($offices as $o)
                                     <div class="ss-option" data-value="{{ $o }}">{{ $o }}</div>
@@ -483,6 +483,7 @@
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="modal">
         <div class="glass-card modal-content animate-fade-in" style="max-width: 400px; text-align: center; padding: 2rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; display: block;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <h2 style="margin-bottom: 0.5rem; border: none;">Delete Employee?</h2>
             <p style="color: var(--text-muted); margin-bottom: 2rem;">
                 Are you sure you want to delete <strong id="delete-emp-name" style="color: white;"></strong>? 
