@@ -668,7 +668,7 @@
         /* Nearest Disaster Popup Overlay */
         #disaster-popup {
             position: fixed;
-            bottom: 2rem;
+            bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             opacity: 0;
@@ -676,10 +676,10 @@
             border: 1px solid var(--border-color);
             border-top: 4px solid #f43f5e;
             border-radius: 1rem;
-            padding: 1.5rem;
+            padding: 1rem;
             width: 90%;
-            max-width: 450px;
-            box-shadow: 0 25px 50px -12px rgba(244, 63, 94, 0.25);
+            max-width: 380px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(244, 63, 94, 0.15);
             z-index: 10000;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
@@ -689,19 +689,60 @@
             opacity: 1;
             pointer-events: auto;
         }
-        .popup-close {
+        #disaster-popup .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-right: 1.5rem;
+        }
+        #disaster-popup .popup-header svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        #disaster-popup .popup-header h3 {
+            color: #f43f5e;
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        #disaster-popup #disaster-popup-content {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+        #disaster-popup .popup-close {
             position: absolute;
-            top: 0.75rem;
-            right: 1rem;
+            top: 0.6rem;
+            right: 0.8rem;
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             padding: 0;
         }
-        .popup-close:hover {
+        #disaster-popup .popup-close:hover {
             color: var(--text-light);
+        }
+        #disaster-popup .notification-item-card {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+        #disaster-popup .notification-item-card .badge {
+            margin-bottom: 0.4rem;
+        }
+        #disaster-popup .notification-item-card div:nth-child(2) {
+            font-size: 0.8rem !important;
+            line-height: 1.3;
+        }
+        #disaster-popup .notification-item-card div:nth-child(3),
+        #disaster-popup .notification-item-card div:nth-child(4) {
+            font-size: 0.7rem !important;
+            margin-top: 2px !important;
         }
         
         .mobile-action-notif {
@@ -871,15 +912,15 @@
 
     <div id="disaster-popup">
         <button class="popup-close" onclick="closeDisasterPopup()">&times;</button>
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="popup-header">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
                 <line x1="12" y1="9" x2="12" y2="13"></line>
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
-            <h3 style="color: #f43f5e; font-size: 1.1rem; margin: 0;">Disaster Alert!</h3>
+            <h3>Disaster Alert!</h3>
         </div>
-        <div id="disaster-popup-content" style="font-size: 0.9rem; color: var(--text-light); line-height: 1.5;">
+        <div id="disaster-popup-content">
             <!-- Content injected via JS -->
         </div>
     </div>

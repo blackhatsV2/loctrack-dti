@@ -214,6 +214,49 @@
         font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-top: 0.5rem;
     }
 
+    /* Dashboard Header Styles */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+    }
+    .dashboard-title-group h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+    .dashboard-title-group p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    .dashboard-actions-group {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    .dashboard-actions-group .btn {
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .dashboard-title-group h1 {
+            font-size: 1.5rem;
+        }
+        .dashboard-actions-group {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
     @media (max-width: 992px) {
         .dashboard-highlights { grid-template-columns: 1fr; }
     }
@@ -222,16 +265,16 @@
 
 @section('content')
 <div class="animate-fade-in">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
-        <div>
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Disaster Tracker Dashboard</h1>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time monitoring of global hazards and personnel safety.</p>
+    <div class="dashboard-header">
+        <div class="dashboard-title-group">
+            <h1>Disaster Tracker Dashboard</h1>
+            <p>Real-time monitoring of global hazards and personnel safety.</p>
         </div>
-        <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <button onclick="syncData()" class="btn btn-ghost" style="font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+        <div class="dashboard-actions-group">
+            <button onclick="syncData()" class="btn btn-ghost">
                 <span id="sync-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span> Sync Data
             </button>
-            <button onclick="recenterPH()" class="btn btn-primary" style="font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <button onclick="recenterPH()" class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Recenter PH
             </button>
             <div class="notification-container mobile-action-notif">
