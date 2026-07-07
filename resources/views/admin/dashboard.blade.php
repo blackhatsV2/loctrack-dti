@@ -145,6 +145,125 @@
         font-size: 0.8rem;
     }
 
+    .sidebar-left .sidebar-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .sidebar-left .search-container {
+        padding: 0.5rem 1rem;
+    }
+
+    #employee-filters {
+        flex: none;
+        max-height: 220px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .directory-header {
+        background: var(--filter-item-hover);
+        padding: 0.5rem 1rem;
+    }
+
+    #employee-names-list {
+        flex: 1;
+    }
+
+    .sidebar-left-footer {
+        padding: 0.75rem 1rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Personnel Directory Compact Items */
+    .personnel-item {
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(255,255,255,0.01);
+    }
+    
+    .personnel-name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2px;
+    }
+    
+    .personnel-name {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .loc-choice-item {
+        padding: 6px 8px;
+        border-radius: 8px;
+        margin-top: 4px;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .loc-choice-home {
+        background: rgba(244, 63, 94, 0.04);
+        border: 1px solid rgba(244, 63, 94, 0.1);
+    }
+    .loc-choice-home:hover {
+        background: rgba(244, 63, 94, 0.08);
+        border-color: rgba(244, 63, 94, 0.3);
+        transform: translateX(4px);
+    }
+    .loc-home-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #fb7185;
+    }
+    
+    .loc-choice-office {
+        background: rgba(99, 102, 241, 0.04);
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    .loc-choice-office:hover {
+        background: rgba(99, 102, 241, 0.08);
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateX(4px);
+    }
+    .loc-office-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #818cf8;
+    }
+
+    .loc-choice-other {
+        background: var(--profile-info-bg);
+        border: 1px solid var(--profile-info-border);
+    }
+    .loc-choice-other:hover {
+        background: var(--notif-item-hover);
+        border-color: var(--border-color);
+        transform: translateX(4px);
+    }
+    
+    .loc-meta-title {
+        font-size: 0.6rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .loc-meta-desc {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .map-loading {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -180,9 +299,12 @@
         .sidebar-left {
             width: 100%;
             min-width: 100%;
-            height: 350px;
+            height: 550px;
             border-right: none;
             border-bottom: 1px solid var(--glass-border);
+        }
+        #employee-filters {
+            max-height: 150px;
         }
         .sidebar-right {
             width: 100%;
@@ -271,19 +393,19 @@
                 <input type="text" id="employee-search" class="search-input" placeholder="Search employees...">
             </div>
 
-            <div class="scroll-area" id="employee-filters" style="flex: none; max-height: 220px; border-bottom: 1px solid var(--glass-border);">
+            <div class="scroll-area" id="employee-filters">
                 <!-- Dynamic categories -->
             </div>
 
-            <div class="sidebar-header" style="background: var(--filter-item-hover); padding: 0.75rem 1.25rem;">
+            <div class="sidebar-header directory-header">
                 <h3 style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Personnel Directory</h3>
             </div>
 
-            <div class="scroll-area" id="employee-names-list" style="flex: 1;">
+            <div class="scroll-area" id="employee-names-list">
                 <!-- Dynamic employee names -->
             </div>
 
-            <div style="padding: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
+            <div class="sidebar-left-footer">
                 <button class="btn btn-ghost" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(false)">Hide All</button>
                 <button class="btn btn-primary" style="flex: 1; font-size: 0.75rem;" onclick="toggleAllEmployees(true)">Show All</button>
             </div>
@@ -697,12 +819,7 @@
         if (container) {
             Object.values(userGroups).sort((a, b) => a.name.localeCompare(b.name)).forEach(group => {
                 const item = document.createElement('div');
-                item.className = 'filter-item';
-                item.style.padding = '1rem 1.25rem';
-                item.style.flexDirection = 'column';
-                item.style.alignItems = 'stretch';
-                item.style.borderBottom = '1px solid var(--glass-border)';
-                item.style.background = 'rgba(255,255,255,0.01)';
+                item.className = 'personnel-item';
                 
                 let locationHtml = '';
                 const homeLoc = group.locations.find(m => m.data.type === 'home');
@@ -711,14 +828,12 @@
 
                 if (homeLoc) {
                     locationHtml += `
-                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: rgba(244, 63, 94, 0.04); border: 1px solid rgba(244, 63, 94, 0.1); display: flex; align-items: center; gap: 12px;"
-                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(homeLoc)}, this)"
-                             onmouseover="this.style.background='rgba(244, 63, 94, 0.08)'; this.style.borderColor='rgba(244, 63, 94, 0.3)'; this.style.transform='translateX(4px)'"
-                             onmouseout="this.style.background='rgba(244, 63, 94, 0.04)'; this.style.borderColor='rgba(244, 63, 94, 0.1)'; this.style.transform='none'">
-                            <span style="font-size: 0.7rem; font-weight: 800; color: #fb7185;">H</span>
+                        <div class="loc-choice-item loc-choice-home"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(homeLoc)}, this)">
+                            <span class="loc-home-label">H</span>
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
-                                <span style="font-size: 0.65rem; font-weight: 800; color: #fb7185; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Home Address</span>
-                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${homeLoc.data.address || 'Address not set'}</span>
+                                <span class="loc-meta-title" style="color: #fb7185; margin-bottom: 2px;">Home Address</span>
+                                <span class="loc-meta-desc">${homeLoc.data.address || 'Address not set'}</span>
                             </div>
                         </div>
                     `;
@@ -726,14 +841,12 @@
 
                 if (officeLoc) {
                     locationHtml += `
-                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 6px; cursor: pointer; transition: all 0.25s; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.1); display: flex; align-items: center; gap: 12px;"
-                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(officeLoc)}, this)"
-                             onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'; this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.transform='translateX(4px)'"
-                             onmouseout="this.style.background='rgba(99, 102, 241, 0.04)'; this.style.borderColor='rgba(99, 102, 241, 0.1)'; this.style.transform='none'">
-                            <span style="font-size: 0.7rem; font-weight: 800; color: #818cf8;">O</span>
+                        <div class="loc-choice-item loc-choice-office"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(officeLoc)}, this)">
+                            <span class="loc-office-label">O</span>
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
-                                <span style="font-size: 0.65rem; font-weight: 800; color: #818cf8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Office Location</span>
-                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${officeLoc.data.office || 'Office not set'}</span>
+                                <span class="loc-meta-title" style="color: #818cf8; margin-bottom: 2px;">Office Location</span>
+                                <span class="loc-meta-desc">${officeLoc.data.office || 'Office not set'}</span>
                             </div>
                         </div>
                     `;
@@ -741,22 +854,20 @@
                 
                 if (!homeLoc && !officeLoc && otherLoc) {
                     locationHtml += `
-                        <div class="loc-choice-item" style="padding: 10px 12px; border-radius: 12px; margin-top: 8px; cursor: pointer; transition: all 0.25s; background: var(--profile-info-bg); border: 1px solid var(--profile-info-border); display: flex; align-items: center; gap: 12px;"
-                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(otherLoc)}, this)"
-                             onmouseover="this.style.background='var(--notif-item-hover)'; this.style.borderColor='var(--border-color)'; this.style.transform='translateX(4px)'"
-                             onmouseout="this.style.background='var(--profile-info-bg)'; this.style.borderColor='var(--profile-info-border)'; this.style.transform='none'">
+                        <div class="loc-choice-item loc-choice-other"
+                             onclick="event.stopPropagation(); focusMarker(${employeeMarkers.indexOf(otherLoc)}, this)">
                             <div style="display: flex; flex-direction: column; overflow: hidden;">
-                                <span style="font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Latest Activity</span>
-                                <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${otherLoc.data.office || 'Details not set'}</span>
+                                <span class="loc-meta-title" style="color: var(--text-muted); margin-bottom: 2px;">Latest Activity</span>
+                                <span class="loc-meta-desc">${otherLoc.data.office || 'Details not set'}</span>
                             </div>
                         </div>
                     `;
                 }
 
                 item.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 4px;">
-                        <div class="filter-dot" style="background:${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}; width: 10px; height: 10px; box-shadow: 0 0 10px ${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}44;"></div>
-                        <span style="font-weight: 700; font-size: 1rem; color: var(--text-light);">${group.name}</span>
+                    <div class="personnel-name-wrapper">
+                        <div class="filter-dot" style="background:${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}; width: 8px; height: 8px; box-shadow: 0 0 10px ${categories.find(c => c.key === group.cat)?.color || '#94a3b8'}44;"></div>
+                        <span class="personnel-name">${group.name}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 2px;">
                         ${locationHtml}
