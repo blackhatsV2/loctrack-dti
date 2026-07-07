@@ -344,6 +344,38 @@
             gap: 0.75rem;
         }
     }
+
+    .filter-tabs {
+        display: flex;
+        background: var(--input-bg);
+        padding: 0.2rem;
+        border-radius: 0.5rem;
+        margin: 0.5rem 1rem 0;
+        gap: 0.2rem;
+        border: 1px solid var(--border-color);
+    }
+    .filter-tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.35rem 0.5rem;
+        border-radius: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: transparent;
+        border: none;
+    }
+    .filter-tab:hover {
+        color: var(--text-light);
+    }
+    .filter-tab.active {
+        background: var(--card-bg);
+        color: var(--primary);
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
 </style>
 @endsection
 
@@ -391,6 +423,11 @@
             
             <div class="search-container">
                 <input type="text" id="employee-search" class="search-input" placeholder="Search employees...">
+            </div>
+
+            <div class="filter-tabs">
+                <button type="button" id="tab-office" class="filter-tab active" onclick="setFilterTab('office')">By Office</button>
+                <button type="button" id="tab-province" class="filter-tab" onclick="setFilterTab('province')">By Province</button>
             </div>
 
             <div class="scroll-area" id="employee-filters">
@@ -489,6 +526,18 @@
     let staticLayersLoaded = false;
     let activeHazardFilter = 'all';
     let employeeFilters = {};
+    let activeFilterTab = 'office';
+    let provinceFilters = {};
+
+    const provinces = [
+        { key: 'Aklan', label: 'Aklan', color: '#f97316' },
+        { key: 'Antique', label: 'Antique', color: '#22c55e' },
+        { key: 'Capiz', label: 'Capiz', color: '#8b5cf6' },
+        { key: 'Guimaras', label: 'Guimaras', color: '#eab308' },
+        { key: 'Iloilo', label: 'Iloilo', color: '#800000' },
+        { key: 'Negros Occidental', label: 'Negros Occidental', color: '#3b82f6' },
+        { key: 'Other', label: 'Other', color: '#94a3b8' },
+    ];
 
     const categories = [
         { key: 'NC Negros Occidental',  label: 'NC Negros Occidental', color: '#3b82f6' },
@@ -707,6 +756,7 @@
                 const lat = parseFloat(loc.latitude), lon = parseFloat(loc.longitude);
                 if (isNaN(lat) || isNaN(lon)) return;
                 const cat = getCategory(loc);
+                const province = getProvinceForLocation(loc);
                 
                 let icon;
                 if (loc.type === 'home') icon = getHomeIcon(cat);
@@ -715,7 +765,7 @@
  
                 const marker = L.marker([lat, lon], { icon: icon });
                 marker.bindPopup(buildEmployeePopup(loc), { maxWidth: 300 });
-                employeeMarkers.push({ marker, cat, data: loc });
+                employeeMarkers.push({ marker, cat, province, data: loc });
                 marker.addTo(map);
             });
             buildEmployeeFilters();
@@ -732,6 +782,31 @@
         if (type.includes('antique')) return 'NC Antique';
         if (type.includes('aklan')) return 'NC AKlan';
         return 'DTI6 Regular Employees';
+    }
+
+    function getProvinceForLocation(loc) {
+        const office = (loc.office || '').toLowerCase();
+        const type = (loc.employee_type || '').toLowerCase();
+        const address = (loc.address || '').toLowerCase();
+
+        if (office.includes('aklan') || type.includes('aklan') || address.includes('aklan')) return 'Aklan';
+        if (office.includes('antique') || type.includes('antique') || address.includes('antique')) return 'Antique';
+        if (office.includes('capiz') || type.includes('capiz') || address.includes('capiz')) return 'Capiz';
+        if (office.includes('guimaras') || type.includes('guimaras') || address.includes('guimaras')) return 'Guimaras';
+        if (office.includes('iloilo') || office.includes('ilolo') || type.includes('iloilo') || type.includes('ilolo') || address.includes('iloilo') || address.includes('ilolo')) return 'Iloilo';
+        if (office.includes('negros') || type.includes('negros') || address.includes('negros') || office.includes('bacolod') || address.includes('bacolod')) return 'Negros Occidental';
+        
+        if (office.includes('regional') || office.includes('ro6') || office.includes('ro 6') || office.includes('dti6') || office.includes('dti 6')) return 'Iloilo';
+
+        return 'Other';
+    }
+
+    function setFilterTab(tab) {
+        activeFilterTab = tab;
+        document.querySelectorAll('.filter-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        buildEmployeeFilters();
+        updateEmployeeVisibility();
     }
 
     function getEmployeeIcon(cat) {
@@ -770,20 +845,57 @@
     }
 
     function buildEmployeeFilters() {
-        const counts = {}; 
-        categories.forEach(c => counts[c.key] = new Set()); 
-        employeeMarkers.forEach(m => {
-            if (counts[m.cat]) counts[m.cat].add(m.data.user_id);
-        });
+        const container = document.getElementById('employee-filters');
+        if (!container) return;
+        container.innerHTML = '';
 
-        const container = document.getElementById('employee-filters'); container.innerHTML = '';
-        categories.forEach(cat => {
-            employeeFilters[cat.key] = true;
-            const item = document.createElement('div'); item.className = 'filter-item';
-            item.innerHTML = `<input type="checkbox" checked data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key].size}</span>`;
-            item.onclick = (e) => { const cb = item.querySelector('input'); if (e.target !== cb) cb.checked = !cb.checked; employeeFilters[cat.key] = cb.checked; updateEmployeeVisibility(); };
-            container.appendChild(item);
-        });
+        if (activeFilterTab === 'office') {
+            const counts = {}; 
+            categories.forEach(c => counts[c.key] = new Set()); 
+            employeeMarkers.forEach(m => {
+                if (counts[m.cat]) counts[m.cat].add(m.data.user_id);
+            });
+
+            categories.forEach(cat => {
+                if (employeeFilters[cat.key] === undefined) {
+                    employeeFilters[cat.key] = true;
+                }
+                const item = document.createElement('div');
+                item.className = 'filter-item';
+                const isChecked = employeeFilters[cat.key];
+                item.innerHTML = `<input type="checkbox" ${isChecked ? 'checked' : ''} data-key="${cat.key}"><span class="filter-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="filter-count">${counts[cat.key].size}</span>`;
+                item.onclick = (e) => {
+                    const cb = item.querySelector('input');
+                    if (e.target !== cb) cb.checked = !cb.checked;
+                    employeeFilters[cat.key] = cb.checked;
+                    updateEmployeeVisibility();
+                };
+                container.appendChild(item);
+            });
+        } else {
+            const counts = {};
+            provinces.forEach(p => counts[p.key] = new Set());
+            employeeMarkers.forEach(m => {
+                if (counts[m.province]) counts[m.province].add(m.data.user_id);
+            });
+
+            provinces.forEach(prov => {
+                if (provinceFilters[prov.key] === undefined) {
+                    provinceFilters[prov.key] = true;
+                }
+                const item = document.createElement('div');
+                item.className = 'filter-item';
+                const isChecked = provinceFilters[prov.key];
+                item.innerHTML = `<input type="checkbox" ${isChecked ? 'checked' : ''} data-key="${prov.key}"><span class="filter-dot" style="background:${prov.color}"></span><span>${prov.label}</span><span class="filter-count">${counts[prov.key].size}</span>`;
+                item.onclick = (e) => {
+                    const cb = item.querySelector('input');
+                    if (e.target !== cb) cb.checked = !cb.checked;
+                    provinceFilters[prov.key] = cb.checked;
+                    updateEmployeeVisibility();
+                };
+                container.appendChild(item);
+            });
+        }
     }
 
     function updateEmployeeVisibility() {
@@ -796,7 +908,7 @@
         employeeMarkers.forEach(m => {
             const searchStr = `${m.data.user?.name} ${m.data.office} ${m.data.address || ''}`.toLowerCase();
             const matchesSearch = searchStr.includes(query);
-            const matchesFilter = employeeFilters[m.cat];
+            const matchesFilter = activeFilterTab === 'office' ? employeeFilters[m.cat] : provinceFilters[m.province];
             const isVisible = matchesSearch && matchesFilter;
 
             if (isVisible) {
@@ -898,7 +1010,15 @@
         }
     }
 
-    function toggleAllEmployees(state) { Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state); document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state); updateEmployeeVisibility(); }
+    function toggleAllEmployees(state) {
+        if (activeFilterTab === 'office') {
+            Object.keys(employeeFilters).forEach(k => employeeFilters[k] = state);
+        } else {
+            Object.keys(provinceFilters).forEach(k => provinceFilters[k] = state);
+        }
+        document.querySelectorAll('#employee-filters input').forEach(cb => cb.checked = state);
+        updateEmployeeVisibility();
+    }
     function toggleStaticLayer(type, isFromCheckbox = false) {
         const checkbox = document.getElementById(`layer-${type}`);
         if (!isFromCheckbox) checkbox.checked = !checkbox.checked;
