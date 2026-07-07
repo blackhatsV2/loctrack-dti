@@ -1312,8 +1312,8 @@
                     }, 1500);
                 }
                 closeDisasterPopup();
-                const dropdown = document.getElementById('notif-dropdown');
-                if (dropdown) dropdown.classList.remove('show');
+                const dropdown = document.getElementById('notification-dropdown');
+                if (dropdown) dropdown.classList.remove('active');
             } else {
                 window.location.href = `${targetPath}?lat=${lat}&lon=${lon}&zoom=10&open_popup=1`;
             }
@@ -1479,9 +1479,8 @@
             const isDisasterPopupOpen = !!document.querySelector('#disaster-popup.show');
             const isSelectOpen = !!document.querySelector('.searchable-select.open');
             const isModalOpen = !!document.querySelector('.modal.active, .modal-overlay.active');
-            const isMapPopupOpen = !!document.querySelector('.leaflet-popup');
 
-            const hasActiveOverlay = isNavOpen || isNotifOpen || isDisasterPopupOpen || isSelectOpen || isModalOpen || isMapPopupOpen;
+            const hasActiveOverlay = isNavOpen || isNotifOpen || isDisasterPopupOpen || isSelectOpen || isModalOpen;
 
             if (hasActiveOverlay) {
                 document.body.classList.add('mobile-blur-active');
